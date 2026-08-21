@@ -1,0 +1,1988 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>20260827 双形双能动物实验 CRF</title>
+<style>
+:root{
+  --navy:#102a43;--blue:#0b63ce;--orange:#e96619;--green:#18794e;--red:#b42318;
+  --amber:#b54708;--bg:#f4f7fb;--line:#d7dee8;--muted:#667085;--soft:#f8fafc;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Arial,sans-serif;background:var(--bg);color:#1d2939}
+header{background:linear-gradient(135deg,#102a43,#1e4e79);color:white;padding:16px 22px;position:sticky;top:0;z-index:30;box-shadow:0 2px 12px #0002}
+header h1{margin:0;font-size:22px}
+header .sub{margin-top:4px;color:#dce7f2;font-size:12px}
+.toolbar{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px;align-items:center}
+button,.file-btn,summary{font:inherit}
+button{border:1px solid #c9d2df;background:#fff;color:var(--navy);border-radius:6px;padding:7px 11px;font-weight:700;cursor:pointer}
+button:hover{background:#f0f5fb}
+button.primary{background:#2e90fa;color:#fff;border-color:#2e90fa}
+button.danger{background:#fff0ef;color:var(--red);border-color:#f5b7b1}
+button.mini{padding:5px 8px;font-size:11px}
+details.tool{position:relative}
+details.tool>summary{list-style:none;background:white;color:var(--navy);padding:7px 11px;border-radius:6px;border:1px solid #c9d2df;font-weight:700;cursor:pointer}
+details.tool>summary::-webkit-details-marker{display:none}
+details.tool>summary::after{content:" ▾";font-size:10px}
+.menu{position:absolute;left:0;top:38px;min-width:210px;background:white;border:1px solid #ccd5e0;border-radius:7px;padding:5px;box-shadow:0 10px 26px #102a4330;z-index:80}
+.menu button,.menu .file-btn{display:block;width:100%;text-align:left;border:0;background:white;padding:8px 9px;border-radius:4px;color:var(--navy);font-size:12px;cursor:pointer}
+.menu button:hover,.menu .file-btn:hover{background:#eef4fa}
+.menu input[type=file]{display:none}
+.modebar{max-width:1650px;margin:14px auto 0;padding:0 16px;display:flex;gap:8px}
+.modebtn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.status{margin-left:auto;font-size:11px;color:#d6e2ef}
+.shell{max-width:1650px;margin:12px auto 30px;padding:0 16px}
+.card{background:white;border:1px solid #e0e6ee;border-radius:12px;box-shadow:0 2px 8px #102a430c;margin-bottom:14px;overflow:hidden}
+.card-head{padding:11px 14px;background:#f8fafc;border-bottom:1px solid #e3e8ef;font-weight:800;color:var(--navy);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card-body{padding:13px 14px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(160px,1fr));gap:10px}
+.grid3{grid-template-columns:repeat(3,minmax(180px,1fr))}
+.grid2{grid-template-columns:repeat(2,minmax(220px,1fr))}
+.field label{display:block;font-size:11px;color:#475467;font-weight:700;margin-bottom:4px}
+input,select,textarea{width:100%;border:1px solid #cfd7e3;border-radius:5px;padding:7px 8px;background:#fff;color:#1d2939;font:inherit}
+textarea{min-height:70px;resize:vertical}
+input:disabled,select:disabled,textarea:disabled{background:#eef1f5;color:#98a2b3}
+.locked{background:#f1f4f8!important;color:#667085!important}
+.help{font-size:11px;color:#667085;line-height:1.5;margin-top:7px}
+.note{background:#fff8e8;border-left:4px solid #f79009;padding:9px 11px;border-radius:5px;font-size:11px;line-height:1.55}
+.badge{display:inline-block;padding:3px 7px;border-radius:999px;font-size:10px;font-weight:800}
+.badge.blue{background:#e9f2ff;color:#075bb7}.badge.orange{background:#fff0e8;color:#c84d08}.badge.green{background:#e9f7ef;color:#18794e}.badge.gray{background:#eef2f6;color:#475467}.badge.red{background:#fdecec;color:#b42318}.badge.amber{background:#f0efff;color:#4f46b5}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th,td{border:1px solid #dce2ea;padding:6px;vertical-align:middle}
+th{background:#f5f7fa;text-align:center;font-weight:800;color:#344054}
+.table-wrap{overflow:auto}
+.center{text-align:center}
+.section-title{font-size:15px;font-weight:900;color:var(--navy);margin:16px 0 8px;border-bottom:2px solid #dfe6ee;padding-bottom:6px}
+.section-title span{display:inline-grid;place-items:center;width:25px;height:25px;border-radius:50%;background:var(--navy);color:white;margin-right:7px;font-size:12px}
+.random-box{border:1px solid #b8c8da;border-radius:9px;background:#f8fbff;padding:10px;margin-bottom:12px}
+.random-grid{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr;gap:8px;align-items:end}
+.dash-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:9px}
+.pig-card{border:1px solid #dbe2eb;border-radius:9px;padding:10px;background:white;cursor:pointer}
+.pig-card:hover{border-color:#84adcf}
+.pig-card .id{font-weight:900;font-size:17px;color:var(--navy)}
+.progress{height:6px;background:#edf1f5;border-radius:8px;overflow:hidden;margin-top:8px}.progress span{display:block;height:100%;background:#2e90fa}
+.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:12px 0}
+.metric{border:1px solid #dfe5ed;border-radius:8px;padding:9px;background:#fbfcfe}.metric .k{font-size:10px;color:#667085}.metric .v{font-size:20px;font-weight:900;margin-top:4px}
+.hidden{display:none!important}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.tab.active{background:var(--navy);color:white;border-color:var(--navy)}
+.site-tabs .tab[data-site="MI"].active{background:#1a7f57;border-color:#1a7f57}
+.site-tabs .tab[data-site="ROOF"].active{background:#0b63ce;border-color:#0b63ce}
+.site-tabs .tab[data-site="VENT"].active{background:#b42318;border-color:#b42318}
+.focusbar{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.focusbox{border:1px solid #d9e1ea;border-radius:8px;padding:8px;background:#fff}
+.focusbox .k{font-size:10px;color:#667085}.focusbox .v{font-size:13px;font-weight:800;margin-top:2px}
+.rowchips{display:flex;gap:5px;flex-wrap:wrap;margin:7px 0}
+.rowchip.active{background:#344054;color:#fff;border-color:#344054}
+.rowchip.vp{border-color:#70a7e5}.rowchip.combo{border-color:#efaa79}
+.row-actions{display:flex;gap:5px;flex-wrap:wrap;margin:7px 0}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.disabled-card{opacity:.6;background:#f3f5f8}
+.calc-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:8px}
+.calc{border:1px solid #dfe4ec;border-radius:7px;padding:7px;background:#fbfcfd}.calc .k{font-size:9px;color:#667085}.calc .v{font-size:14px;font-weight:900}
+.crf-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.crf-nav button.active{background:var(--navy);color:white}
+.crf-sheet{background:white;border:1px solid #dce3ec;border-radius:10px;padding:16px}
+.crf-header{display:grid;grid-template-columns:2fr repeat(4,1fr);border:2px solid #344054;margin-bottom:12px}
+.crf-header>div{padding:8px;border-right:1px solid #344054}.crf-header>div:last-child{border:0}
+.crf-header .label{font-size:9px;color:#667085}.crf-header .value{font-weight:900;margin-top:3px}
+.analysis-note{background:#eff8ff;border-left:4px solid #2e90fa;padding:9px 11px;font-size:11px;line-height:1.55}
+.invalid{outline:2px solid #f97066!important}
+.qc{font-size:10px;color:#b42318}
+.sticky-actions{position:sticky;bottom:8px;display:flex;justify-content:flex-end;gap:7px;margin-top:10px;z-index:8}
+@media(max-width:1100px){.grid,.random-grid{grid-template-columns:repeat(2,1fr)}.dash-grid{grid-template-columns:repeat(3,1fr)}.split{grid-template-columns:1fr}.focusbar{grid-template-columns:1fr}.calc-strip{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:650px){header{position:relative}.shell{padding:0 8px}.grid,.random-grid,.dash-grid,.metric-grid,.calc-strip{grid-template-columns:1fr}.modebar{padding:0 8px}.crf-header{grid-template-columns:1fr}}
+@media print{header,.modebar,.no-print{display:none!important}.shell{max-width:none;margin:0;padding:0}.card{box-shadow:none;border:0}.crf-sheet{border:0;padding:0}.table-wrap{overflow:visible}body{background:white}}
+
+/* macOS-style visual system: calm materials, compact hierarchy, and clear workspace context. */
+:root{
+  --mac-bg:#f5f5f7;
+  --mac-surface:rgba(255,255,255,.78);
+  --mac-surface-solid:#ffffff;
+  --mac-label:#1d1d1f;
+  --mac-secondary:#6e6e73;
+  --mac-tertiary:#86868b;
+  --mac-blue:#007aff;
+  --mac-blue-soft:#eaf3ff;
+  --mac-indigo:#5856d6;
+  --mac-green:#34c759;
+  --mac-orange:#ff9500;
+  --mac-red:#ff3b30;
+  --mac-separator:rgba(60,60,67,.16);
+  --mac-shadow:0 1px 2px rgba(0,0,0,.04),0 10px 28px rgba(24,32,48,.045);
+}
+html{background:var(--mac-bg);scroll-behavior:smooth}
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 16% -10%,rgba(255,255,255,.96),transparent 33rem),
+    radial-gradient(circle at 88% 0%,rgba(221,232,255,.34),transparent 28rem),
+    var(--mac-bg);
+  color:var(--mac-label);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","PingFang SC","Helvetica Neue",Arial,sans-serif;
+  letter-spacing:-.01em;
+}
+header{
+  color:var(--mac-label);
+  padding:18px 26px 14px;
+  background:rgba(250,250,252,.82);
+  border-bottom:1px solid rgba(60,60,67,.14);
+  box-shadow:0 1px 0 rgba(255,255,255,.72),0 8px 22px rgba(24,32,48,.035);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);
+  backdrop-filter:blur(24px) saturate(180%);
+}
+.header-main{max-width:1650px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand-lockup{display:flex;align-items:center;gap:12px;min-width:0}
+.app-symbol{position:relative;display:grid;place-items:center;width:38px;height:38px;flex:0 0 38px;border-radius:12px;background:linear-gradient(145deg,#1d1d1f,#48484a);box-shadow:inset 0 1px 0 rgba(255,255,255,.32),0 4px 12px rgba(0,0,0,.12)}
+.app-symbol::before{content:"";width:15px;height:15px;border:2px solid #fff;border-radius:50%;opacity:.94}
+.app-symbol::after{content:"";position:absolute;width:4px;height:4px;border-radius:50%;background:#fff;box-shadow:-8px 0 0 rgba(255,255,255,.9),8px 0 0 rgba(255,255,255,.9)}
+header h1{font-size:19px;line-height:1.18;letter-spacing:-.025em;color:var(--mac-label)}
+header .sub{margin-top:4px;color:var(--mac-secondary);font-size:11px;line-height:1.45}
+.header-meta{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+.header-meta .meta-chip{display:inline-flex;align-items:center;gap:5px;padding:6px 8px;border:1px solid var(--mac-separator);border-radius:10px;background:rgba(255,255,255,.64);font-size:10.5px;color:var(--mac-secondary);white-space:nowrap}
+.header-meta .meta-chip strong{color:var(--mac-label);font-weight:700}
+.toolbar{max-width:1650px;margin:15px auto 0;padding-top:13px;border-top:1px solid rgba(60,60,67,.12);gap:7px}
+button,.file-btn,summary{font:inherit}
+button{border:1px solid rgba(60,60,67,.16);background:rgba(255,255,255,.78);color:var(--mac-label);border-radius:10px;padding:7px 11px;font-weight:650;line-height:1.2;cursor:pointer;box-shadow:0 1px 1px rgba(0,0,0,.025);transition:background .16s ease,border-color .16s ease,box-shadow .16s ease,transform .16s ease}
+button:hover{background:#fff;border-color:rgba(0,122,255,.34);box-shadow:0 3px 10px rgba(0,122,255,.10);transform:translateY(-1px)}
+button:active{transform:translateY(0);box-shadow:none}
+button.primary{background:var(--mac-blue);color:#fff;border-color:var(--mac-blue);box-shadow:0 3px 10px rgba(0,122,255,.18)}
+button.primary:hover{background:#0071e3;border-color:#0071e3}
+button.danger{background:rgba(255,59,48,.06);color:#c9342c;border-color:rgba(255,59,48,.2)}
+button.mini{padding:5px 8px;font-size:11px;border-radius:8px}
+details.tool{position:relative}
+details.tool>summary{list-style:none;background:rgba(255,255,255,.78);color:var(--mac-label);padding:7px 11px;border-radius:10px;border:1px solid rgba(60,60,67,.16);font-weight:650;cursor:pointer;box-shadow:0 1px 1px rgba(0,0,0,.025)}
+details.tool>summary::-webkit-details-marker{display:none}
+details.tool>summary::after{content:"⌄";display:inline-block;margin-left:6px;font-size:11px;color:var(--mac-tertiary);transform:translateY(-1px)}
+.menu{position:absolute;left:0;top:calc(100% + 8px);min-width:224px;background:rgba(255,255,255,.96);border:1px solid rgba(60,60,67,.18);border-radius:12px;padding:6px;box-shadow:0 12px 30px rgba(0,0,0,.14);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);z-index:80}
+.menu button,.menu .file-btn{display:block;width:100%;text-align:left;border:0;background:transparent;padding:8px 9px;border-radius:8px;color:var(--mac-label);font-size:12px;cursor:pointer;box-shadow:none}
+.menu button:hover,.menu .file-btn:hover{background:var(--mac-blue-soft);color:#005ecb;transform:none;box-shadow:none}
+.status{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--mac-secondary);white-space:nowrap}
+.status::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--mac-green);box-shadow:0 0 0 3px rgba(52,199,89,.12)}
+.modebar{max-width:1650px;margin:14px auto 0;padding:0 26px;display:block}
+.modebar-inner{display:flex;align-items:center;gap:12px;padding:5px 6px 5px 14px;border:1px solid rgba(60,60,67,.14);border-radius:15px;background:rgba(255,255,255,.62);box-shadow:0 1px 2px rgba(0,0,0,.035);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
+.mode-label{display:flex;align-items:center;gap:7px;color:var(--mac-secondary);font-size:11px;font-weight:700;white-space:nowrap}
+.mode-label::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--mac-blue);box-shadow:0 0 0 3px rgba(0,122,255,.12)}
+.mode-segment{display:flex;align-items:center;gap:2px;padding:2px;border-radius:10px;background:rgba(118,118,128,.12)}
+.modebtn{border:0;background:transparent;border-radius:8px;padding:7px 13px;color:var(--mac-secondary);font-size:12px;font-weight:650;box-shadow:none}
+.modebtn:hover{background:rgba(255,255,255,.78);color:var(--mac-label);box-shadow:none;transform:none}
+.modebtn.active{background:#fff;color:var(--mac-label);border:0;box-shadow:0 1px 3px rgba(0,0,0,.12);transform:none}
+.mode-helper{margin-left:auto;color:var(--mac-tertiary);font-size:11px;padding-right:8px;white-space:nowrap}
+.shell{max-width:1650px;margin:12px auto 34px;padding:0 26px}
+.card{background:var(--mac-surface);border:1px solid rgba(60,60,67,.13);border-radius:16px;box-shadow:var(--mac-shadow);margin-bottom:14px;overflow:hidden;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+.card-head{padding:12px 15px;background:rgba(248,248,250,.74);border-bottom:1px solid rgba(60,60,67,.11);font-weight:750;color:var(--mac-label);letter-spacing:-.015em}
+.card-body{padding:14px 15px}
+.grid{gap:12px}
+.field label{font-size:11px;color:var(--mac-secondary);font-weight:650;margin-bottom:5px}
+input,select,textarea{border:1px solid rgba(60,60,67,.19);border-radius:9px;padding:8px 9px;background:rgba(255,255,255,.86);color:var(--mac-label);font:inherit;line-height:1.2;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease}
+input:hover,select:hover,textarea:hover{border-color:rgba(0,122,255,.34)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:rgba(0,122,255,.62);box-shadow:0 0 0 3px rgba(0,122,255,.14);background:#fff}
+textarea{min-height:74px}
+input:disabled,select:disabled,textarea:disabled{background:rgba(118,118,128,.10);color:#98989d;border-color:rgba(60,60,67,.10)}
+.locked{background:rgba(118,118,128,.10)!important;color:var(--mac-secondary)!important}
+.help{font-size:11px;color:var(--mac-secondary);line-height:1.55}
+.note{background:rgba(255,149,0,.09);border-left:3px solid var(--mac-orange);padding:10px 12px;border-radius:9px;font-size:11px;line-height:1.55}
+.badge{padding:3px 7px;border-radius:7px;font-size:10px;font-weight:750;letter-spacing:.01em}
+.badge.blue{background:rgba(0,122,255,.11);color:#0066d6}.badge.orange{background:rgba(255,149,0,.14);color:#b76500}.badge.green{background:rgba(52,199,89,.13);color:#21873c}.badge.gray{background:rgba(118,118,128,.12);color:#5e5e63}.badge.red{background:rgba(255,59,48,.12);color:#c9342c}.badge.amber{background:rgba(88,86,214,.12);color:#4f46b5}
+table{font-size:11px}
+th,td{border:0;border-bottom:1px solid rgba(60,60,67,.11);padding:8px 7px}
+tbody tr:last-child td{border-bottom:0}
+th{background:rgba(248,248,250,.72);color:var(--mac-secondary);font-weight:700}
+.section-title{font-size:14px;color:var(--mac-label);margin:18px 0 9px;border-bottom:1px solid rgba(60,60,67,.13);padding-bottom:8px}
+.section-title span{width:24px;height:24px;border-radius:8px;background:var(--mac-label);font-size:11px;margin-right:7px}
+.random-box{border:1px solid rgba(0,122,255,.18);border-radius:14px;background:rgba(234,243,255,.58);padding:11px;margin-bottom:12px}
+.random-grid{gap:10px}
+.random-grid>div>button{width:100%;min-height:34px}
+.protocol-key{display:flex;align-items:center;align-content:center;flex-wrap:wrap;gap:4px 9px;min-height:34px;padding:6px 9px;border:1px solid rgba(60,60,67,.12);border-radius:9px;background:rgba(255,255,255,.5);color:var(--mac-secondary);font-size:10px;line-height:1.35}
+.protocol-key .protocol-key-title{font-weight:800;color:var(--mac-label)}
+.protocol-key b{color:var(--mac-label)}
+.strategy-cell{display:flex;align-items:flex-start;gap:5px;width:100%;box-sizing:border-box;max-width:100%;padding:4px 6px;border:1px solid transparent;border-radius:9px;line-height:1.35;vertical-align:top}
+.strategy-cell .strategy-name{font-weight:700;min-width:0}
+.strategy-cell .strategy-id{font-size:10px;font-weight:800;letter-spacing:.01em;flex:0 0 auto;padding-top:2px}
+.strategy-cell.blue{background:rgba(0,122,255,.07);border-color:rgba(0,122,255,.22);color:#0066d6}.strategy-cell.green{background:rgba(52,199,89,.08);border-color:rgba(52,199,89,.25);color:#21873c}.strategy-cell.orange{background:rgba(255,149,0,.08);border-color:rgba(255,149,0,.26);color:#a85f00}.strategy-cell.red{background:rgba(255,59,48,.07);border-color:rgba(255,59,48,.24);color:#c9342c}.strategy-cell.amber{background:rgba(88,86,214,.07);border-color:rgba(88,86,214,.24);color:#4f46b5}.strategy-cell.gray{background:rgba(118,118,128,.08);border-color:rgba(118,118,128,.2);color:#5e5e63}
+.strategy-stack{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px 5px;min-width:0;width:100%}
+.strategy-stack .strategy-cell{align-items:center;min-width:0;padding:3px 5px;font-size:10px;white-space:nowrap;overflow:hidden}
+.strategy-stack .strategy-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.strategy-stack .strategy-id{padding-top:0}
+.random-box table td{vertical-align:middle}
+.randomization-table{width:100%;table-layout:fixed}
+.randomization-table th,.randomization-table td{padding:7px 5px}
+.randomization-table th:nth-child(1){width:5%}.randomization-table th:nth-child(2){width:10%}.randomization-table th:nth-child(3){width:5%}.randomization-table th:nth-child(4){width:5%}.randomization-table th:nth-child(5),.randomization-table th:nth-child(6),.randomization-table th:nth-child(7){width:14%}.randomization-table th:nth-child(8){width:27%}.randomization-table th:nth-child(9){width:6%}
+.randomization-table th:nth-child(n+5):nth-child(-n+8),.randomization-table td:nth-child(n+5):nth-child(-n+8){border-left:1px solid rgba(60,60,67,.2)}
+.randomization-table th:nth-child(8),.randomization-table td:nth-child(8){border-right:1px solid rgba(60,60,67,.2)}
+.randomization-table .strategy-cell{padding:4px 5px;font-size:10px}
+.randomization-table .strategy-stack .strategy-cell{padding:3px 4px;font-size:9.5px;gap:3px}
+.randomization-table .strategy-stack .strategy-id{font-size:9.5px}
+.dash-grid{gap:10px}
+.pig-card{border:1px solid rgba(60,60,67,.14);border-radius:13px;padding:11px;background:rgba(255,255,255,.72);cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+.pig-card:hover{border-color:rgba(0,122,255,.34);box-shadow:0 8px 18px rgba(0,122,255,.09);transform:translateY(-2px)}
+.pig-card .id{font-size:16px;color:var(--mac-label)}
+.progress{height:5px;background:rgba(118,118,128,.14);margin-top:9px}.progress span{background:var(--mac-blue)}
+.metric-grid{gap:10px;margin:12px 0}
+.metric{min-height:82px;border:1px solid rgba(60,60,67,.13);border-radius:13px;padding:11px 12px;background:rgba(255,255,255,.68);display:flex;flex-direction:column;justify-content:space-between}.metric .k{color:var(--mac-secondary);font-size:11px;font-weight:650}.metric .v{font-size:22px;color:var(--mac-label);letter-spacing:-.02em}.metric .sub{margin-top:4px;color:var(--mac-tertiary);font-size:10px;line-height:1.35}.metric .split{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}.metric .split span{white-space:nowrap}.metric .split small{margin-right:3px;color:var(--mac-tertiary);font-size:10px;font-weight:700}.metric.progress-metric .v{color:var(--mac-blue)}
+.stats-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:9px}.stats-heading .title{font-size:12px;font-weight:750;color:var(--mac-label)}.stats-heading .meta{font-size:10px;color:var(--mac-tertiary)}
+.stats-empty{margin-bottom:10px;padding:8px 10px;border:1px solid rgba(255,149,0,.24);border-radius:9px;background:rgba(255,149,0,.07);color:#8a5400;font-size:10px;line-height:1.45}
+.phase-pill{display:inline-flex;align-items:center;justify-content:center;min-width:44px;padding:3px 7px;border-radius:999px;background:rgba(118,118,128,.1);color:var(--mac-secondary);font-size:10px;font-weight:750;white-space:nowrap}.phase-pill.acute{background:rgba(0,122,255,.1);color:#0066d6}.phase-pill.long{background:rgba(88,86,214,.1);color:#4f46b5}
+.result-table th,.result-table td{padding-top:7px;padding-bottom:7px}.result-table td:nth-child(1),.result-table td:nth-child(4),.result-table td:nth-child(5){text-align:center}.result-table tbody tr.phase-start td{border-top:2px solid rgba(60,60,67,.16)}
+.phase-result{display:grid;gap:4px;margin-top:6px}.phase-result-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:4px;border-top:1px solid rgba(60,60,67,.09);font-size:10px}.phase-result-row .label{color:var(--mac-secondary);font-weight:700}.phase-result-row .value{color:var(--mac-label);font-weight:750;text-align:right}.phase-result-row .n{color:var(--mac-tertiary);font-weight:500}
+.tabs{gap:6px;flex-wrap:wrap}
+.tab{border:1px solid transparent;background:transparent;border-radius:9px;color:var(--mac-secondary);padding:7px 10px;font-size:12px;font-weight:650;box-shadow:none}
+.tab:hover{background:rgba(118,118,128,.10);color:var(--mac-label);border-color:transparent;box-shadow:none;transform:none}
+.tab.active{background:var(--mac-label);color:#fff;border-color:var(--mac-label);box-shadow:0 2px 6px rgba(0,0,0,.13)}
+.field-nav{display:grid;gap:8px;margin-bottom:12px}
+.context-strip{display:grid;grid-template-columns:52px minmax(0,1fr);align-items:center;gap:10px;padding:6px 7px;border:1px solid rgba(60,60,67,.12);border-radius:14px;background:rgba(255,255,255,.65);box-shadow:0 1px 2px rgba(0,0,0,.028);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+.context-label{padding-left:5px;color:var(--mac-tertiary);font-size:11px;font-weight:750;letter-spacing:.02em}
+.animal-tabs{display:flex;gap:5px;min-width:0;overflow-x:auto;padding:2px}
+.animal-tab{flex:0 0 auto;min-width:84px;text-align:center}
+.animal-tab.active{background:var(--mac-blue);border-color:var(--mac-blue);box-shadow:0 3px 8px rgba(0,122,255,.2)}
+.site-strip{grid-template-columns:52px minmax(0,1fr)}
+.site-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:2px}
+.site-tabs .tab{position:relative;display:flex;align-items:center;justify-content:center;min-height:32px;padding-left:10px;padding-right:10px;border:1px solid rgba(60,60,67,.14);background:rgba(248,248,250,.68);white-space:nowrap}
+.site-tabs .tab::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:7px;background:currentColor;vertical-align:1px;opacity:.65}
+.site-tabs .tab:not(:last-child)::after{content:"";position:absolute;top:6px;bottom:6px;right:-4px;width:1px;background:rgba(60,60,67,.28);box-shadow:0 0 0 1px rgba(255,255,255,.45);z-index:2;pointer-events:none}
+.site-tabs .tab[data-site="MI"]{color:#21873c;border-color:rgba(52,199,89,.22);background:rgba(52,199,89,.06)}
+.site-tabs .tab[data-site="ROOF"]{color:#0066d6;border-color:rgba(0,122,255,.22);background:rgba(0,122,255,.06)}
+.site-tabs .tab[data-site="RPV"]{color:#4f46b5;border-color:rgba(88,86,214,.22);background:rgba(88,86,214,.06)}
+.site-tabs .tab[data-site="VENT"]{color:#c9342c;border-color:rgba(255,59,48,.22);background:rgba(255,59,48,.06)}
+.site-tabs .tab[data-site="MI"].active{background:var(--mac-green);border-color:var(--mac-green)}
+.site-tabs .tab[data-site="ROOF"].active{background:var(--mac-blue);border-color:var(--mac-blue)}
+.site-tabs .tab[data-site="RPV"].active{background:var(--mac-indigo);border-color:var(--mac-indigo)}
+.site-tabs .tab[data-site="VENT"].active{background:var(--mac-red);border-color:var(--mac-red)}
+.stage-strip{grid-template-columns:52px minmax(0,1fr)}
+.stage-tabs{display:flex;gap:5px;padding:2px;overflow-x:auto}
+.stage-tabs .tab.active{background:rgba(0,122,255,.12);color:#0066d6;border-color:rgba(0,122,255,.18);box-shadow:none}
+.focusbar{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-bottom:12px;padding:9px;border:1px solid rgba(60,60,67,.12);border-radius:14px;background:rgba(255,255,255,.55);box-shadow:0 1px 2px rgba(0,0,0,.025)}
+.focusbox{border:0;border-radius:9px;padding:7px 9px;background:rgba(118,118,128,.08)}
+.focusbox .k{color:var(--mac-tertiary);font-size:10px}.focusbox .v{font-size:12px;color:var(--mac-label)}
+.rowchips{gap:5px}
+.rowchip{border:1px solid rgba(60,60,67,.15);background:rgba(255,255,255,.7);border-radius:8px;padding:5px 8px;font-size:11px;color:var(--mac-secondary);box-shadow:none}
+.rowchip:hover{background:#fff;box-shadow:none;transform:none}
+.rowchip.active{background:var(--mac-label);color:#fff;border-color:var(--mac-label)}
+.rowchip.vp{border-color:rgba(0,122,255,.32)}.rowchip.combo{border-color:rgba(255,149,0,.42)}.rowchip.rf{border-color:rgba(255,59,48,.42)}
+.ablation-picker{display:grid;grid-template-columns:auto minmax(0,1fr);gap:9px;align-items:center;min-height:34px;margin:6px 0 12px;padding:5px 7px;border:1px solid rgba(60,60,67,.11);border-radius:11px;background:rgba(118,118,128,.05)}
+.picker-caption{display:flex;align-items:baseline;gap:5px;min-width:78px;padding-left:2px;color:var(--mac-secondary);font-size:10px;white-space:nowrap}.picker-caption b{color:var(--mac-label);font-size:11px}.picker-caption span{color:var(--mac-tertiary);font-variant-numeric:tabular-nums}
+.position-grid{display:grid;gap:4px;min-width:0}.position-grid.vp{grid-template-columns:repeat(3,minmax(48px,1fr))}.position-grid.rf{grid-template-columns:repeat(10,minmax(32px,1fr))}
+.position-chip{position:relative;min-width:0;padding:5px 5px;border:1px solid rgba(60,60,67,.14);border-radius:7px;background:rgba(255,255,255,.76);box-shadow:none;color:var(--mac-secondary);font-size:10px;font-variant-numeric:tabular-nums}.position-chip:hover{background:#fff;box-shadow:none;transform:none}.position-chip.active{border-color:var(--mac-label);background:var(--mac-label);color:#fff}.position-chip.has-data::after{content:"";position:absolute;right:4px;top:4px;width:4px;height:4px;border-radius:50%;background:var(--mac-green)}.position-chip.active.has-data::after{background:#fff}
+.rf-matrix-wrap{overflow:auto;border:1px solid rgba(60,60,67,.12);border-radius:11px;background:rgba(255,255,255,.76)}
+.rf-matrix{width:100%;min-width:1040px;table-layout:fixed;border-collapse:separate;border-spacing:0;font-variant-numeric:tabular-nums}.rf-matrix.points-6{min-width:760px}
+.rf-matrix th,.rf-matrix td{padding:5px 4px;border-right:1px solid rgba(60,60,67,.1);border-bottom:1px solid rgba(60,60,67,.1);text-align:center;vertical-align:middle}.rf-matrix tr:last-child th,.rf-matrix tr:last-child td{border-bottom:0}.rf-matrix th:last-child,.rf-matrix td:last-child{border-right:0}
+.rf-matrix thead th{position:sticky;top:0;z-index:2;background:#f5f5f7;color:var(--mac-secondary);font-size:9.5px;white-space:nowrap}.rf-matrix thead th:first-child{left:0;z-index:4}
+.rf-matrix tbody th{position:sticky;left:0;z-index:3;width:128px;background:#f5f5f7;color:var(--mac-secondary);font-size:9.5px;text-align:left;white-space:nowrap}.rf-matrix thead th:first-child{width:128px;text-align:left}
+.rf-matrix input,.rf-matrix select{width:100%;min-width:0;padding:5px 3px;border-radius:6px;font-size:10px;text-align:center}.rf-matrix .matrix-fixed{font-size:10px;font-weight:750;color:var(--mac-label)}
+.rf-matrix .binary-choice{grid-template-columns:repeat(2,minmax(0,1fr));gap:2px}.rf-matrix .binary-option{gap:2px;min-height:27px;padding:2px 3px;border-radius:6px}.rf-matrix .binary-option input[type="checkbox"]{width:13px;height:13px;min-width:13px}.rf-matrix .binary-label{font-size:9px}
+.vp-matrix-wrap{overflow:auto;border:1px solid rgba(60,60,67,.12);border-radius:11px;background:rgba(255,255,255,.76)}
+.vp-matrix{width:100%;min-width:820px;table-layout:fixed;border-collapse:separate;border-spacing:0;font-variant-numeric:tabular-nums}.vp-matrix.points-3{min-width:560px}.vp-matrix th,.vp-matrix td{padding:5px 6px;border-right:1px solid rgba(60,60,67,.1);border-bottom:1px solid rgba(60,60,67,.1);text-align:center;vertical-align:middle}.vp-matrix tr:last-child th,.vp-matrix tr:last-child td{border-bottom:0}.vp-matrix th:last-child,.vp-matrix td:last-child{border-right:0}
+.vp-matrix thead th{position:sticky;top:0;z-index:2;background:#f5f5f7;color:var(--mac-secondary);font-size:9.5px;white-space:nowrap}.vp-matrix thead th:first-child{left:0;z-index:4;width:145px;text-align:left}.vp-matrix tbody th{position:sticky;left:0;z-index:3;width:145px;background:#f5f5f7;color:var(--mac-secondary);font-size:9.5px;text-align:left;white-space:nowrap}
+.vp-matrix input,.vp-matrix select{width:100%;min-width:0;padding:5px 5px;border-radius:6px;font-size:10px;text-align:center}.vp-matrix .matrix-fixed{font-size:10px;font-weight:750;color:var(--mac-tertiary)}.vp-matrix .binary-choice{grid-template-columns:repeat(2,minmax(0,1fr));gap:3px}.vp-matrix .binary-option{gap:3px;min-height:27px;padding:2px 4px;border-radius:6px}.vp-matrix .binary-option input[type="checkbox"]{width:13px;height:13px;min-width:13px}.vp-matrix .binary-label{font-size:9px}
+.vent-matrix-wrap{margin-top:7px}.vent-matrix tbody tr.matrix-section-row th{position:static;padding:6px 8px;background:rgba(0,122,255,.06);color:#0066d6;font-size:9px;letter-spacing:.03em;text-transform:uppercase}.vent-matrix tbody tr.matrix-section-row td{padding:0;background:rgba(0,122,255,.025)}
+.matrix-point-label{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:5px}.matrix-point-label.has-data::after{content:"";width:5px;height:5px;border-radius:50%;background:var(--mac-green)}
+.disabled-card{opacity:.6;background:rgba(118,118,128,.08)}
+.calc-strip{gap:8px;margin-top:9px}
+.calc{border:1px solid rgba(60,60,67,.12);border-radius:10px;padding:8px;background:rgba(248,248,250,.72)}.calc .k{color:var(--mac-tertiary)}.calc .v{font-size:14px;color:var(--mac-label)}
+.crf-workbar{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:6px;border:1px solid rgba(60,60,67,.12);border-radius:14px;background:rgba(255,255,255,.64);box-shadow:0 1px 2px rgba(0,0,0,.025);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+.crf-nav{display:flex;gap:3px;min-width:0;overflow-x:auto;margin:0;padding:0}
+.crf-nav button{flex:0 0 auto;min-width:48px;border:0;background:transparent;box-shadow:none;color:var(--mac-secondary)}.crf-nav button:hover{background:rgba(118,118,128,.1);border-color:transparent;box-shadow:none;transform:none}.crf-nav button.active{background:var(--mac-label);color:#fff;border-color:var(--mac-label);box-shadow:0 2px 5px rgba(0,0,0,.12)}
+.crf-workbar-note{margin-left:auto;padding-right:7px;color:var(--mac-tertiary);font-size:10px;white-space:nowrap}
+.crf-sheet{background:rgba(255,255,255,.82);border:1px solid rgba(60,60,67,.13);border-radius:18px;padding:18px;box-shadow:var(--mac-shadow)}
+.crf-cover{display:grid;grid-template-columns:minmax(300px,1.8fr) repeat(3,minmax(145px,1fr));overflow:hidden;margin-bottom:12px;border:1px solid rgba(60,60,67,.14);border-radius:14px;background:rgba(248,248,250,.76)}
+.crf-cover>div{min-width:0;padding:12px 14px;border-right:1px solid rgba(60,60,67,.12)}.crf-cover>div:last-child{border-right:0}
+.crf-cover .eyebrow{color:var(--mac-tertiary);font-size:9px;font-weight:750;letter-spacing:.07em;text-transform:uppercase}.crf-cover h2{margin:4px 0 0;color:var(--mac-label);font-size:17px;letter-spacing:-.025em}.crf-cover .label{color:var(--mac-tertiary);font-size:9px;font-weight:650}.crf-cover .value{margin-top:4px;color:var(--mac-label);font-size:12px;font-weight:750;line-height:1.35}
+.crf-section-index{display:flex;gap:4px;overflow-x:auto;margin-bottom:8px;padding:4px;border-radius:11px;background:rgba(118,118,128,.08)}
+.crf-section-index a{display:inline-flex;align-items:center;gap:5px;flex:0 0 auto;padding:6px 9px;border-radius:8px;color:var(--mac-secondary);font-size:10.5px;font-weight:650;text-decoration:none;transition:background .15s ease,color .15s ease}.crf-section-index a b{display:grid;place-items:center;width:18px;height:18px;border-radius:6px;background:rgba(118,118,128,.13);color:var(--mac-label);font-size:9px}.crf-section-index a:hover{background:#fff;color:var(--mac-label)}
+.crf-section{scroll-margin-top:150px;padding:4px 0 2px}.crf-section+.crf-section{margin-top:4px}
+.crf-sheet .section-title{display:flex;align-items:center;margin:16px 0 10px;padding-bottom:9px;border-bottom:1px solid rgba(60,60,67,.14);font-size:14px;letter-spacing:-.015em}.crf-sheet .section-title span{flex:0 0 auto;display:grid;place-items:center;width:23px;height:23px;margin-right:8px;border-radius:7px;background:var(--mac-label);color:#fff;font-size:10px}
+.crf-subhead{margin:13px 0 8px;color:var(--mac-secondary);font-size:10px;font-weight:750;letter-spacing:.035em;text-transform:uppercase}.crf-subhead:first-child{margin-top:0}
+.crf-field-group{padding:11px;border:1px solid rgba(60,60,67,.11);border-radius:12px;background:rgba(248,248,250,.55)}.crf-field-group+.crf-field-group{margin-top:10px}
+.crf-sheet .card{margin-bottom:10px;border-color:rgba(60,60,67,.12);border-radius:13px;background:rgba(248,248,250,.5);box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}.crf-sheet .card-head{padding:9px 11px;background:rgba(248,248,250,.82);font-size:11.5px}.crf-sheet .card-body{padding:11px}
+.crf-sheet .table-wrap{overflow:auto;border:1px solid rgba(60,60,67,.12);border-radius:10px;background:rgba(255,255,255,.76)}.crf-sheet .table-wrap table{min-width:760px}.crf-sheet .table-wrap table.crf-table-wide{min-width:1120px}.crf-sheet .table-wrap table.crf-table-compact{min-width:620px}.crf-sheet th{position:sticky;top:0;z-index:1;background:#f5f5f7;font-size:10px;white-space:nowrap}.crf-sheet td{background:rgba(255,255,255,.42)}
+.crf-sheet table input,.crf-sheet table select{min-width:74px;padding:6px 7px;border-radius:7px;font-size:10.5px}.crf-sheet table textarea{min-width:150px;min-height:54px;padding:6px 7px;border-radius:7px;font-size:10.5px}.crf-sheet td.cell-na{text-align:center;color:var(--mac-tertiary);background:rgba(118,118,128,.035)}
+.crf-site-card>.card-head{border-left:3px solid var(--site-accent,var(--mac-blue))}.crf-site-card.site-mi{--site-accent:var(--mac-green)}.crf-site-card.site-roof{--site-accent:var(--mac-blue)}.crf-site-card.site-rpv{--site-accent:var(--mac-indigo)}.crf-site-card.site-vent{--site-accent:var(--mac-red)}
+.crf-footprint{margin-bottom:9px;padding:10px;border:1px solid rgba(60,60,67,.12);border-radius:12px;background:rgba(255,255,255,.66)}.crf-footprint:last-child{margin-bottom:0}.crf-footprint-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}.crf-footprint-title{display:flex;align-items:center;gap:7px;min-width:0}.crf-footprint-title strong{font-size:12px}.crf-footprint-title .strategy-cell{width:auto;max-width:250px}.crf-footprint-meta{color:var(--mac-tertiary);font-size:10px;white-space:nowrap}.crf-footprint .grid{grid-template-columns:repeat(5,minmax(120px,1fr));gap:9px}.crf-footprint-summary{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;padding-top:7px;border-top:1px solid rgba(60,60,67,.1);color:var(--mac-secondary);font-size:10px}.crf-footprint-summary b{color:var(--mac-label)}
+.vent-print-page{margin:0 0 14px;padding:14px;border:1px solid rgba(60,60,67,.14);border-radius:15px;background:rgba(255,255,255,.72)}.vent-page-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:10px;padding-bottom:9px;border-bottom:1px solid rgba(60,60,67,.13)}.vent-page-head .eyebrow{color:var(--mac-tertiary);font-size:8.5px;font-weight:750;letter-spacing:.07em;text-transform:uppercase}.vent-page-head h3{margin:3px 0 0;font-size:17px;letter-spacing:-.02em}.vent-page-identity{display:flex;align-items:center;gap:8px;color:var(--mac-secondary);font-size:10px}.vent-page-meta{display:grid;grid-template-columns:repeat(5,minmax(125px,1fr));gap:7px;margin-bottom:8px}.vent-page-meta .field{min-width:0}.vent-meta-static{display:flex;align-items:center;min-height:32px;padding:6px 8px;border:1px solid rgba(60,60,67,.14);border-radius:7px;background:rgba(248,248,250,.74);font-size:10.5px;line-height:1.25}.vent-page-summary{display:flex;gap:14px;flex-wrap:wrap;margin-top:7px;padding:7px 9px;border-radius:8px;background:rgba(118,118,128,.06);color:var(--mac-secondary);font-size:10px}.vent-page-summary b{color:var(--mac-label)}.vent-page-exploratory{margin-top:8px}.vent-page-foot{margin-top:7px;color:var(--mac-tertiary);font-size:8.5px;text-align:right}
+.crf-empty{padding:12px;border:1px dashed rgba(60,60,67,.2);border-radius:10px;color:var(--mac-tertiary);font-size:11px;text-align:center;background:rgba(248,248,250,.4)}
+.analysis-note{background:rgba(234,243,255,.68);border-left:3px solid var(--mac-blue);border-radius:9px;padding:9px 11px;font-size:10.5px;line-height:1.5}.analysis-note b{color:#0066d6}
+.sticky-actions{bottom:12px}
+@media(max-width:1100px){.header-main{align-items:flex-start}.header-meta{display:none}.mode-helper{display:none}.modebar{padding:0 16px}.shell{padding:0 16px}.focusbar{grid-template-columns:repeat(2,minmax(0,1fr))}.crf-cover{grid-template-columns:repeat(2,minmax(0,1fr))}.crf-cover>div:nth-child(2){border-right:0}.crf-cover>div:nth-child(-n+2){border-bottom:1px solid rgba(60,60,67,.12)}.crf-footprint .grid{grid-template-columns:repeat(3,minmax(120px,1fr))}.vent-page-meta{grid-template-columns:repeat(3,minmax(125px,1fr))}}
+@media(max-width:650px){header{position:relative;padding:15px 12px 12px}.header-main{display:block}.brand-lockup{align-items:flex-start}.app-symbol{width:34px;height:34px;flex-basis:34px;border-radius:10px}.toolbar{margin-top:13px;padding-top:11px}.status{width:100%;margin-left:0;margin-top:2px}.modebar{padding:0 8px;margin-top:10px}.modebar-inner{align-items:stretch;display:block;padding:6px}.mode-label{padding:2px 5px 6px}.mode-segment{width:100%;overflow:auto}.modebtn{flex:1;white-space:nowrap}.shell{padding:0 8px;margin-top:9px}.context-strip{grid-template-columns:42px minmax(0,1fr)}.context-label{padding-left:2px}.site-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.site-tabs .tab{padding-left:9px;padding-right:9px}.site-tabs .tab:nth-child(2)::after,.site-tabs .tab:nth-child(4)::after{display:none}.focusbar{grid-template-columns:1fr}.card{border-radius:13px}.crf-workbar{align-items:flex-start;display:block}.crf-workbar-note{display:none}.crf-nav{padding:1px}.crf-sheet{padding:10px;border-radius:14px}.crf-cover{grid-template-columns:1fr}.crf-cover>div{border-right:0;border-bottom:1px solid rgba(60,60,67,.12)}.crf-cover>div:last-child{border-bottom:0}.crf-footprint-head{align-items:flex-start;display:block}.crf-footprint-meta{margin-top:5px;white-space:normal}.crf-footprint .grid,.vent-page-meta{grid-template-columns:1fr}.vent-print-page{padding:10px}.vent-page-head{align-items:flex-start;display:block}.vent-page-identity{margin-top:7px}}
+@page{size:A4 landscape;margin:9mm 10mm}
+@media print{
+  html,body{background:#fff!important}
+  body{font-size:8.6pt;line-height:1.28;orphans:3;widows:3;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  header,.modebar,.no-print,.crf-section-index,.crf-workbar{display:none!important}
+  .shell{max-width:none;margin:0;padding:0}
+  .crf-sheet{padding:0;border:0;background:#fff;box-shadow:none}
+  .crf-cover{margin-bottom:5mm;border-color:#b8b8bd;background:#fff;break-after:avoid-page;page-break-after:avoid}
+  .crf-cover>div{padding:7px 9px}
+
+  /* 按CRF栏目分组分页：LV F01–F05使用独立分页单元。 */
+  .crf-section{padding:0;break-inside:auto;page-break-inside:auto}
+  #crf-c,#crf-v,#crf-d,#crf-e,#crf-f{break-before:page;page-break-before:always}
+  #crf-b{break-before:auto;page-break-before:auto}
+  #crf-g{break-before:auto;page-break-before:auto}
+
+  /* 栏目标题、子标题和内容首块保持在同一页。 */
+  .crf-sheet .section-title,.crf-subhead,.crf-sheet .card-head,.crf-footprint-head{
+    break-after:avoid-page;page-break-after:avoid;
+  }
+  .crf-sheet .section-title+*,.crf-subhead+*,.crf-sheet .card-head+*,.crf-footprint-head+*{
+    break-before:avoid-page;page-break-before:avoid;
+  }
+  .crf-sheet .section-title{margin:4mm 0 2.3mm;padding-bottom:1.8mm}
+  .crf-section:first-of-type .section-title{margin-top:0}
+  .crf-subhead{margin:2.5mm 0 1.5mm}
+
+  /* 小内容块整体保留；LV改由独立Footprint页控制。 */
+  .crf-field-group,.crf-footprint,.crf-empty,.crf-admin{
+    break-inside:avoid-page;page-break-inside:avoid;background:#fff;
+  }
+  .crf-site-card.site-pfa-only,.crf-site-card.site-rpv{break-inside:avoid-page;page-break-inside:avoid;background:#fff}
+  .crf-site-card.site-has-rf:not(.site-rpv){break-inside:auto;page-break-inside:auto;background:#fff}
+  /* B组的Roof含10个RF点，从新页开始；A组纯VP MI/ROOF保持连续。 */
+  #crf-c .crf-site-card.site-roof.site-has-rf{break-before:page;page-break-before:always}
+  .crf-sheet .card{margin-bottom:2.5mm;border-color:#c7c7cc;background:#fff;box-shadow:none}
+  .crf-sheet .card-head{padding:5px 7px;background:#f5f5f7!important}
+  .crf-sheet .card-body{padding:7px}
+  .crf-field-group,.crf-footprint{padding:7px;border-color:#c7c7cc;background:#fff}
+  .crf-footprint{margin-bottom:2.3mm}
+  .field{break-inside:avoid-page;page-break-inside:avoid}
+
+  /* 长表格允许跨页，但重复表头并禁止单行被拆分。 */
+  .crf-sheet .table-wrap{overflow:visible;border-color:#c7c7cc}
+  .crf-sheet .table-wrap table,.crf-sheet .table-wrap table.crf-table-wide,.crf-sheet .table-wrap table.crf-table-compact{
+    width:100%;min-width:100%;font-size:7.1pt;break-inside:auto;page-break-inside:auto;
+  }
+  .crf-sheet thead{display:table-header-group}
+  .crf-sheet tfoot{display:table-footer-group}
+  .crf-sheet tbody{display:table-row-group}
+  .crf-sheet tr{break-inside:avoid-page;page-break-inside:avoid}
+  .crf-sheet th{position:static;padding:4px 3px;background:#f5f5f7!important}
+  .crf-sheet td{padding:3px;background:#fff}
+  .crf-sheet .crf-rf-wrap{margin-top:1.5mm!important}
+  .crf-sheet .crf-atrial-vp-table,.crf-sheet .crf-atrial-rf-table{table-layout:fixed;font-size:6.8pt}
+  .crf-sheet .crf-atrial-vp-table th,.crf-sheet .crf-atrial-vp-table td,.crf-sheet .crf-atrial-rf-table th,.crf-sheet .crf-atrial-rf-table td{padding:2px 2.5px}
+  .crf-sheet .rf-matrix.crf-atrial-rf-table{min-width:100%;font-size:6.5pt}
+  .crf-sheet .rf-matrix.crf-atrial-rf-table th{position:static}
+  .crf-sheet .rf-matrix.crf-atrial-rf-table.points-10 th:first-child{width:14%;text-align:left}
+  .crf-sheet .rf-matrix.crf-atrial-rf-table.points-10 th:nth-child(n+2){width:8.6%}
+  .crf-sheet .rf-matrix.crf-atrial-rf-table.points-6 th:first-child{width:16%;text-align:left}
+  .crf-sheet .rf-matrix.crf-atrial-rf-table.points-6 th:nth-child(n+2){width:14%}
+  .crf-sheet .rf-matrix.crf-atrial-rf-table .binary-choice{gap:1px}
+  .crf-sheet .rf-matrix.crf-atrial-rf-table .binary-option{gap:1px;padding:0}
+  .crf-sheet .rf-matrix.crf-atrial-rf-table .binary-label{font-size:6.1pt}
+  .crf-sheet .vp-matrix-wrap{break-inside:avoid-page;page-break-inside:avoid}
+  .crf-sheet .vp-matrix.crf-atrial-vp-matrix{min-width:100%;table-layout:fixed;font-size:6.8pt}
+  .crf-sheet .vp-matrix.crf-atrial-vp-matrix th{position:static;padding:2px 3px}
+  .crf-sheet .vp-matrix.crf-atrial-vp-matrix td{padding:2px 3px}
+  .crf-sheet .vp-matrix.crf-atrial-vp-matrix.points-6 th:first-child{width:16%;text-align:left}
+  .crf-sheet .vp-matrix.crf-atrial-vp-matrix.points-6 th:nth-child(n+2){width:14%}
+  .crf-sheet .vp-matrix.crf-atrial-vp-matrix.points-3 th:first-child{width:19%;text-align:left}
+  .crf-sheet .vp-matrix.crf-atrial-vp-matrix.points-3 th:nth-child(n+2){width:27%}
+  .crf-sheet .vp-matrix.crf-atrial-vp-matrix .binary-choice{gap:3px}
+  .crf-sheet .vp-matrix.crf-atrial-vp-matrix .matrix-point-label.has-data::after{display:none}
+  .crf-sheet .vent-matrix-wrap{margin-top:1.5mm;break-inside:avoid-page;page-break-inside:avoid}
+  .crf-sheet .vent-matrix{min-width:100%;table-layout:fixed;font-size:6.8pt}
+  .crf-sheet .vent-matrix th{position:static;padding:2px 3px}
+  .crf-sheet .vent-matrix td{padding:2px 3px}
+  .crf-sheet .vent-matrix th:first-child{width:19%;text-align:left}
+  .crf-sheet .vent-matrix th:nth-child(n+2){width:27%}
+  .crf-sheet .vent-matrix .matrix-point-label.has-data::after{display:none}
+  .crf-sheet .vent-matrix tbody tr.matrix-section-row th{padding:2px 3px;background:#f5f5f7!important;color:#000;font-size:6.4pt}
+
+  /* 打印时将表单控件还原为纸质CRF的静态文本。 */
+  .crf-sheet input,.crf-sheet select,.crf-sheet textarea{
+    appearance:none;-webkit-appearance:none;border:0!important;box-shadow:none!important;background:transparent!important;
+    min-width:0!important;padding:1px!important;color:#000!important;font-size:inherit;line-height:1.2;
+  }
+  .crf-sheet textarea{min-height:24px;resize:none}
+  .crf-sheet .grid{gap:5px 7px}
+  .crf-sheet .help{margin-top:4px;font-size:7pt}
+  .crf-footprint-summary{margin-top:4px;padding-top:4px}
+
+  /* F01–F05：每个Footprint完整占用一张A4横向页。 */
+  #crf-v .vent-print-page{box-sizing:border-box;margin:0;padding:3mm;border:1px solid #aeb0b5;border-radius:0;background:#fff;break-inside:avoid-page;page-break-inside:avoid}
+  #crf-v .vent-print-page+.vent-print-page{break-before:page;page-break-before:always}
+  #crf-v .vent-page-head{margin:0 0 1.5mm;padding:0 0 1.5mm}
+  #crf-v .vent-page-head .eyebrow{font-size:5.8pt}
+  #crf-v .vent-page-head h3{margin-top:.5mm;font-size:11pt}
+  #crf-v .vent-page-identity{font-size:6.4pt}
+  #crf-v .vent-page-meta{grid-template-columns:repeat(5,minmax(0,1fr));gap:1mm 1.5mm;margin-bottom:1.2mm}
+  #crf-v .vent-page-meta .field label{margin-bottom:.4mm;font-size:5.8pt}
+  #crf-v .vent-page-meta input,#crf-v .vent-page-meta select{font-size:6.2pt;line-height:1.05}
+  #crf-v .vent-meta-static{min-height:0;padding:1px 2px;border:0;background:transparent;font-size:6.2pt;line-height:1.1}
+  #crf-v .vent-matrix-wrap{margin-top:0;break-inside:avoid-page;page-break-inside:avoid}
+  #crf-v .vent-matrix{font-size:5.8pt;line-height:1.05}
+  #crf-v .vent-matrix th,#crf-v .vent-matrix td{padding:1px 2px}
+  #crf-v .vent-matrix tbody tr.matrix-section-row th{padding:1px 2px;font-size:5.5pt}
+  #crf-v .vent-matrix .binary-choice{gap:1px}
+  #crf-v .vent-matrix .binary-option{gap:1px;padding:0}
+  #crf-v .vent-matrix .binary-option input[type="checkbox"]{width:9px!important;height:9px!important;min-width:9px!important}
+  #crf-v .vent-matrix .binary-label{font-size:5.3pt}
+  #crf-v .vent-page-summary{gap:3mm;margin-top:1.2mm;padding:1mm 1.5mm;font-size:5.8pt}
+  #crf-v .vent-page-exploratory{margin-top:1.2mm}
+  #crf-v .vent-page-exploratory .crf-subhead{margin:1mm 0 .8mm;font-size:6pt}
+  #crf-v .vent-page-exploratory table{font-size:5.4pt}
+  #crf-v .vent-page-exploratory th,#crf-v .vent-page-exploratory td{padding:1px 2px}
+  #crf-v .vent-page-foot{margin-top:1mm;font-size:5.3pt}
+}
+
+/* Local data-governance layer: identity attribution, record control, validation and audit. */
+.session-panel{display:flex;align-items:center;gap:7px;margin-left:4px}
+.session-chip{display:flex;align-items:center;gap:8px;padding:5px 6px 5px 10px;border:1px solid var(--mac-separator);border-radius:11px;background:rgba(255,255,255,.72);font-size:11px;color:var(--mac-secondary)}
+.session-chip .avatar{display:grid;place-items:center;width:22px;height:22px;border-radius:7px;background:linear-gradient(145deg,#007aff,#5ac8fa);color:#fff;font-size:10px;font-weight:800}.session-chip strong{color:var(--mac-label)}.session-chip button{padding:4px 7px;border-radius:7px;font-size:10px}
+.readonly-ribbon{display:flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid rgba(255,149,0,.22);border-radius:10px;background:rgba(255,149,0,.09);color:#9a5900;font-size:11px}
+.record-control{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 11px;margin-bottom:10px;border:1px solid rgba(60,60,67,.13);border-radius:12px;background:rgba(255,255,255,.65)}
+.record-control .control-copy{min-width:0}.record-control .title{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:750}.record-control .sub{margin-top:3px;color:var(--mac-secondary);font-size:10px;line-height:1.35}.record-control .actions{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+.lock-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 7px;border-radius:7px;font-size:10px;font-weight:750}.lock-badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}.lock-badge.open{background:rgba(52,199,89,.12);color:#23863f}.lock-badge.locked{background:rgba(88,86,214,.12)!important;color:#4f46b5!important}.lock-badge.correction{background:rgba(255,149,0,.14)!important;color:#a85f00!important}
+.governance-hero{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(250px,.55fr);gap:12px;margin-bottom:14px}.governance-callout{padding:16px;border:1px solid rgba(0,122,255,.16);border-radius:16px;background:linear-gradient(135deg,rgba(234,243,255,.86),rgba(255,255,255,.76))}.governance-callout h2{margin:0 0 6px;font-size:19px}.governance-callout p{margin:0;color:var(--mac-secondary);font-size:11px;line-height:1.65}.governance-actions{display:flex;align-items:center;align-content:center;flex-wrap:wrap;gap:7px;margin-top:12px}
+.governance-status{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.governance-stat{padding:12px;border:1px solid rgba(60,60,67,.13);border-radius:13px;background:rgba(255,255,255,.72)}.governance-stat .k{color:var(--mac-secondary);font-size:10px}.governance-stat .v{margin-top:4px;font-size:18px;font-weight:800}.governance-stat .sub{margin-top:2px;color:var(--mac-tertiary);font-size:9px}
+.control-grid{display:grid;grid-template-columns:repeat(3,minmax(250px,1fr));gap:9px}.animal-control{padding:11px;border:1px solid rgba(60,60,67,.13);border-radius:13px;background:rgba(255,255,255,.72)}.animal-control .head{display:flex;align-items:center;justify-content:space-between;gap:8px}.animal-control .meta{margin:7px 0;color:var(--mac-secondary);font-size:10px;line-height:1.5}.animal-control .actions{display:flex;gap:6px;flex-wrap:wrap}
+.validation-list{display:grid;gap:6px}.validation-row{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;align-items:start;padding:8px 9px;border-radius:10px;background:rgba(118,118,128,.06);font-size:11px}.validation-row .mark{display:grid;place-items:center;width:20px;height:20px;border-radius:7px;font-weight:800}.validation-row.pass .mark{background:rgba(52,199,89,.13);color:#21873c}.validation-row.fail .mark{background:rgba(255,59,48,.12);color:#c9342c}.validation-row .detail{margin-top:2px;color:var(--mac-secondary);font-size:10px}.validation-row .state{font-size:10px;font-weight:750}
+.validation-row.warn .mark{background:rgba(255,149,0,.14);color:#a85f00}
+.audit-table{table-layout:fixed}.audit-table th:nth-child(1){width:12%}.audit-table th:nth-child(2){width:10%}.audit-table th:nth-child(3){width:16%}.audit-table th:nth-child(4){width:10%}.audit-table th:nth-child(5){width:22%}.audit-table th:nth-child(6){width:30%}.audit-table td{vertical-align:top;word-break:break-word}.audit-detail{color:var(--mac-secondary);font-size:10px;line-height:1.45}
+.login-overlay{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:20px;background:rgba(20,20,24,.34);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}.login-dialog{width:min(430px,100%);padding:22px;border:1px solid rgba(255,255,255,.68);border-radius:20px;background:rgba(250,250,252,.94);box-shadow:0 24px 70px rgba(0,0,0,.25)}.login-dialog .symbol{display:grid;place-items:center;width:42px;height:42px;margin-bottom:14px;border-radius:13px;background:linear-gradient(145deg,#1d1d1f,#48484a);color:#fff;font-weight:800}.login-dialog h2{margin:0;font-size:21px}.login-dialog p{margin:7px 0 15px;color:var(--mac-secondary);font-size:11px;line-height:1.6}.login-dialog label{display:block;margin-bottom:5px;color:var(--mac-secondary);font-size:11px;font-weight:700}.login-dialog .actions{display:flex;gap:8px;margin-top:13px}.login-dialog .actions button{flex:1}.login-dialog .privacy{margin:13px 0 0;padding-top:11px;border-top:1px solid var(--mac-separator);font-size:10px}
+.admin-credential{margin-top:11px;padding:11px;border:1px solid rgba(88,86,214,.18);border-radius:12px;background:rgba(88,86,214,.06)}.admin-credential .credential-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}.admin-credential .credential-head label{margin:0;color:#4f46b5}.admin-credential .admin-tag{padding:3px 7px;border-radius:7px;background:rgba(88,86,214,.12);color:#4f46b5;font-size:9px;font-weight:800}.admin-credential .credential-help{margin:6px 0 0;color:var(--mac-secondary);font-size:9px}.login-dialog.auth-error{animation:authShake .28s ease}.login-dialog.auth-error .admin-credential{border-color:rgba(255,59,48,.42);background:rgba(255,59,48,.06)}
+@keyframes authShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.governance-disclaimer{padding:10px 12px;border:1px solid rgba(255,149,0,.2);border-radius:11px;background:rgba(255,149,0,.08);color:#805000;font-size:10px;line-height:1.55}
+.binary-choice{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;width:100%}.binary-option{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:32px;margin:0;padding:5px 7px;border:1px solid rgba(60,60,67,.15);border-radius:9px;background:rgba(255,255,255,.72);color:var(--mac-secondary);cursor:pointer;transition:border-color .15s ease,background .15s ease,box-shadow .15s ease}.field .binary-option{display:flex;margin-bottom:0;color:var(--mac-secondary);font-size:inherit}
+.binary-option:hover{border-color:rgba(0,122,255,.34);background:#fff}.binary-option:has(input:focus-visible){border-color:rgba(0,122,255,.62);box-shadow:0 0 0 3px rgba(0,122,255,.14)}.binary-option.yes:has(input:checked){border-color:rgba(0,122,255,.25);background:rgba(0,122,255,.08);color:#0066d6}.binary-option.no:has(input:checked){border-color:rgba(118,118,128,.30);background:rgba(118,118,128,.11);color:#48484a}
+.binary-option input[type="checkbox"]{appearance:auto;-webkit-appearance:checkbox;width:16px;height:16px;min-width:16px;margin:0;padding:0;border:0;border-radius:4px;box-shadow:none;accent-color:var(--mac-blue);cursor:pointer}.binary-option.no input[type="checkbox"]{accent-color:#6e6e73}.binary-option .binary-label{font-size:11px;font-weight:700;line-height:1}.binary-option input:disabled{opacity:.52;cursor:not-allowed}.binary-option:has(input:disabled){cursor:not-allowed;background:rgba(118,118,128,.08);color:var(--mac-tertiary)}
+button:disabled{cursor:not-allowed;opacity:.46;transform:none!important;box-shadow:none!important}[data-edit-locked="true"]{cursor:not-allowed!important}
+@media(max-width:1000px){.governance-hero{grid-template-columns:1fr}.control-grid{grid-template-columns:repeat(2,minmax(240px,1fr))}}
+@media(max-width:650px){.header-meta{display:none}.session-panel{width:100%;margin:5px 0 0}.session-chip{width:100%;justify-content:space-between}.record-control{align-items:flex-start;display:block}.record-control .actions{margin-top:8px}.control-grid,.governance-status{grid-template-columns:1fr}.governance-callout{padding:14px}.audit-table{min-width:760px}}
+@media(max-width:780px){.ablation-picker{grid-template-columns:1fr;gap:5px}.picker-caption{padding-left:0}.position-grid.rf{grid-template-columns:repeat(5,minmax(38px,1fr))}}
+@media print{.login-overlay,.session-panel,.record-control,#governanceMode{display:none!important}}
+@media print{.crf-sheet .binary-choice{display:flex;gap:6px}.crf-sheet .binary-option{min-height:0;padding:1px;border:0;background:transparent!important;box-shadow:none!important}.crf-sheet .binary-option input[type="checkbox"]{appearance:auto!important;-webkit-appearance:checkbox!important;width:12px!important;height:12px!important;min-width:12px!important;padding:0!important}.crf-sheet .binary-option .binary-label{font-size:7.1pt;color:#000}}
+
+/* Print palette: low-ink clinical document with grayscale-safe hierarchy. */
+@media print{
+  :root{
+    --print-ink:#1f2933;
+    --print-muted:#52606d;
+    --print-line:#8795a3;
+    --print-line-soft:#c6cfd8;
+    --print-panel:#f6f8fa;
+    --print-head:#e6ebf0;
+    --print-accent:#334e68;
+    --print-accent-soft:#edf2f6;
+    --print-mi:#496b59;
+    --print-roof:#3f6588;
+    --print-rpv:#625d7d;
+    --print-vent:#85504e;
+  }
+  html,body,.crf-sheet{color:var(--print-ink)!important;color-scheme:light}
+  .crf-sheet *{text-shadow:none!important}
+  .crf-cover{border:1pt solid #718090!important;background:#fff!important}
+  .crf-cover>div{border-color:var(--print-line-soft)!important;background:#fff!important}
+  .crf-cover>div:first-child{background:var(--print-accent-soft)!important}
+  .crf-cover h2,.crf-cover .value{color:var(--print-ink)!important}
+  .crf-cover .label,.crf-cover .eyebrow{color:var(--print-muted)!important}
+
+  .crf-sheet .section-title{border-bottom:1.2pt solid var(--print-accent)!important;color:var(--print-ink)!important}
+  .crf-sheet .section-title span{border:1pt solid var(--print-accent)!important;border-radius:3px!important;background:var(--print-accent)!important;color:#fff!important}
+  .crf-subhead{padding-left:5px;border-left:2.2pt solid var(--print-accent);color:var(--print-accent)!important}
+
+  .crf-sheet .card,.crf-field-group,.crf-footprint,.crf-empty,#crf-v .vent-print-page{
+    border:.7pt solid var(--print-line-soft)!important;background:#fff!important;
+  }
+  .crf-sheet .card-head{border-bottom:1px solid var(--print-line-soft)!important;background:var(--print-panel)!important;color:var(--print-ink)!important}
+  .crf-site-card>.card-head{border-left-width:3.2pt!important}
+  .crf-site-card.site-mi>.card-head{border-left-color:var(--print-mi)!important;background:#eef3f0!important}
+  .crf-site-card.site-roof>.card-head{border-left-color:var(--print-roof)!important;background:#eef3f7!important}
+  .crf-site-card.site-rpv>.card-head{border-left-color:var(--print-rpv)!important;background:#f1f0f5!important}
+  .crf-site-card.site-vent>.card-head{border-left-color:var(--print-vent)!important;background:#f6eeee!important}
+
+  .crf-sheet .table-wrap{border:.7pt solid var(--print-line)!important;background:#fff!important}
+  .crf-sheet th,.crf-sheet td{border-color:#aeb8c2!important;color:var(--print-ink)!important}
+  .crf-sheet thead th{background:var(--print-head)!important;color:#26384a!important}
+  .crf-sheet tbody th{background:#eff2f5!important;color:#364b5f!important}
+  .crf-sheet tbody tr:nth-child(even)>td{background:#fbfcfd!important}
+  .crf-sheet td.cell-na{background:#f1f3f5!important;color:var(--print-muted)!important}
+  .crf-sheet .matrix-fixed{color:var(--print-muted)!important}
+  .crf-sheet .vent-matrix tbody tr.matrix-section-row th{border-top:1pt solid var(--print-line)!important;border-bottom:1pt solid var(--print-line)!important;background:#dce4eb!important;color:#2d455b!important}
+
+  .strategy-cell,.badge,.phase-pill{border:1px solid #8e99a6!important;box-shadow:none!important}
+  .strategy-cell.blue,.badge.blue,.phase-pill.acute{background:#edf3f8!important;border-color:#7f96ab!important;color:#2d587c!important}
+  .strategy-cell.orange,.badge.orange{background:#f7f1e9!important;border-color:#ad8b64!important;color:#76501f!important}
+  .strategy-cell.red,.badge.red{background:#f7eded!important;border-color:#ae7774!important;color:#773d3a!important}
+  .strategy-cell.amber,.badge.amber,.phase-pill.long{background:#f1f0f6!important;border-color:#8c88a4!important;color:#514c70!important}
+  .strategy-cell.green,.badge.green{background:#eef3f0!important;border-color:#789586!important;color:#395d49!important}
+  .strategy-cell.gray,.badge.gray,.phase-pill{background:#f1f3f5!important;border-color:#929ca6!important;color:#46515c!important}
+
+  .crf-sheet input,.crf-sheet select,.crf-sheet textarea{color:var(--print-ink)!important}
+  .crf-field-group .field>input,.crf-field-group .field>select,.crf-field-group .field>textarea,
+  #crf-v .vent-page-meta .field>input,#crf-v .vent-page-meta .field>select,#crf-v .vent-meta-static{
+    border-bottom:.55pt solid #8793a0!important;
+  }
+  .crf-sheet .field label,.crf-sheet .help,.crf-footprint-summary,.vent-page-identity,.vent-page-foot{color:var(--print-muted)!important}
+  .crf-empty{border-style:dashed!important;color:var(--print-muted)!important;background:var(--print-panel)!important}
+  #crf-v .vent-print-page{border:1pt solid #718090!important}
+  #crf-v .vent-page-head{border-bottom:1pt solid var(--print-accent)!important}
+  #crf-v .vent-page-summary{border-top:.6pt solid var(--print-line-soft);border-bottom:.6pt solid var(--print-line-soft);border-radius:0;background:var(--print-accent-soft)!important;color:var(--print-muted)!important}
+  #crf-v .vent-page-summary b,.crf-footprint-summary b{color:var(--print-ink)!important}
+  .crf-sheet .binary-option .binary-label{color:var(--print-ink)!important}
+  .crf-sheet .binary-option input[type="checkbox"]{accent-color:#334e68!important}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-main">
+    <div class="brand-lockup">
+      <span class="app-symbol" aria-hidden="true"></span>
+      <div>
+        <h1>Varipulse ± STSF 猪实验 CRF</h1>
+        <div class="sub">20260827 双形双能动物实验｜P01–P02 即刻 2 h｜P03–P06 长期 28 d</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <span class="meta-chip"><strong>房间隔</strong> ICE + Vizigo</span>
+      <span class="meta-chip"><strong>标测</strong> Pen</span>
+      <span class="meta-chip"><strong>通路</strong> 动脉1 / 静脉2</span>
+      <span class="meta-chip"><strong>分组</strong> A = VP · B = VP + RF</span>
+    </div>
+    <div class="session-panel no-print" id="userSession"></div>
+  </div>
+  <div class="toolbar no-print">
+    <button class="primary" onclick="saveLocal()">保存</button>
+    <details class="tool"><summary>数据</summary><div class="menu">
+      <button onclick="loadLocal()">读取本地数据</button>
+      <button onclick="exportValidatedBackup()">生成校验备份</button>
+      <label class="file-btn">导入并校验备份<input type="file" accept=".json,application/json" onchange="importJSON(event)"></label>
+      <button onclick="restoreSnapshot()">恢复最近校验备份</button>
+    </div></details>
+    <details class="tool"><summary>导出</summary><div class="menu">
+      <button onclick="exportLineCSV()">MI / Roof / RIPV 线级结果 CSV</button>
+      <button onclick="exportAtrialPathCSV()">房间隔靶点染色采样点 CSV</button>
+      <button onclick="exportVentricularCSV()">LV Footprint 结果 CSV</button>
+      <button onclick="exportVentSiteCSV()">LV主要取材点 CSV</button>
+      <button onclick="exportVentExploratoryCSV()">LV探索性取材 CSV</button>
+      <button onclick="exportAblationCSV()">消融质量 CSV</button>
+      <button onclick="exportSafetyCSV()">安全事件 CSV</button>
+    </div></details>
+    <details class="tool"><summary>打印</summary><div class="menu">
+      <button onclick="printCurrent()">打印当前 CRF</button>
+      <button onclick="printAll()">打印全部 CRF</button>
+    </div></details>
+    <details class="tool"><summary>编辑</summary><div class="menu">
+      <button onclick="undo()">撤销</button><button onclick="redo()">恢复</button>
+    </div></details>
+    <button class="danger" onclick="resetAll()">清空</button>
+    <div class="status" id="status">自动保存已启用</div>
+  </div>
+</header>
+
+<div class="modebar no-print">
+  <div class="modebar-inner">
+    <div class="mode-label">工作区</div>
+    <div class="mode-segment">
+      <button class="modebtn active" data-mode="field" onclick="setMode('field')">现场录入</button>
+      <button class="modebtn" data-mode="crf" onclick="setMode('crf')">完整 CRF</button>
+      <button class="modebtn" data-mode="analysis" onclick="setMode('analysis')">研究总览 / 分析</button>
+      <button class="modebtn" data-mode="governance" onclick="setMode('governance')">数据治理</button>
+    </div>
+    <div class="mode-helper">数据默认保存在本机浏览器</div>
+  </div>
+</div>
+
+<div class="shell">
+  <section id="fieldMode"></section>
+  <section id="crfMode" class="hidden"></section>
+  <section id="analysisMode" class="hidden"></section>
+  <section id="governanceMode" class="hidden"></section>
+</div>
+
+<div class="login-overlay hidden no-print" id="loginOverlay" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+  <div class="login-dialog">
+    <div class="symbol">CRF</div>
+    <h2 id="loginTitle">使用姓名登录</h2>
+    <p>登录后才可录入或更正数据。普通用户首次使用姓名即自动注册；管理员“刘佳林”需要密码验证。</p>
+    <label for="loginNameInput">姓名</label>
+    <input id="loginNameInput" list="registeredUserNames" autocomplete="name" maxlength="40" placeholder="请输入真实姓名" oninput="syncLoginRole()" onkeydown="if(event.key==='Enter')loginFromDialog()">
+    <datalist id="registeredUserNames"></datalist>
+    <div class="admin-credential hidden" id="adminCredential">
+      <div class="credential-head"><label for="loginPasswordInput">管理员密码</label><span class="admin-tag">系统管理员</span></div>
+      <input id="loginPasswordInput" type="password" autocomplete="current-password" placeholder="请输入管理员密码" onkeydown="if(event.key==='Enter')loginFromDialog()">
+      <div class="credential-help">仅管理员刘佳林登录时验证；密码不会写入研究数据或稽查轨迹。</div>
+    </div>
+    <div class="actions"><button class="primary" onclick="loginFromDialog()">登录 / 首次注册</button><button onclick="closeLoginDialog()">只读查看</button></div>
+    <p class="privacy">单文件本地模式不能验证姓名真实性，也不能防止有权限访问电脑的人直接修改浏览器存储。正式受控研究仍应使用经验证的服务器型 eCRF/EDC。</p>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+const PFA4='VP 4× PFA';
+const PFA2='VP 2× PFA';
+const PFA2_RF450='VP 2× PFA + SF 450 RF';
+const RF450='SF 450 RF';
+const RF450_PFA2='SF 450 RF + VP 2× PFA';
+// 保留旧别名，便于旧版数据迁移；新方案的真实策略使用上面的明确常量。
+const VP=PFA4;
+const COMBO=PFA2_RF450;
+const VENT_STRATEGIES=[PFA4,PFA2,PFA2_RF450,RF450,RF450_PFA2];
+const VENT_FOOTPRINT_COUNT=VENT_STRATEGIES.length;
+const VENT_SCHEMA='LV_VP4_VP2_VP2RF_RF_RFVP2';
+const ATRIAL_SITES=['MI','ROOF','RPV'];
+const VENT_PRIMARY_ELECTRODES=['E3','E5','E7'];
+const SITE_NAMES={MI:'二尖瓣峡部线',ROOF:'左房顶部线',RPV:'右下肺静脉（RIPV）',VENT:'左室（LV）'};
+const PROTOCOL_VERSION='20260827';
+const ENDPOINT_ACUTE='Acute 2 h';
+const ENDPOINT_LONG='Long-term 28 d';
+const DEFAULT_SEED='260811';
+const STORAGE='vp_stsf_porcine_v8';
+const SNAPSHOT='vp_stsf_porcine_v8_snapshot';
+const BACKUPS='vp_stsf_porcine_v8_validated_backups';
+const SESSION_KEY='vp_stsf_porcine_v8_session_user';
+const SESSION_ADMIN_AUTH_KEY='vp_stsf_porcine_v8_admin_auth';
+const ADMIN_NAME='刘佳林';
+const ADMIN_PASSWORD_SHA256='8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92';
+const ADMIN_PASSWORD_FALLBACK='9995b6aa';
+const ATRIAL_ROW_SCHEMA='MI_ROOF_VP6_RF10_RIPV_VP3_RF6';
+const DEFAULT_ATRIAL_VP_ROWS=6;
+const DEFAULT_ATRIAL_RF_ROWS=10;
+const DEFAULT_RPV_VP_ROWS=3;
+const DEFAULT_RPV_RF_ROWS=6;
+const SYSTEM_BUILD='v8.1-macOS-governance-14-lv5fp';
+const BACKUP_FORMAT='VP_CRF_BACKUP_V1';
+
+let ui={mode:'field',animal:0,site:'MI',stage:'ablation',vpIndex:0,rfIndex:0,ventIndex:0,crfAnimal:0};
+let history=[],future=[],historyLock=false,timer=null,sessionUserId='',schemaMigrationApplied=false;
+
+function freshCompliance(){
+  return {schemaVersion:'1.0',systemBuild:SYSTEM_BUILD,users:[],auditTrail:[],validation:{latest:null,history:[]},backupIndex:[]};
+}
+function emptyRecordControl(){
+  return {status:'Unlocked',lockedAt:'',lockedBy:'',lockedByName:'',dataHash:'',correction:{active:false,reason:'',openedAt:'',openedBy:'',openedByName:''}};
+}
+
+function emptyBlock(){
+  return {pacingSite:'',cl:'',transTime:'',orderReversal:'',breakthrough:'',diffPacing:'',doublePotentials:'',finalBlock:'',naReason:''};
+}
+function emptyMapping(withBlock=true){
+  return {preMap:'',postMap:'',d30Map:'',mapId:'',note:'',immediateBlock:withBlock?emptyBlock():null,d30Block:withBlock?emptyBlock():null};
+}
+function emptyVP(n=4){
+  return {count:n,tpi:'',impBaseline:'',impPrePFA:'',impPostPFA:'',stable:'',alarm:'',note:''};
+}
+function emptyRF(targetAI=450){
+  return {targetAI,actualAI:'',duration:'',power:'',cfMean:'',impPreRF:'',impPostRF:'',impDrop:'',spacing:4,stable:'',alarm:''};
+}
+function emptyPath(label){
+  return {label,blockId:'',ttcId:'',heId:'',massonId:'',evgId:'',wall:'',depth:'',width:'',transmural:'',bridge:'',collagen:'',note:''};
+}
+function emptyTTC(){
+  return {lesionLength:'',widthMean:'',widthMax:'',continuity:'',grossTrans:'',heGross:'',massonGross:'',imageId:'',note:''};
+}
+
+function emptyVentIndexSite(electrode='E3',role='primary'){
+  return {electrode,role,impBaseline:'',impPrePFA:'',impPostPFA:'',impPreRF:'',impPostRF:'',
+    rfActualAI:'',rfDuration:'',rfPower:'',cfMean:'',rfSpacing:4,stable:'',alarm:'',
+    ttcId:'',heId:'',massonId:'',wall:'',depth:'',width:'',transmural:'',bridge:'',note:''};
+}
+function emptyWorkflow(){
+  return {
+    studyPhase:ENDPOINT_ACUTE,armSide:'A',isBackup:'No',arterialAccess:1,venousAccess:2,
+    iceTransseptal:'',penMappingLA:'',penMappingLV:'',vpCalibration:'',
+    floatingImpedanceLA:'',floatingImpedanceLV:'',
+    preAblationImpedance:'',postAblationImpedance:'',postMappingLA:'',postMappingLV:'',
+    ablationComplete:'',assessmentTime:'2 h',ttcComplete:'',ttcImageId:'',
+    specimenHE:'',specimenMasson:'',photoId:'',notes:''
+  };
+}
+function isPFAOnly(t){return t===PFA4||t===PFA2}
+function hasPFA(t){return t===PFA4||t===PFA2||t===PFA2_RF450||t===RF450_PFA2}
+function hasRF(t){return t===PFA2_RF450||t===RF450||t===RF450_PFA2}
+function vpCountFor(t){return t===PFA4?4:(t===PFA2||t===PFA2_RF450||t===RF450_PFA2?2:0)}
+function rfTargetFor(t){return hasRF(t)?450:''}
+function strategySequence(t){
+  if(t===PFA4)return 'VP ×4 PFA';
+  if(t===PFA2)return 'VP ×2 PFA';
+  if(t===PFA2_RF450)return 'VP ×1 → SF 450 RF → VP ×1';
+  if(t===RF450)return 'SF 450 RF';
+  if(t===RF450_PFA2)return 'SF 450 RF → VP ×2 PFA';
+  return '—';
+}
+function normalizeStrategy(t){
+  if(t==='Varipulse only'||t===VP)return PFA4;
+  if(t==='VP 2x PFA'||t==='VP 2X PFA'||t==='VP 2×')return PFA2;
+  if(t==='Varipulse + STSF'||t===COMBO)return PFA2_RF450;
+  return t||PFA4;
+}
+function endpointLabel(a){return a?.workflow?.studyPhase===ENDPOINT_LONG?'28天':'2 h'}
+function endpointDateLabel(a){return a?.workflow?.studyPhase===ENDPOINT_LONG?'28天终点评估日期':'2 h 终点评估日期'}
+function endpointGroupLabel(a){return a?.workflow?.studyPhase===ENDPOINT_LONG?'长期组 · 28 d':'即刻组 · 2 h'}
+function roleLabel(a){return a?.workflow?.isBackup==='Yes'?'备用':'核心'}
+const ROLE_OPTIONS=[['No','核心'],['Yes','备用']];
+function emptyVentFootprint(id,treatment){
+  return {id,treatment,sequence:strategySequence(treatment),vpCount:vpCountFor(treatment),rfTargetAI:rfTargetFor(treatment),
+    anatomicalSite:'',effectiveElectrodes:'',tpi:'',
+    stable:'',alarm:'',note:'',
+    primarySites:VENT_PRIMARY_ELECTRODES.map(e=>emptyVentIndexSite(e,'primary')),
+    exploratorySites:[]};
+}
+function emptyAtrialAblation(site){
+  const isLine=site==='MI'||site==='ROOF',isRPV=site==='RPV',vpRows=isLine?DEFAULT_ATRIAL_VP_ROWS:(isRPV?DEFAULT_RPV_VP_ROWS:1),rfRows=isLine?DEFAULT_ATRIAL_RF_ROWS:(isRPV?DEFAULT_RPV_RF_ROWS:1),vpCount=isRPV?2:4;
+  return {vp:Array.from({length:vpRows},()=>emptyVP(vpCount)),rf:Array.from({length:rfRows},()=>emptyRF(450))};
+}
+
+function emptyAnimal(i){
+  return {
+    id:'P'+String(i+1).padStart(2,'0'),randomCode:'',miTreatment:'',roofTreatment:'',rpvTreatment:'',
+    sex:'',weight:'',procedureDate:'',d30Date:'',investigator:'',anesthesia:'',act:'',transseptal:'',blindCode:'',completion:'',
+    protocol:{version:PROTOCOL_VERSION,atrialPFAOnly:4,atrialComboVP:2,ai:450,rfSpacing:4,rfPower:'',ventFootprints:VENT_FOOTPRINT_COUNT,ventSchema:VENT_SCHEMA,ventStrategies:VENT_STRATEGIES.join(' | '),ventPrimarySites:'E3/E5/E7',atrialRowSchema:ATRIAL_ROW_SCHEMA},
+    workflow:emptyWorkflow(),
+    mapping:{MI:emptyMapping(true),ROOF:emptyMapping(true),RPV:emptyMapping(false),VENT:emptyMapping(false)},
+    ablation:{MI:emptyAtrialAblation('MI'),ROOF:emptyAtrialAblation('ROOF'),RPV:emptyAtrialAblation('RPV')},
+    ttc:{MI:emptyTTC(),ROOF:emptyTTC(),RPV:emptyTTC(),VENT:emptyTTC()},
+    pathology:{
+      MI:[emptyPath('瓣环侧'),emptyPath('中间二分位（1/2）'),emptyPath('肺静脉侧')],
+      ROOF:[emptyPath('心耳侧'),emptyPath('正顶'),emptyPath('肺静脉侧')],
+      RPV:[emptyPath('RIPV代表切面')]
+    },
+    ventFootprints:[],
+    safety:[],deviations:[],missing:[],images:[],custom:[],
+    quickNotes:'',finalComments:'',reviewer:'',reviewDate:'',signature:'',
+    recordControl:emptyRecordControl()
+  };
+}
+
+function freshState(){
+  const s={version:PROTOCOL_VERSION,protocolVersion:PROTOCOL_VERSION,seed:DEFAULT_SEED,createdAt:new Date().toISOString(),compliance:freshCompliance(),animals:Array.from({length:6},(_,i)=>emptyAnimal(i))};
+  applyAtrialRandomization(s,DEFAULT_SEED,false);
+  s.animals.forEach((a,i)=>generateVentFootprintRandomization(a,DEFAULT_SEED+'-VF-'+(i+1),false));
+  return s;
+}
+
+// 主研究状态：v8原版遗漏了该初始化，导致主体区无法渲染。
+let state=freshState();
+function hashSeed(str){
+  let h=2166136261>>>0;
+  for(let i=0;i<String(str).length;i++){h^=String(str).charCodeAt(i);h=Math.imul(h,16777619);}
+  return h>>>0;
+}
+function chainChecksum(text){return hashSeed(String(text)).toString(16).padStart(8,'0')}
+function cloneData(x){return JSON.parse(JSON.stringify(x))}
+function isoNow(){return new Date().toISOString()}
+function safeSessionGet(){try{return sessionStorage.getItem(SESSION_KEY)||''}catch(e){return ''}}
+function safeSessionSet(value){try{value?sessionStorage.setItem(SESSION_KEY,value):sessionStorage.removeItem(SESSION_KEY)}catch(e){}}
+function safeAdminAuthGet(){try{return sessionStorage.getItem(SESSION_ADMIN_AUTH_KEY)||''}catch(e){return ''}}
+function safeAdminAuthSet(value){try{value?sessionStorage.setItem(SESSION_ADMIN_AUTH_KEY,value):sessionStorage.removeItem(SESSION_ADMIN_AUTH_KEY)}catch(e){}}
+function currentUser(){return state?.compliance?.users?.find(u=>u.id===sessionUserId)||null}
+function isLoggedIn(){return !!currentUser()}
+function isAdminName(name){return normalizeUserName(name)===ADMIN_NAME}
+function isAdmin(){return currentUser()?.role==='Administrator'&&currentUser()?.name===ADMIN_NAME}
+function compactAuditValue(value){
+  let text;
+  try{text=typeof value==='string'?value:JSON.stringify(value)}catch(e){text=String(value)}
+  return String(text??'').length>500?String(text).slice(0,497)+'…':String(text??'');
+}
+function auditPayload(record){const copy={...record};delete copy.hash;return JSON.stringify(copy)}
+function appendAudit(action,detail={}){
+  if(!state.compliance)state.compliance=freshCompliance();
+  if(!Array.isArray(state.compliance.auditTrail))state.compliance.auditTrail=[];
+  const user=currentUser(),trail=state.compliance.auditTrail,previousHash=trail.length?trail[trail.length-1].hash:'GENESIS';
+  const record={
+    id:'AT-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7),timestamp:isoNow(),
+    userId:user?.id||'SYSTEM',userName:user?.name||'系统 / 只读',action,
+    animalId:detail.animalId||'',path:detail.path||'',oldValue:compactAuditValue(detail.oldValue),newValue:compactAuditValue(detail.newValue),
+    reason:detail.reason||'',note:detail.note||'',previousHash
+  };
+  record.hash=chainChecksum(auditPayload(record));trail.push(record);return record;
+}
+function verifyAuditTrail(){
+  const trail=state?.compliance?.auditTrail||[];let previousHash='GENESIS';
+  for(let i=0;i<trail.length;i++){
+    const x=trail[i];
+    if(x.previousHash!==previousHash||x.hash!==chainChecksum(auditPayload(x)))return {ok:false,index:i,message:`第 ${i+1} 条记录链校验失败`};
+    previousHash=x.hash;
+  }
+  return {ok:true,index:-1,message:trail.length?`连续校验 ${trail.length} 条`:'尚无稽查记录'};
+}
+function normalizeUserName(name){return String(name||'').trim().replace(/\s+/g,' ')}
+function syncLoginRole(){
+  const name=normalizeUserName(document.getElementById('loginNameInput')?.value),credential=document.getElementById('adminCredential');
+  credential?.classList.toggle('hidden',!isAdminName(name));
+}
+function flashLoginError(){const dialog=document.querySelector('.login-dialog');if(!dialog)return;dialog.classList.remove('auth-error');void dialog.offsetWidth;dialog.classList.add('auth-error');setTimeout(()=>dialog.classList.remove('auth-error'),350)}
+function showLoginDialog(){
+  const overlay=document.getElementById('loginOverlay'),input=document.getElementById('loginNameInput'),password=document.getElementById('loginPasswordInput');
+  if(!overlay)return;overlay.classList.remove('hidden');if(input)input.value=currentUser()?.name||'';if(password)password.value='';syncLoginRole();setTimeout(()=>input?.focus(),30)
+}
+function closeLoginDialog(){document.getElementById('loginOverlay')?.classList.add('hidden');renderAll()}
+async function loginFromDialog(){
+  const input=document.getElementById('loginNameInput'),passwordInput=document.getElementById('loginPasswordInput'),name=normalizeUserName(input?.value);
+  if(name.length<2)return alert('请输入至少2个字符的真实姓名。');
+  if(isAdminName(name)){const digest=await digestText(passwordInput?.value||''),expected=digest.algorithm==='SHA-256'?ADMIN_PASSWORD_SHA256:ADMIN_PASSWORD_FALLBACK;if(digest.value!==expected){appendAudit('LOGIN_FAILED',{note:'管理员密码验证失败'});autoSave();if(passwordInput){passwordInput.value='';passwordInput.focus()}flashLoginError();return alert('管理员密码不正确。')}}
+  ensureState();const previous=currentUser();let user=state.compliance.users.find(u=>u.name.toLocaleLowerCase()===name.toLocaleLowerCase());
+  let registered=false;
+  if(!user){user={id:'USR-'+Date.now().toString(36)+'-'+chainChecksum(name+Date.now()),name,role:isAdminName(name)?'Administrator':'User',registeredAt:isoNow(),lastLoginAt:''};state.compliance.users.push(user);registered=true}
+  user.role=isAdminName(name)?'Administrator':'User';sessionUserId=user.id;safeSessionSet(user.id);safeAdminAuthSet(isAdminName(name)?'ADMIN_AUTH_V1':'');user.lastLoginAt=isoNow();
+  appendAudit(registered?'USER_REGISTER':'USER_LOGIN',{note:`${user.role==='Administrator'?'管理员密码验证':'普通用户姓名登录'}${previous&&previous.id!==user.id?`；由 ${previous.name} 切换`:''}`});
+  if(passwordInput)passwordInput.value='';document.getElementById('loginOverlay')?.classList.add('hidden');autoSave();renderAll();setStatus(`${user.name} 已登录${isAdmin()?'（管理员）':''}`);
+}
+function switchUser(){showLoginDialog()}
+function logoutUser(){
+  const user=currentUser();if(user)appendAudit('USER_LOGOUT',{note:'退出到只读模式'});
+  sessionUserId='';safeSessionSet('');safeAdminAuthSet('');autoSave();renderAll();showLoginDialog();setStatus('已退出，当前为只读模式');
+}
+function renderSessionUI(){
+  const host=document.getElementById('userSession');if(!host)return;const user=currentUser(),list=document.getElementById('registeredUserNames');if(list)list.innerHTML=(state.compliance.users||[]).map(u=>`<option value="${esc(u.name)}"></option>`).join('');
+  host.innerHTML=user?`<div class="session-chip"><span class="avatar">${esc(user.name.slice(0,1))}</span><span><strong>${esc(user.name)}</strong> · ${isAdmin()?'管理员':'普通用户'}</span><button onclick="switchUser()">切换</button><button onclick="logoutUser()">退出</button></div>`:`<div class="session-chip"><span class="avatar">阅</span><span><strong>只读查看</strong></span><button class="primary" onclick="showLoginDialog()">登录</button></div>`;
+}
+function animalIndexFromPath(path){const m=String(path||'').match(/^animals\.(\d+)\./);return m?Number(m[1]):null}
+function correctionFor(i){return state.animals[i]?.recordControl?.correction||emptyRecordControl().correction}
+function canEditAnimal(i){
+  const user=currentUser(),control=state.animals[i]?.recordControl;if(!user||!control)return false;
+  if(control.status!=='Locked')return true;
+  return !!(control.correction?.active&&control.correction.openedBy===user.id);
+}
+function canEditPath(path){const i=animalIndexFromPath(path);return i==null?isLoggedIn():canEditAnimal(i)}
+function requireLogin(action='执行此操作'){if(isLoggedIn())return true;alert(`${action}前请先使用姓名登录。`);showLoginDialog();return false}
+function requireAdmin(action='执行系统级操作'){if(!requireLogin(action))return false;if(isAdmin())return true;alert(`${action}仅限管理员 ${ADMIN_NAME}。`);return false}
+function requireAnimalEditable(i,action='修改数据'){
+  if(!requireLogin(action))return false;const control=state.animals[i]?.recordControl;
+  if(control?.status!=='Locked')return true;
+  if(control.correction?.active&&control.correction.openedBy===currentUser().id)return true;
+  alert(`${state.animals[i].id} 已锁定。请先在“数据治理”中发起数据更正并填写原因。`);return false;
+}
+function requireGlobalEditable(action='修改研究方案'){
+  if(!requireLogin(action))return false;
+  const locked=state.animals.filter(a=>a.recordControl?.status==='Locked');
+  if(locked.length){alert(`以下动物已锁定，不能执行全局变更：${locked.map(a=>a.id).join('、')}`);return false}return true;
+}
+function applyEditPermissions(){
+  document.querySelectorAll('[data-bind]').forEach(el=>{const allowed=canEditPath(el.dataset.bind);if(!allowed){el.disabled=true;el.dataset.editLocked='true';el.title=isLoggedIn()?'记录已锁定':'登录后才可编辑'}});
+  const globalAllowed=isLoggedIn()&&state.animals.every(a=>a.recordControl?.status!=='Locked');
+  const adminGlobalAllowed=isAdmin()&&state.animals.every(a=>a.recordControl?.status!=='Locked');
+  const seed=document.getElementById('seedInput');if(seed){seed.disabled=!adminGlobalAllowed;seed.dataset.editLocked=String(!adminGlobalAllowed);seed.title=adminGlobalAllowed?'':'仅管理员可修改随机种子'}
+  const adminPattern=/rerandomizeAtrial|regenerateAllVent|rerandomizeVentCurrent|resetAll|loadLocal\(|restoreSnapshot/;
+  const historyPattern=/undo\(|redo\(/;
+  const localPattern=/addVP|dupVP|delVP|addRF|delRF|rerandomizeVentCurrent|addVentExploratory|delVentExploratory|addSafety|delSafety/;
+  document.querySelectorAll('button[onclick]').forEach(button=>{const code=button.getAttribute('onclick')||'';if(adminPattern.test(code))button.disabled=!adminGlobalAllowed;else if(historyPattern.test(code))button.disabled=!globalAllowed;else if(localPattern.test(code))button.disabled=!canEditAnimal(ui.mode==='crf'?ui.crfAnimal:ui.animal)});
+  document.querySelectorAll('.file-btn input[type="file"]').forEach(input=>{input.disabled=!isAdmin();input.parentElement.style.opacity=isAdmin()?'1':'.46';input.parentElement.title=isAdmin()?'':'仅管理员可导入备份'});
+}
+function rng(seed){
+  let a=hashSeed(seed);
+  return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296}
+}
+function shuffle(arr,seed){
+  let r=rng(seed),a=arr.slice();
+  for(let i=a.length-1;i>0;i--){let j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+  return a;
+}
+function applyAtrialRandomization(target,seed,confirmOverwrite=true){
+  if(confirmOverwrite && hasStudyData() && !confirm('重新生成20260827方案分配会改变房间隔靶点和备用猪的侧别。已有数据可能与分配不一致，确定继续？'))return false;
+  // 每一对动物保持“一边一头”：P01/P02、P03/P04、P05/P06各有一只A侧和一只B侧。
+  const codes=[];
+  [['A','B'],['A','B'],['A','B']].forEach((pair,i)=>codes.push(...shuffle(pair,seed+'-PAIR-'+(i+1))));
+  target.seed=seed;
+  target.animals.forEach((a,i)=>{
+    a.randomCode=codes[i];
+    a.workflow=a.workflow||emptyWorkflow();
+    a.workflow.armSide=codes[i];
+    a.workflow.studyPhase=i<2?ENDPOINT_ACUTE:ENDPOINT_LONG;
+    a.workflow.isBackup=i>=4?'Yes':'No';
+    a.workflow.assessmentTime=i<2?'2 h':'28 d';
+    a.workflow.arterialAccess=1;a.workflow.venousAccess=2;
+    a.miTreatment=codes[i]==='A'?PFA4:PFA2_RF450;
+    a.roofTreatment=codes[i]==='A'?PFA4:PFA2_RF450;
+    a.rpvTreatment=PFA2_RF450;
+    syncAtrialProtocol(a,'MI');syncAtrialProtocol(a,'ROOF');syncAtrialProtocol(a,'RPV');
+  });
+  return true;
+}
+
+function generateVentFootprintRandomization(a,seed,confirmOverwrite=true){
+  if(confirmOverwrite && a.ventFootprints.some(ventFootprintHasData) &&
+     !confirm(`${a.id}已有LV Footprint数据。重新随机会清空现有LV Footprint，继续？`))return false;
+  const seq=shuffle(VENT_STRATEGIES,seed);
+  a.ventFootprints=seq.map((t,i)=>emptyVentFootprint('F'+String(i+1).padStart(2,'0'),t));
+  return true;
+}
+function treatmentFor(a,site){return site==='MI'?a.miTreatment:site==='ROOF'?a.roofTreatment:site==='RPV'?a.rpvTreatment:''}
+function syncAtrialProtocol(a,site){
+  const t=normalizeStrategy(treatmentFor(a,site)),exp=vpCountFor(t),block=a.ablation[site];
+  if(!block)return;
+  block.vp.forEach(x=>{if(x.count===''||x.count==null||[0,2,4].includes(Number(x.count)))x.count=exp});
+  block.rf.forEach(x=>{x.targetAI=450;if(!hasRF(t)){x.actualAI='';x.duration='';x.power='';x.cfMean='';x.impPreRF='';x.impPostRF='';x.impDrop=''}});
+}
+function tLabel(t){
+  t=normalizeStrategy(t);
+  if(t===PFA4)return 'VP 4× PFA';
+  if(t===PFA2)return 'VP 2× PFA';
+  if(t===PFA2_RF450)return 'VP 2× PFA + SF 450 RF';
+  if(t===RF450)return 'SF 450 RF';
+  if(t===RF450_PFA2)return 'SF 450 RF + VP 2× PFA';
+  return '未分配';
+}
+function tBadge(t){
+  t=normalizeStrategy(t);
+  if(t===PFA4)return '<span class="badge blue">VP 4×</span>';
+  if(t===PFA2)return '<span class="badge green">VP 2×</span>';
+  if(t===PFA2_RF450)return '<span class="badge orange">VP 2× + RF</span>';
+  if(t===RF450)return '<span class="badge red">RF 450</span>';
+  if(t===RF450_PFA2)return '<span class="badge amber">RF + VP 2×</span>';
+  return '<span class="badge gray">未分配</span>';
+}
+function strategyTone(t){
+  t=normalizeStrategy(t);
+  if(t===PFA4)return 'blue';
+  if(t===PFA2)return 'green';
+  if(t===PFA2_RF450)return 'orange';
+  if(t===RF450)return 'red';
+  if(t===RF450_PFA2)return 'amber';
+  return 'gray';
+}
+function strategyCompactLabel(t){
+  t=normalizeStrategy(t);
+  if(t===PFA4)return 'VP 4×';
+  if(t===PFA2)return 'VP 2×';
+  if(t===PFA2_RF450)return 'VP 2× + RF';
+  if(t===RF450)return 'RF 450';
+  if(t===RF450_PFA2)return 'RF + VP 2×';
+  return '未分配';
+}
+function strategyCell(t,prefix='',compact=false){
+  const label=compact?strategyCompactLabel(t):tLabel(t);
+  return `<span class="strategy-cell ${strategyTone(t)}" title="${esc(tLabel(t))}">${prefix?`<span class="strategy-id">${esc(prefix)}</span>`:''}<span class="strategy-name">${esc(label)}</span></span>`;
+}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function n(v){const x=Number(v);return String(v).trim()!==''&&Number.isFinite(x)?x:null}
+function mean(arr){const x=arr.map(n).filter(v=>v!=null);return x.length?x.reduce((a,b)=>a+b,0)/x.length:null}
+function sd(arr){const x=arr.map(n).filter(v=>v!=null);if(x.length<2)return null;const m=mean(x);return Math.sqrt(x.reduce((s,v)=>s+(v-m)**2,0)/(x.length-1))}
+function fmt(v,d=1,suf=''){return v==null?'—':Number(v).toFixed(d)+suf}
+function yn(v){return v==='Yes'?'是':v==='No'?'否':v==='Not assessable'?'不可评价':'—'}
+function getA(){return state.animals[ui.animal]}
+
+
+function hasStudyData(){
+  return state.animals.some(a=>a.weight||a.procedureDate||a.d30Date||a.quickNotes||a.finalComments||a.workflow.floatingImpedanceLA||a.workflow.floatingImpedanceLV||
+    ATRIAL_SITES.some(s=>a.ablation[s].vp.some(atrialVPHasData)||a.ablation[s].rf.some(atrialRFHasData)||a.mapping[s].preMap||a.mapping[s].postMap||a.mapping[s].d30Map||a.pathology[s].some(x=>x.blockId||x.ttcId||x.heId||x.massonId||x.depth||x.note))||
+    a.ventFootprints.some(ventFootprintHasData)||a.safety.length||a.deviations.length||a.missing.length||a.images.length);
+}
+
+function ventFootprintHasData(f){
+  return !!(f.anatomicalSite||f.tpi||f.effectiveElectrodes||f.note||
+    f.stable||f.alarm||(f.primarySites||[]).some(ventPrimarySiteHasData)||(f.exploratorySites||[]).some(ventPrimarySiteHasData));
+}
+function setStatus(x){document.getElementById('status').textContent=x}
+function saveLocal(){localStorage.setItem(STORAGE,JSON.stringify(state));setStatus('已保存 '+new Date().toLocaleTimeString())}
+function autoSave(){clearTimeout(timer);timer=setTimeout(()=>{localStorage.setItem(STORAGE,JSON.stringify(state));setStatus('已自动保存 '+new Date().toLocaleTimeString())},500)}
+async function digestText(text){
+  try{if(globalThis.crypto?.subtle&&globalThis.TextEncoder){const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text));return {algorithm:'SHA-256',value:Array.from(new Uint8Array(bytes)).map(x=>x.toString(16).padStart(2,'0')).join('')}}}catch(e){}
+  return {algorithm:'FNV1A-32',value:chainChecksum(text)};
+}
+async function createBackupPackage(source=state){
+  const payload=cloneData(source),digest=await digestText(JSON.stringify(payload));
+  return {format:BACKUP_FORMAT,createdAt:isoNow(),createdBy:currentUser()?.name||'系统自动备份',systemBuild:SYSTEM_BUILD,algorithm:digest.algorithm,checksum:digest.value,payload};
+}
+async function verifyBackupPackage(pkg){
+  if(!pkg||pkg.format!==BACKUP_FORMAT||!pkg.payload||!pkg.checksum)return {ok:false,message:'不是受支持的校验备份格式'};
+  const digest=await digestText(JSON.stringify(pkg.payload));
+  if(digest.value!==pkg.checksum)return {ok:false,message:'备份校验值不一致，文件可能损坏或被修改'};
+  return {ok:true,message:`${digest.algorithm} 校验通过`,algorithm:digest.algorithm};
+}
+function storedBackups(){try{const rows=JSON.parse(localStorage.getItem(BACKUPS)||'[]');return Array.isArray(rows)?rows:[]}catch(e){return []}}
+function storeBackupPackage(pkg,kind='automatic'){
+  const rows=storedBackups();rows.unshift({kind,package:pkg});const kept=rows.slice(0,5);
+  try{localStorage.setItem(BACKUPS,JSON.stringify(kept))}catch(e){try{localStorage.setItem(BACKUPS,JSON.stringify(kept.slice(0,1)))}catch(ignore){}}
+  try{localStorage.setItem(SNAPSHOT,JSON.stringify(pkg))}catch(e){}
+  state.compliance.backupIndex=[{createdAt:pkg.createdAt,createdBy:pkg.createdBy,kind,algorithm:pkg.algorithm,checksum:pkg.checksum},...(state.compliance.backupIndex||[])].slice(0,20);
+}
+async function snapshot(){try{const pkg=await createBackupPackage();storeBackupPackage(pkg,'automatic')}catch(e){}}
+function mergeUsers(currentUsers,incomingUsers){const map=new Map();[...(currentUsers||[]),...(incomingUsers||[])].forEach(u=>{if(u?.id&&!map.has(u.id))map.set(u.id,u)});return Array.from(map.values())}
+function replaceStateFromExternal(next,action,note=''){
+  const existingCompliance=cloneData(state.compliance||freshCompliance()),incomingUsers=next?.compliance?.users||[];
+  state=next;ensureState();existingCompliance.users=mergeUsers(existingCompliance.users,incomingUsers);state.compliance=existingCompliance;ensureState();
+  appendAudit(action,{note});renderAll();autoSave();
+}
+async function restoreSnapshot(){
+  if(!requireAdmin('恢复备份')||!requireGlobalEditable('恢复备份'))return;const x=localStorage.getItem(SNAPSHOT);if(!x)return alert('没有可恢复的校验备份。');
+  if(!confirm('用最近校验备份覆盖当前研究数据？本次恢复会写入稽查轨迹。'))return;
+  try{const parsed=JSON.parse(x),pkg=parsed.format===BACKUP_FORMAT?parsed:{format:'LEGACY',payload:parsed};
+    if(pkg.format===BACKUP_FORMAT){const result=await verifyBackupPackage(pkg);if(!result.ok)return alert(result.message)}else if(!confirm('这是旧版无校验快照，无法验证完整性。仍要恢复吗？'))return;
+    pushHistory();replaceStateFromExternal(cloneData(pkg.payload),'BACKUP_RESTORE',pkg.format===BACKUP_FORMAT?`已校验 ${pkg.checksum}`:'旧版无校验快照');setStatus('备份已恢复并记录稽查轨迹');
+  }catch(err){alert('恢复失败：'+err.message)}
+}
+function loadLocal(){
+  if(!requireAdmin('读取并覆盖本地数据')||!requireGlobalEditable('读取本地数据'))return;const x=localStorage.getItem(STORAGE);if(!x)return alert('未找到本地数据。');
+  try{pushHistory();replaceStateFromExternal(JSON.parse(x),'LOCAL_DATA_LOAD','读取本机浏览器数据');setStatus('已读取本地数据')}catch(err){alert('本地数据读取失败：'+err.message)}
+}
+async function exportValidatedBackup(){
+  if(!requireLogin('生成校验备份'))return;appendAudit('BACKUP_EXPORT',{note:'生成并下载校验备份'});const pkg=await createBackupPackage();storeBackupPackage(pkg,'manual');saveLocal();
+  download(`Varipulse_STSF_CRF_校验备份_${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(pkg,null,2),'application/json');renderAll();setStatus(`${pkg.algorithm} 备份已生成`);
+}
+function exportJSON(){return exportValidatedBackup()}
+function importJSON(e){
+  const input=e.target,f=input.files[0];if(!f)return;if(!requireAdmin('导入备份')||!requireGlobalEditable('导入备份')){input.value='';return}const r=new FileReader();
+  r.onload=async()=>{try{const parsed=JSON.parse(r.result);let payload=parsed,note='旧版无校验 JSON';
+    if(parsed.format===BACKUP_FORMAT){const result=await verifyBackupPackage(parsed);if(!result.ok)throw new Error(result.message);payload=parsed.payload;note=`已校验 ${parsed.algorithm} / ${parsed.checksum}`}
+    else if(!confirm('这是旧版无校验 JSON，无法验证文件完整性。仍要导入吗？'))return;
+    if(!payload||!Array.isArray(payload.animals))throw new Error('备份中缺少动物研究数据');pushHistory();replaceStateFromExternal(cloneData(payload),'BACKUP_IMPORT',note);setStatus('备份已导入并记录稽查轨迹');
+  }catch(err){alert('备份读取失败：'+err.message)}finally{input.value=''}};r.readAsText(f,'utf-8');
+}
+function resetAll(){
+  if(!requireAdmin('清空研究数据')||!requireGlobalEditable('清空研究数据'))return;if(!confirm('确定清空全部录入数据并恢复6只猪随机初始方案？用户、验证记录和稽查轨迹会保留。'))return;
+  pushHistory();const compliance=cloneData(state.compliance),previousSummary=state.animals.map(a=>({id:a.id,status:a.completion||'未完成'}));state=freshState();state.compliance=compliance;ensureState();appendAudit('STUDY_DATA_RESET',{oldValue:previousSummary,note:'恢复初始随机方案'});renderAll();autoSave();
+}
+function pushHistory(){if(historyLock)return;history.push(JSON.stringify(state));if(history.length>20)history.shift();future=[]}
+function restoreHistoryState(serialized,action){const compliance=cloneData(state.compliance);historyLock=true;state=JSON.parse(serialized);historyLock=false;ensureState();state.compliance=compliance;ensureState();appendAudit(action,{note:'用户界面历史操作'});renderAll();autoSave()}
+function undo(){if(!history.length||!requireGlobalEditable('撤销'))return;future.push(JSON.stringify(state));restoreHistoryState(history.pop(),'UNDO')}
+function redo(){if(!future.length||!requireGlobalEditable('恢复'))return;history.push(JSON.stringify(state));restoreHistoryState(future.pop(),'REDO')}
+function download(name,text,type='text/plain'){const b=new Blob([text],{type}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
+function csv(rows){
+  if(!rows.length)return '';
+  const h=Object.keys(rows[0]),qv=v=>'"'+String(v??'').replaceAll('"','""')+'"';
+  return '\ufeff'+[h.map(qv).join(','),...rows.map(r=>h.map(k=>qv(r[k])).join(','))].join('\n');
+}
+
+function ventStrategySetComplete(footprints){
+  return Array.isArray(footprints)&&footprints.length===VENT_FOOTPRINT_COUNT&&VENT_STRATEGIES.every(t=>footprints.filter(f=>normalizeStrategy(f.treatment)===t).length===1);
+}
+function nextVentFootprintId(footprints){
+  const used=new Set((footprints||[]).map(f=>f.id));let i=1,id='F01';
+  while(used.has(id)){i++;id='F'+String(i).padStart(2,'0')}
+  return id;
+}
+function migrateVentFootprints(a,seed){
+  a.ventFootprints=Array.isArray(a.ventFootprints)?a.ventFootprints:[];
+  if(ventStrategySetComplete(a.ventFootprints))return {changed:false,mode:''};
+  const hasExistingData=a.ventFootprints.some(ventFootprintHasData);
+  if(!hasExistingData){generateVentFootprintRandomization(a,seed,false);return {changed:true,mode:'regenerated'}}
+  // 兼容既有4策略数据：不重排、不改写原Footprint，仅追加独立VP 2×组。
+  const before=a.ventFootprints.length;
+  VENT_STRATEGIES.forEach(t=>{
+    if(!a.ventFootprints.some(f=>normalizeStrategy(f.treatment)===t))a.ventFootprints.push(emptyVentFootprint(nextVentFootprintId(a.ventFootprints),t));
+  });
+  return {changed:a.ventFootprints.length!==before,mode:'appended'};
+}
+
+
+function ensureState(){
+  if(!state||!Array.isArray(state.animals))state=freshState();
+  while(state.animals.length<6)state.animals.push(emptyAnimal(state.animals.length));
+  state.animals=state.animals.slice(0,6);
+  state.animals=state.animals.map((a,i)=>a&&typeof a==='object'?a:emptyAnimal(i));
+  state.compliance=state.compliance&&typeof state.compliance==='object'?state.compliance:freshCompliance();
+  const complianceDef=freshCompliance();
+  Object.keys(complianceDef).forEach(k=>{if(state.compliance[k]===undefined)state.compliance[k]=complianceDef[k]});
+  state.compliance.schemaVersion='1.0';state.compliance.systemBuild=SYSTEM_BUILD;
+  state.compliance.users=Array.isArray(state.compliance.users)?state.compliance.users:[];
+  state.compliance.users.forEach((u,i)=>{u.id=u.id||`USR-MIGRATED-${i+1}`;u.name=normalizeUserName(u.name||`用户${i+1}`);u.role=isAdminName(u.name)?'Administrator':'User';u.registeredAt=u.registeredAt||state.createdAt||isoNow();u.lastLoginAt=u.lastLoginAt||''});
+  state.compliance.auditTrail=Array.isArray(state.compliance.auditTrail)?state.compliance.auditTrail:[];
+  state.compliance.validation=state.compliance.validation&&typeof state.compliance.validation==='object'?state.compliance.validation:{latest:null,history:[]};
+  state.compliance.validation.history=Array.isArray(state.compliance.validation.history)?state.compliance.validation.history:[];
+  state.compliance.backupIndex=Array.isArray(state.compliance.backupIndex)?state.compliance.backupIndex:[];
+  const schemaMigrations=[];
+  const needsAtrialPlan=state.animals.some(a=>!a.miTreatment||!a.roofTreatment||!a.rpvTreatment);
+  state.protocolVersion=PROTOCOL_VERSION;state.version=PROTOCOL_VERSION;
+  state.animals.forEach((a,i)=>{
+    a.id=a.id||'P'+String(i+1).padStart(2,'0');
+    const simpleAnimalDef=emptyAnimal(i);
+    const needsAtrialRowMigration=a.protocol?.atrialRowSchema!==ATRIAL_ROW_SCHEMA;
+    ['randomCode','sex','weight','procedureDate','d30Date','investigator','anesthesia','act','transseptal','blindCode','completion','quickNotes','finalComments','reviewer','reviewDate','signature'].forEach(k=>{if(a[k]===undefined)a[k]=simpleAnimalDef[k]});
+    const protocolDef={version:PROTOCOL_VERSION,atrialPFAOnly:4,atrialComboVP:2,ai:450,rfSpacing:4,rfPower:'',ventFootprints:VENT_FOOTPRINT_COUNT,ventSchema:VENT_SCHEMA,ventStrategies:VENT_STRATEGIES.join(' | '),ventPrimarySites:'E3/E5/E7',atrialRowSchema:ATRIAL_ROW_SCHEMA};
+    a.protocol=a.protocol||{};
+    Object.keys(protocolDef).forEach(k=>{a.protocol[k]=protocolDef[k]});
+    a.workflow=a.workflow||emptyWorkflow();
+    const workflowDef=emptyWorkflow();
+    Object.keys(workflowDef).forEach(k=>{if(a.workflow[k]===undefined)a.workflow[k]=workflowDef[k]});
+    a.workflow.studyPhase=a.workflow.studyPhase|| (i<2?ENDPOINT_ACUTE:ENDPOINT_LONG);
+    a.workflow.assessmentTime=a.workflow.assessmentTime|| (a.workflow.studyPhase===ENDPOINT_LONG?'28 d':'2 h');
+    a.workflow.isBackup=a.workflow.isBackup|| (i>=4?'Yes':'No');
+    a.workflow.arterialAccess=a.workflow.arterialAccess??1;a.workflow.venousAccess=a.workflow.venousAccess??2;
+    a.mapping=a.mapping||{};
+    ['MI','ROOF','RPV','VENT'].forEach(s=>{
+      const withBlock=s==='MI'||s==='ROOF',def=emptyMapping(withBlock);
+      if(!a.mapping[s]||typeof a.mapping[s]!=='object')a.mapping[s]=def;
+      ['preMap','postMap','d30Map','mapId','note'].forEach(k=>{if(a.mapping[s][k]===undefined)a.mapping[s][k]=def[k]});
+      if(withBlock){
+        ['immediateBlock','d30Block'].forEach(k=>{
+          if(!a.mapping[s][k]||typeof a.mapping[s][k]!=='object')a.mapping[s][k]=emptyBlock();
+          const bd=emptyBlock();Object.keys(bd).forEach(key=>{if(a.mapping[s][k][key]===undefined)a.mapping[s][k][key]=bd[key]});
+        });
+      }
+    });
+    a.ablation=a.ablation||{};
+    ATRIAL_SITES.forEach(s=>{
+      const fallback=s==='RPV'?PFA2_RF450:PFA4;
+      const t=normalizeStrategy(treatmentFor(a,s)||fallback);
+      if(!a.ablation[s])a.ablation[s]=emptyAtrialAblation(s);
+      if(!Array.isArray(a.ablation[s].vp)||!a.ablation[s].vp.length)a.ablation[s].vp=emptyAtrialAblation(s).vp;
+      if(!Array.isArray(a.ablation[s].rf)||!a.ablation[s].rf.length)a.ablation[s].rf=emptyAtrialAblation(s).rf;
+      a.ablation[s].vp.forEach(x=>{const def=emptyVP(vpCountFor(t));Object.keys(def).forEach(k=>{if(x[k]===undefined)x[k]=def[k]})});
+      a.ablation[s].rf.forEach(x=>{const def=emptyRF(450);Object.keys(def).forEach(k=>{if(x[k]===undefined)x[k]=def[k]});x.targetAI=450});
+    });
+    if(needsAtrialRowMigration){
+      [['MI',DEFAULT_ATRIAL_VP_ROWS,DEFAULT_ATRIAL_RF_ROWS],['ROOF',DEFAULT_ATRIAL_VP_ROWS,DEFAULT_ATRIAL_RF_ROWS],['RPV',DEFAULT_RPV_VP_ROWS,DEFAULT_RPV_RF_ROWS]].forEach(([s,vpRows,rfRows])=>{
+        const t=normalizeStrategy(treatmentFor(a,s)||(s==='RPV'?PFA2_RF450:PFA4)),block=a.ablation[s];
+        while(block.vp.length<vpRows)block.vp.push(emptyVP(vpCountFor(t)));
+        while(block.rf.length<rfRows)block.rf.push(emptyRF(450));
+      });
+      a.protocol.atrialRowSchema=ATRIAL_ROW_SCHEMA;
+    }
+    a.ttc=a.ttc||{};
+    ['MI','ROOF','RPV','VENT'].forEach(s=>{if(!a.ttc[s])a.ttc[s]=emptyTTC();const def=emptyTTC();Object.keys(def).forEach(k=>{if(a.ttc[s][k]===undefined)a.ttc[s][k]=def[k]});delete a.ttc[s].fusion});
+    a.pathology=a.pathology||{};
+    const pathLabels={MI:['瓣环侧','中间二分位（1/2）','肺静脉侧'],ROOF:['心耳侧','正顶','肺静脉侧'],RPV:['RIPV代表切面']};
+    Object.entries(pathLabels).forEach(([s,labels])=>{
+      if(!Array.isArray(a.pathology[s])||!a.pathology[s].length)a.pathology[s]=labels.map(emptyPath);
+      a.pathology[s].forEach((x,j)=>{const def=emptyPath(labels[j]||x.label||('采样点'+(j+1)));Object.keys(def).forEach(k=>{if(x[k]===undefined)x[k]=def[k]});if(s==='RPV'&&['RPV代表切面','RSPV代表切面'].includes(x.label))x.label='RIPV代表切面'});
+    });
+    const ventMigration=migrateVentFootprints(a,(state.seed||DEFAULT_SEED)+'-VF-'+(i+1));
+    if(ventMigration.changed)schemaMigrations.push({animal:a,index:i,mode:ventMigration.mode});
+    a.ventFootprints.forEach((f,j)=>{
+      f.id=f.id||'F'+String(j+1).padStart(2,'0');
+      f.treatment=normalizeStrategy(f.treatment);
+      f.sequence=f.sequence||strategySequence(f.treatment);
+      f.vpCount=f.vpCount===''||f.vpCount==null?vpCountFor(f.treatment):f.vpCount;
+      f.rfTargetAI=hasRF(f.treatment)?450:'';
+      f.anatomicalSite=f.anatomicalSite??'';
+      f.effectiveElectrodes=f.effectiveElectrodes??'';
+      f.tpi=f.tpi??'';
+      f.stable=f.stable??'';
+      f.alarm=f.alarm??'';
+      f.note=f.note??'';
+      if(!Array.isArray(f.primarySites)||!f.primarySites.length)f.primarySites=VENT_PRIMARY_ELECTRODES.map(e=>emptyVentIndexSite(e,'primary'));
+      while(f.primarySites.length<3)f.primarySites.push(emptyVentIndexSite(VENT_PRIMARY_ELECTRODES[f.primarySites.length],'primary'));
+      f.primarySites=f.primarySites.slice(0,3);
+      f.primarySites.forEach((s,k)=>{
+        const def=emptyVentIndexSite(VENT_PRIMARY_ELECTRODES[k],'primary');
+        Object.keys(def).forEach(key=>{if(s[key]===undefined)s[key]=def[key]});
+        // 方案固定主要index位点；仅更新电极标签，保留旧草稿中的所有测量数据。
+        s.electrode=VENT_PRIMARY_ELECTRODES[k];
+        s.role='primary';
+        if(!hasPFA(f.treatment)){s.impPrePFA='';s.impPostPFA='';}
+        if(!hasRF(f.treatment)){s.impPreRF='';s.impPostRF='';s.rfActualAI='';s.rfDuration='';s.rfPower='';s.cfMean='';}
+      });
+      if(!Array.isArray(f.exploratorySites))f.exploratorySites=[];
+      f.exploratorySites.forEach(s=>{
+        const def=emptyVentIndexSite('', 'exploratory');
+        Object.keys(def).forEach(key=>{if(s[key]===undefined)s[key]=def[key]});
+        s.role='exploratory';if(!hasPFA(f.treatment)){s.impPrePFA='';s.impPostPFA='';}s.impPreRF='';s.impPostRF='';s.rfActualAI='';s.rfDuration='';s.rfPower='';s.cfMean='';
+      });
+    });
+    // 旧版曾在点位层级记录“基础阻抗”。只有同一腔室存在唯一旧值时，才安全迁移为动物级悬空阻抗；原点位值仍保留在数据中以便追溯。
+    const legacyValues=values=>[...new Set(values.map(v=>String(v??'').trim()).filter(Boolean))];
+    const legacyLA=legacyValues(ATRIAL_SITES.flatMap(s=>(a.ablation[s]?.vp||[]).map(x=>x.impBaseline)));
+    const legacyLV=legacyValues(a.ventFootprints.flatMap(f=>[...(f.primarySites||[]),...(f.exploratorySites||[])].map(x=>x.impBaseline)));
+    if(!String(a.workflow.floatingImpedanceLA??'').trim()&&legacyLA.length===1)a.workflow.floatingImpedanceLA=legacyLA[0];
+    if(!String(a.workflow.floatingImpedanceLV??'').trim()&&legacyLV.length===1)a.workflow.floatingImpedanceLV=legacyLV[0];
+    a.safety=Array.isArray(a.safety)?a.safety:[];
+    a.safety.forEach(x=>{const def={type:'ST段抬高',timepoint:'',site:'',position:'',stMax:'',duration:'',selfResolve:'',treatment:'',note:''};Object.keys(def).forEach(k=>{if(x[k]===undefined)x[k]=def[k]})});
+    a.deviations=a.deviations||[];a.missing=a.missing||[];a.images=a.images||[];a.custom=a.custom||[];
+    a.recordControl=a.recordControl&&typeof a.recordControl==='object'?a.recordControl:emptyRecordControl();
+    const recordDef=emptyRecordControl();Object.keys(recordDef).forEach(k=>{if(a.recordControl[k]===undefined)a.recordControl[k]=recordDef[k]});
+    a.recordControl.status=a.recordControl.status==='Locked'?'Locked':'Unlocked';
+    a.recordControl.correction=a.recordControl.correction&&typeof a.recordControl.correction==='object'?a.recordControl.correction:recordDef.correction;
+    Object.keys(recordDef.correction).forEach(k=>{if(a.recordControl.correction[k]===undefined)a.recordControl.correction[k]=recordDef.correction[k]});
+  });
+  if(needsAtrialPlan)applyAtrialRandomization(state,state.seed||DEFAULT_SEED,false);
+  schemaMigrations.forEach(({animal:a,index,mode})=>{
+    schemaMigrationApplied=true;
+    const oldHash=a.recordControl.dataHash||'';
+    if(a.recordControl.status==='Locked'&&!a.recordControl.correction.active)a.recordControl.dataHash=computeAnimalHash(a);
+    appendAudit('SCHEMA_MIGRATION',{
+      animalId:a.id,path:`animals.${index}.ventFootprints`,oldValue:oldHash,
+      newValue:a.recordControl.status==='Locked'?a.recordControl.dataHash:`${a.ventFootprints.length} Footprints`,
+      note:mode==='appended'?'保留既有LV四策略数据，新增独立VP 2× PFA Footprint；已锁定记录同步更新数据校验值':'空白旧版草稿升级为LV五策略随机方案'
+    });
+  });
+}
+function bindInput(path,value,type='text',extra=''){
+  if(type==='textarea')return `<textarea data-bind="${path}" ${extra}>${esc(value)}</textarea>`;
+  return `<input data-bind="${path}" type="${type}" value="${esc(value)}" ${extra}>`;
+}
+function selectBind(path,value,options,extra=''){
+  const binaryValues=options.map(x=>String(x[0])).filter(Boolean);
+  if(binaryValues.length===2&&binaryValues.includes('Yes')&&binaryValues.includes('No'))return `<div class="binary-choice" role="group" aria-label="是或否"><label class="binary-option yes"><input data-bind="${path}" data-binary="yes-no" data-binary-value="Yes" type="checkbox" ${value==='Yes'?'checked':''} ${extra}><span class="binary-label">是</span></label><label class="binary-option no"><input data-bind="${path}" data-binary="yes-no" data-binary-value="No" type="checkbox" ${value==='No'?'checked':''} ${extra}><span class="binary-label">否</span></label></div>`;
+  return `<select data-bind="${path}" ${extra}>${options.map(([v,l])=>`<option value="${esc(v)}" ${String(value)===String(v)?'selected':''}>${esc(l)}</option>`).join('')}</select>`;
+}
+function field(label,html){return `<div class="field"><label>${label}</label>${html}</div>`}
+const YESNO=[['','请选择'],['Yes','是'],['No','否']];
+const YNNA=[['','请选择'],['Yes','是'],['No','否'],['Not assessable','不可评价']];
+const TPI=[['','请选择'],...Array.from({length:11},(_,i)=>[String(i*10),i*10+'%'])];
+
+function pathSet(path,value){
+  const parts=path.split('.');
+  let o=state;
+  for(let i=0;i<parts.length-1;i++){let k=isNaN(parts[i])?parts[i]:Number(parts[i]);o=o[k]}
+  let k=parts.at(-1);k=isNaN(k)?k:Number(k);o[k]=value;
+}
+function pathGet(path){const parts=String(path).split('.');let o=state;for(const part of parts){const k=isNaN(part)?part:Number(part);if(o==null)return undefined;o=o[k]}return o}
+function onBoundChange(e){
+  const el=e.target.closest('[data-bind]');if(!el)return;
+  const path=el.dataset.bind,animalIndex=animalIndexFromPath(path);
+  if(!canEditPath(path)){alert(isLoggedIn()?'该动物记录已锁定，请先发起数据更正。':'请先登录后再编辑。');renderCurrent();if(!isLoggedIn())showLoginDialog();return}
+  const oldValue=pathGet(path),nextValue=el.dataset.binary==='yes-no'?(el.checked?el.dataset.binaryValue:(String(oldValue??'')===String(el.dataset.binaryValue)?'':oldValue)):el.value;if(String(oldValue??'')===String(nextValue??''))return;
+  pushHistory();pathSet(path,nextValue);normalizeAfterChange(path);
+  const correction=animalIndex==null?null:correctionFor(animalIndex);
+  appendAudit(correction?.active?'DATA_CORRECTION':'DATA_CHANGE',{animalId:animalIndex==null?'':state.animals[animalIndex].id,path,oldValue,newValue:nextValue,reason:correction?.active?correction.reason:''});
+  autoSave();renderCurrent();
+}
+
+function normalizeAfterChange(path){
+  const m=path.match(/^animals\.(\d+)\.(miTreatment|roofTreatment|rpvTreatment)$/);
+  if(m){syncAtrialProtocol(state.animals[Number(m[1])],m[2]==='miTreatment'?'MI':m[2]==='roofTreatment'?'ROOF':'RPV')}
+}
+function setMode(m){ui.mode=m;document.querySelectorAll('.modebtn').forEach(b=>b.classList.toggle('active',b.dataset.mode===m));renderCurrent()}
+function renderCurrent(){
+  document.getElementById('fieldMode').classList.toggle('hidden',ui.mode!=='field');
+  document.getElementById('crfMode').classList.toggle('hidden',ui.mode!=='crf');
+  document.getElementById('analysisMode').classList.toggle('hidden',ui.mode!=='analysis');
+  document.getElementById('governanceMode').classList.toggle('hidden',ui.mode!=='governance');
+  if(ui.mode==='field')renderField();
+  else if(ui.mode==='crf')renderCRF();
+  else if(ui.mode==='analysis')renderAnalysis();
+  else renderGovernance();
+  renderSessionUI();applyEditPermissions();
+}
+function renderAll(){ensureState();renderCurrent()}
+
+function animalDataForHash(a){const copy=cloneData(a);delete copy.recordControl;return copy}
+function computeAnimalHash(a){return chainChecksum(JSON.stringify(animalDataForHash(a)))}
+function lockState(a){const c=a.recordControl;if(c.status!=='Locked')return {tone:'open',label:'开放录入'};if(c.correction?.active)return {tone:'correction',label:'更正中'};return {tone:'locked',label:'已锁定'}}
+function lockAnimal(i){
+  if(!requireAnimalEditable(i,'锁定记录'))return;const a=state.animals[i],control=a.recordControl;if(control.status==='Locked')return alert('该动物记录已经锁定。');
+  const issues=qc().filter(x=>x.startsWith(a.id+'：')||x.startsWith(a.id+' '));
+  if(issues.length&&!confirm(`${a.id} 仍有 ${issues.length} 项数据检查提示。仍要锁定吗？`))return;
+  pushHistory();control.dataHash=computeAnimalHash(a);control.status='Locked';control.lockedAt=isoNow();control.lockedBy=currentUser().id;control.lockedByName=currentUser().name;control.correction={active:false,reason:'',openedAt:'',openedBy:'',openedByName:''};
+  appendAudit('RECORD_LOCK',{animalId:a.id,newValue:control.dataHash,note:`锁定时检查提示 ${issues.length} 项`});renderAll();autoSave();
+}
+function beginCorrection(i){
+  if(!requireLogin('发起数据更正'))return;const a=state.animals[i],control=a.recordControl;if(control.status!=='Locked')return alert('记录尚未锁定，可直接录入，无需发起更正。');
+  if(control.correction?.active)return alert(`更正已由 ${control.correction.openedByName||'其他用户'} 发起。`);
+  const actual=computeAnimalHash(a);if(control.dataHash&&actual!==control.dataHash){appendAudit('LOCK_CHECK_FAILED',{animalId:a.id,oldValue:control.dataHash,newValue:actual,note:'发起更正前校验失败'});autoSave();renderAll();return alert('锁定数据校验失败：记录可能在系统外被改动。已写入稽查轨迹，请先核查备份。')}
+  const reason=normalizeUserName(prompt(`请输入 ${a.id} 的数据更正原因（至少5个字符）：`,'')||'');if(reason.length<5)return alert('更正原因至少需要5个字符。');
+  pushHistory();control.correction={active:true,reason,openedAt:isoNow(),openedBy:currentUser().id,openedByName:currentUser().name};appendAudit('CORRECTION_OPEN',{animalId:a.id,reason,note:'锁定记录进入受控更正'});renderAll();autoSave();
+}
+function finishCorrection(i){
+  if(!requireLogin('完成数据更正'))return;const a=state.animals[i],control=a.recordControl,c=control.correction;
+  if(!c?.active)return alert('当前没有进行中的数据更正。');if(c.openedBy!==currentUser().id)return alert(`本次更正由 ${c.openedByName||'其他用户'} 发起，应由同一用户完成。`);
+  pushHistory();const oldHash=control.dataHash;control.dataHash=computeAnimalHash(a);control.lockedAt=isoNow();control.lockedBy=currentUser().id;control.lockedByName=currentUser().name;control.correction={active:false,reason:'',openedAt:'',openedBy:'',openedByName:''};
+  appendAudit('CORRECTION_CLOSE',{animalId:a.id,oldValue:oldHash,newValue:control.dataHash,reason:c.reason,note:'更正完成并重新锁定'});renderAll();autoSave();
+}
+function recordControlPanel(a,i){
+  const stateInfo=lockState(a),c=a.recordControl.correction,editable=canEditAnimal(i);let actions='';
+  if(a.recordControl.status!=='Locked')actions=`<button class="mini" onclick="lockAnimal(${i})" ${isLoggedIn()?'':'disabled'}>锁定记录</button>`;
+  else if(c.active)actions=c.openedBy===currentUser()?.id?`<button class="mini primary" onclick="finishCorrection(${i})">完成更正并重锁</button>`:`<button class="mini" disabled>${esc(c.openedByName||'其他用户')} 更正中</button>`;
+  else actions=`<button class="mini" onclick="beginCorrection(${i})" ${isLoggedIn()?'':'disabled'}>发起数据更正</button>`;
+  const detail=a.recordControl.status==='Locked'?(c.active?`原因：${esc(c.reason)} · 发起人 ${esc(c.openedByName)}`:`${esc(a.recordControl.lockedByName||'—')} 锁定 · ${formatDateTime(a.recordControl.lockedAt)} · 校验 ${esc(a.recordControl.dataHash||'—')}`):(isLoggedIn()?'当前用户可录入；完成审核后可锁定。':'未登录，仅可查看和导出。');
+  return `<div class="record-control no-print"><div class="control-copy"><div class="title"><span class="lock-badge ${stateInfo.tone}">${stateInfo.label}</span><span>${esc(a.id)} 数据控制</span></div><div class="sub">${detail}</div></div><div class="actions">${!editable&&a.recordControl.status!=='Locked'?'<span class="help">只读</span>':''}${actions}</div></div>`;
+}
+function auditMutation(i,action,path,mutator,oldValue='',newValue='',note=''){
+  if(!requireAnimalEditable(i,note||'修改数据'))return false;pushHistory();mutator();const c=correctionFor(i);
+  appendAudit(c.active?'DATA_CORRECTION':action,{animalId:state.animals[i].id,path,oldValue,newValue,reason:c.active?c.reason:'',note});renderCurrent();autoSave();return true;
+}
+
+
+function randomizationPanel(){
+  const rows=state.animals.map((a,i)=>`<tr>
+    <td>${esc(a.id)}</td><td>${esc(a.workflow.studyPhase)}</td><td class="center"><b>${esc(a.workflow.armSide||a.randomCode)}</b></td><td>${a.workflow.isBackup==='Yes'?'备用':'核心'}</td>
+    <td>${strategyCell(a.miTreatment,'',true)}</td>
+    <td>${strategyCell(a.roofTreatment,'',true)}</td>
+    <td>${strategyCell(a.rpvTreatment,'',true)}</td>
+    <td><div class="strategy-stack">${a.ventFootprints.map(f=>strategyCell(f.treatment,f.id,true)).join('')}</div></td>
+    <td><button class="mini" onclick="goAnimal(${i})">进入</button></td>
+  </tr>`).join('');
+  return `<div class="random-box">
+    <div class="random-grid">
+      ${field('随机种子',`<input id="seedInput" value="${esc(state.seed||DEFAULT_SEED)}">`)}
+      <div class="protocol-key"><span class="protocol-key-title">方案侧别</span><span><b>A</b>：MI / Roof VP 4×</span><span><b>B</b>：MI / Roof VP 2× + RF450</span><span><b>RIPV</b>：均为VP 2× + RF450</span></div>
+      <div><button onclick="rerandomizeAtrial()">重新生成一边一头分配</button></div>
+      <div><button onclick="regenerateAllVent()">全部LV Footprint重新随机</button></div>
+    </div>
+    <div class="table-wrap" style="margin-top:9px"><table class="randomization-table"><thead><tr><th>动物</th><th>阶段</th><th>侧别</th><th>角色</th><th>MI</th><th>Roof</th><th>RIPV</th><th>LV（5 FP）</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="help">P01/P02为即刻2 h；P03/P04为长期28 d；P05/P06为加入长期组的备用猪，A/B两侧各一只。LV每只猪固定5个独立策略：VP 4×、VP 2×、VP 2× + SF 450 RF、SF 450 RF、SF 450 RF + VP 2×；Footprint内固定E3/E5/E7为主要取材位点。</div>
+  </div>`;
+}
+function rerandomizeAtrial(){
+  if(!requireAdmin('重新生成房性方案分配')||!requireGlobalEditable('重新生成房性方案分配'))return;const seed=document.getElementById('seedInput')?.value||DEFAULT_SEED,oldValue=state.animals.map(a=>`${a.id}:${a.workflow.armSide}`).join('|');pushHistory();
+  if(applyAtrialRandomization(state,seed,true)){appendAudit('RANDOMIZATION_ATRIAL',{path:'seed',oldValue,newValue:seed,note:'重新生成A/B一边一头分配'});renderCurrent();autoSave()}
+}
+
+function regenerateAllVent(){
+  if(!requireAdmin('重新生成全部LV随机方案')||!requireGlobalEditable('重新生成LV随机方案'))return;
+  if(hasStudyData()&&!confirm('将重建6只猪的LV Footprint随机表。已有LV Footprint数据会被清空，继续？'))return;
+  const seed=document.getElementById('seedInput')?.value||state.seed||DEFAULT_SEED;pushHistory();
+  state.animals.forEach((a,i)=>generateVentFootprintRandomization(a,seed+'-VF-'+(i+1),false));
+  appendAudit('RANDOMIZATION_VENT_ALL',{path:'animals.*.ventFootprints',newValue:seed,note:'重建全部LV Footprint随机表'});renderCurrent();autoSave();
+}
+function goAnimal(i){ui.animal=i;ui.crfAnimal=i;if(ui.mode==='analysis')ui.mode='field';renderCurrent()}
+
+function pigTabs(){
+  return `<div class="context-strip animal-strip"><div class="context-label">动物</div><div class="animal-tabs">${state.animals.map((a,i)=>`<button class="tab animal-tab ${i===ui.animal?'active':''}" onclick="ui.animal=${i};ui.crfAnimal=${i};renderCurrent()">${esc(a.id)} <span class="badge gray">${esc(a.randomCode)}</span></button>`).join('')}</div></div>`;
+}
+function siteTabs(){
+  return `<div class="context-strip site-strip"><div class="context-label">部位</div><div class="tabs site-tabs">
+    <button class="tab ${ui.site==='MI'?'active':''}" data-site="MI" onclick="ui.site='MI';ui.stage='ablation';ui.vpIndex=0;ui.rfIndex=0;renderCurrent()">二尖瓣峡部线</button>
+    <button class="tab ${ui.site==='ROOF'?'active':''}" data-site="ROOF" onclick="ui.site='ROOF';ui.stage='ablation';ui.vpIndex=0;ui.rfIndex=0;renderCurrent()">左房顶部线</button>
+    <button class="tab ${ui.site==='RPV'?'active':''}" data-site="RPV" onclick="ui.site='RPV';ui.stage='ablation';ui.vpIndex=0;ui.rfIndex=0;renderCurrent()">RIPV</button>
+    <button class="tab ${ui.site==='VENT'?'active':''}" data-site="VENT" onclick="ui.site='VENT';ui.stage='vent';ui.ventIndex=0;renderCurrent()">LV Footprint</button>
+  </div></div>`;
+}
+function stageTabs(){
+  if(ui.site==='VENT')return `<div class="context-strip stage-strip"><div class="context-label">阶段</div><div class="tabs stage-tabs">
+    <button class="tab ${ui.stage==='workflow'?'active':''}" onclick="ui.stage='workflow';renderCurrent()">流程记录</button>
+    <button class="tab ${ui.stage==='vent'?'active':''}" onclick="ui.stage='vent';renderCurrent()">Footprint录入</button>
+    <button class="tab ${ui.stage==='mapping'?'active':''}" onclick="ui.stage='mapping';renderCurrent()">标测</button>
+    <button class="tab ${ui.stage==='safety'?'active':''}" onclick="ui.stage='safety';renderCurrent()">安全事件</button></div></div>`;
+  return `<div class="context-strip stage-strip"><div class="context-label">阶段</div><div class="tabs stage-tabs">
+    <button class="tab ${ui.stage==='workflow'?'active':''}" onclick="ui.stage='workflow';renderCurrent()">流程记录</button>
+    <button class="tab ${ui.stage==='ablation'?'active':''}" onclick="ui.stage='ablation';renderCurrent()">消融</button>
+    <button class="tab ${ui.stage==='mapping'?'active':''}" onclick="ui.stage='mapping';renderCurrent()">标测 / 阻滞</button>
+    <button class="tab ${ui.stage==='path'?'active':''}" onclick="ui.stage='path';renderCurrent()">TTC / 染色</button>
+    <button class="tab ${ui.stage==='safety'?'active':''}" onclick="ui.stage='safety';renderCurrent()">安全事件</button></div></div>`;
+}
+function renderField(){
+  const host=document.getElementById('fieldMode'),a=getA(),t=ui.site==='VENT'?'Footprint级1:1随机':treatmentFor(a,ui.site);
+  host.innerHTML=`<div class="field-nav">${pigTabs()}${siteTabs()}${stageTabs()}</div>${recordControlPanel(a,ui.animal)}
+    <div class="focusbar">
+      <div class="focusbox"><div class="k">当前动物</div><div class="v">${esc(a.id)}｜随机码 ${esc(a.randomCode)}</div></div>
+      <div class="focusbox"><div class="k">当前部位</div><div class="v">${SITE_NAMES[ui.site]}</div></div>
+      <div class="focusbox"><div class="k">消融策略</div><div class="v">${ui.site==='VENT'?'5个Footprint：VP4 / VP2 / VP2+RF / RF / RF+VP2':strategyCell(t)}</div></div>
+    </div>
+    <div id="fieldMain"></div>`;
+  const main=document.getElementById('fieldMain');
+  if(ui.stage==='workflow')renderFieldWorkflow(main,a);
+  else if(ui.stage==='ablation')renderFieldAblation(main,a,ui.site);
+  else if(ui.stage==='mapping')renderFieldMapping(main,a,ui.site);
+  else if(ui.stage==='path')renderFieldPath(main,a,ui.site);
+  else if(ui.stage==='vent')renderFieldVent(main,a);
+  else renderFieldSafety(main,a);
+}
+function renderFieldWorkflow(main,a){
+  const b=`animals.${ui.animal}.workflow`,w=a.workflow;
+  main.innerHTML=`<div class="card"><div class="card-head">20260827 流程与时间点</div><div class="card-body">
+    <div class="grid">
+      ${field('研究阶段',`<input disabled class="locked" value="${esc(endpointGroupLabel(a))}">`)}
+      ${field('方案侧别',`<input disabled class="locked" value="${esc(w.armSide)}侧">`)}
+      ${field('动物角色',`<input disabled class="locked" value="${roleLabel(a)}">`)}
+      ${field('终点评估时间',bindInput(b+'.assessmentTime',w.assessmentTime))}
+      ${field('动脉通路条数',bindInput(b+'.arterialAccess',w.arterialAccess,'number','min="1"'))}
+      ${field('静脉通路条数',bindInput(b+'.venousAccess',w.venousAccess,'number','min="1"'))}
+      ${field('ICE + Vizigo 房间隔穿刺',selectBind(b+'.iceTransseptal',w.iceTransseptal,YESNO))}
+      ${field('VP校准完成',selectBind(b+'.vpCalibration',w.vpCalibration,YESNO))}
+    </div>
+    <div class="section-title"><span>1</span>穿刺、基质标测与动物级悬空阻抗</div>
+    <div class="grid">
+      ${field('Pen基质标测 LA',selectBind(b+'.penMappingLA',w.penMappingLA,YESNO))}
+      ${field('Pen基质标测 LV',selectBind(b+'.penMappingLV',w.penMappingLV,YESNO))}
+      ${field('LA悬空阻抗 (Ω)',bindInput(b+'.floatingImpedanceLA',w.floatingImpedanceLA,'number','step="0.1"'))}
+      ${field('LV悬空阻抗 (Ω)',bindInput(b+'.floatingImpedanceLV',w.floatingImpedanceLV,'number','step="0.1"'))}
+      ${field('左房消融前阻抗记录',selectBind(b+'.preAblationImpedance',w.preAblationImpedance,YESNO))}
+      ${field('左房消融后阻抗记录',selectBind(b+'.postAblationImpedance',w.postAblationImpedance,YESNO))}
+    </div>
+    <div class="help">悬空阻抗按动物录入：每只猪 LA 与 LV 各记录 1 个值；不在 MI、Roof、RIPV 或 LV Footprint 点位内重复录入。实际执行 PFA / RF 的每个位置分别记录“PFA前阻抗”与“RF前阻抗”。</div>
+    <div class="section-title"><span>2</span>消融结束后再次标测</div>
+    <div class="grid">
+      ${field('消融完成',selectBind(b+'.ablationComplete',w.ablationComplete,YESNO))}
+      ${field('再次标测 LA',selectBind(b+'.postMappingLA',w.postMappingLA,YESNO))}
+      ${field('再次标测 LV',selectBind(b+'.postMappingLV',w.postMappingLV,YESNO))}
+      ${field('终末 TTC 完成',selectBind(b+'.ttcComplete',w.ttcComplete,YESNO))}
+    </div>
+    <div class="section-title"><span>3</span>TTC、拍照与组织学送检</div>
+    <div class="grid">
+      ${field('TTC整体照片编号',bindInput(b+'.ttcImageId',w.ttcImageId))}
+      ${field('损伤照片编号',bindInput(b+'.photoId',w.photoId))}
+      ${field('标本送 H&E',selectBind(b+'.specimenHE',w.specimenHE,YESNO))}
+      ${field('标本送 Masson',selectBind(b+'.specimenMasson',w.specimenMasson,YESNO))}
+      ${field('流程备注',bindInput(b+'.notes',w.notes,'textarea'))}
+    </div>
+    <div class="analysis-note">流程：动脉1、静脉2 → ICE + Vizigo 房间隔穿刺 → Pen基质标测 LA / LV → VP校准 → 左房 Roof、MI、RIPV 按分配方案消融并记录阻抗 → 双能量方案追加 SF 450 RF → LV按Footprint策略完成 VP / RF 顺序 → 消融结束后再次标测 LA / LV → ${endpointLabel(a)} TTC、拍照、H&E 与 Masson。</div>
+  </div></div>`;
+}
+function atrialVPHasData(x){return !!(x.tpi||x.impBaseline||x.impPrePFA||x.impPostPFA||x.stable||x.alarm||x.note)}
+function atrialRFHasData(x){return !!(x.actualAI||x.duration||x.power||x.cfMean||x.impPreRF||x.impPostRF||x.impDrop||x.stable||x.alarm)}
+function atrialVPMatrix(animalIndex,site,vp,treatment,scope='field'){
+  const pfa=hasPFA(treatment),na='<span class="matrix-fixed">不适用</span>';
+  const rows=[
+    ['VP消融次数',(x,b)=>bindInput(b+'.count',x.count,'number','min="0"')],
+    ['TPI阳性占比',(x,b)=>selectBind(b+'.tpi',x.tpi,TPI)],
+    ['PFA前阻抗 (Ω)',(x,b)=>pfa?bindInput(b+'.impPrePFA',x.impPrePFA,'number','step="0.1"'):na],
+    ['PFA后阻抗 (Ω)',(x,b)=>pfa?bindInput(b+'.impPostPFA',x.impPostPFA,'number','step="0.1"'):na],
+    ['导管位置稳定',(x,b)=>selectBind(b+'.stable',x.stable,YESNO)],
+    ['报警 / 中断',(x,b)=>bindInput(b+'.alarm',x.alarm)],
+    ['备注',(x,b)=>bindInput(b+'.note',x.note)]
+  ];
+  return `<div class="table-wrap vp-matrix-wrap"><table class="vp-matrix points-${vp.length} ${scope==='crf'?'crf-table-wide crf-atrial-vp-matrix':''}"><thead><tr><th>参数</th>${vp.map((x,j)=>`<th><span class="matrix-point-label ${atrialVPHasData(x)?'has-data':''}">VP${String(j+1).padStart(2,'0')}</span></th>`).join('')}</tr></thead><tbody>
+    ${rows.map(([label,render])=>`<tr><th>${label}</th>${vp.map((x,j)=>{const b=`animals.${animalIndex}.ablation.${site}.vp.${j}`;return `<td>${render(x,b)}</td>`}).join('')}</tr>`).join('')}
+  </tbody></table></div>`;
+}
+function atrialRFMatrix(animalIndex,site,rf,scope='field'){
+  const rows=[
+    ['目标 AI',(x,b)=>'<span class="matrix-fixed">450</span>'],
+    ['实际 AI',(x,b)=>bindInput(b+'.actualAI',x.actualAI,'number')],
+    ['RF时间 (s)',(x,b)=>bindInput(b+'.duration',x.duration,'number','step="0.1"')],
+    ['功率 (W)',(x,b)=>bindInput(b+'.power',x.power,'number')],
+    ['平均 CF (g)',(x,b)=>bindInput(b+'.cfMean',x.cfMean,'number','step="0.1"')],
+    ['RF前阻抗 (Ω)',(x,b)=>bindInput(b+'.impPreRF',x.impPreRF,'number','step="0.1"')],
+    ['RF后阻抗 (Ω)',(x,b)=>bindInput(b+'.impPostRF',x.impPostRF,'number','step="0.1"')],
+    ['RF阻抗下降 (Ω)',(x,b)=>bindInput(b+'.impDrop',x.impDrop,'number','step="0.1"')],
+    ['点间距 (mm)',(x,b)=>bindInput(b+'.spacing',x.spacing,'number','step="0.1"')],
+    ['导管稳定',(x,b)=>selectBind(b+'.stable',x.stable,YESNO)],
+    ['报警 / 中断',(x,b)=>bindInput(b+'.alarm',x.alarm)]
+  ];
+  const crfClass=scope==='crf'?' crf-rf-wrap':'';
+  return `<div class="table-wrap rf-matrix-wrap${crfClass}"><table class="rf-matrix points-${rf.length} ${scope==='crf'?'crf-table-wide crf-atrial-rf-table':''}"><thead><tr><th>参数</th>${rf.map((x,j)=>`<th>RF${String(j+1).padStart(2,'0')}</th>`).join('')}</tr></thead><tbody>
+    ${rows.map(([label,render])=>`<tr><th>${label}</th>${rf.map((x,j)=>{const b=`animals.${animalIndex}.ablation.${site}.rf.${j}`;return `<td>${render(x,b)}</td>`}).join('')}</tr>`).join('')}
+  </tbody></table></div>`;
+}
+function renderFieldAblation(main,a,site){
+  const ai=ui.animal,t=treatmentFor(a,site),b=a.ablation[site],vpEnd=`VP${String(b.vp.length).padStart(2,'0')}`,rfEnd=`RF${String(b.rf.length).padStart(2,'0')}`;
+  const vp=`<div class="card"><div class="card-head"><span>Varipulse位置记录</span><span class="badge blue">${b.vp.length}点矩阵</span></div><div class="card-body">
+      ${atrialVPMatrix(ai,site,b.vp,t,'field')}
+      <div class="help">横向为 VP01–${vpEnd}，纵向为每项消融参数；每一列对应一个完整的Varipulse位置。</div>
+    </div></div>`;
+  const rf=hasRF(t)?`<div class="card"><div class="card-head"><span>STSF RF逐点记录</span><span class="badge gray">${b.rf.length}点矩阵</span></div><div class="card-body">
+      ${atrialRFMatrix(ai,site,b.rf,'field')}
+      <div class="help">横向为 RF01–${rfEnd}，纵向为每项消融参数；可直接按列完成单个RF点记录。</div>
+    </div></div>`:`<div class="card disabled-card"><div class="card-head">STSF RF逐点记录</div><div class="card-body">当前为纯VP 4× PFA，该区不录入RF数据。</div></div>`;
+  main.innerHTML=vp+rf;
+}
+function addVP(site){const i=ui.animal,a=getA(),t=treatmentFor(a,site);auditMutation(i,'ROW_ADD',`animals.${i}.ablation.${site}.vp`,()=>{a.ablation[site].vp.push(emptyVP(vpCountFor(t)));ui.vpIndex=a.ablation[site].vp.length-1},'',`位置${a.ablation[site].vp.length+1}`,'增加Varipulse位置')}
+function dupVP(site,row){const i=ui.animal,a=getA(),x=cloneData(a.ablation[site].vp[row]);auditMutation(i,'ROW_COPY',`animals.${i}.ablation.${site}.vp.${row}`,()=>{a.ablation[site].vp.splice(row+1,0,x);ui.vpIndex=row+1},x,x,'复制Varipulse位置')}
+function delVP(site,row){const i=ui.animal,a=getA();if(a.ablation[site].vp.length===1)return alert('至少保留一个位置。');const old=cloneData(a.ablation[site].vp[row]);auditMutation(i,'ROW_DELETE',`animals.${i}.ablation.${site}.vp.${row}`,()=>{a.ablation[site].vp.splice(row,1);ui.vpIndex=Math.max(0,row-1)},old,'','删除Varipulse位置')}
+function addRF(site){const i=ui.animal,a=getA();auditMutation(i,'ROW_ADD',`animals.${i}.ablation.${site}.rf`,()=>{a.ablation[site].rf.push(emptyRF());ui.rfIndex=a.ablation[site].rf.length-1},'',`RF${a.ablation[site].rf.length+1}`,'增加RF点')}
+function delRF(site,row){const i=ui.animal,a=getA();if(a.ablation[site].rf.length===1)return alert('至少保留一个RF点。');const old=cloneData(a.ablation[site].rf[row]);auditMutation(i,'ROW_DELETE',`animals.${i}.ablation.${site}.rf.${row}`,()=>{a.ablation[site].rf.splice(row,1);ui.rfIndex=Math.max(0,row-1)},old,'','删除RF点')}
+
+function renderFieldMapping(main,a,site){
+  const ai=ui.animal,m=a.mapping[site],base=`animals.${ai}.mapping.${site}`;
+  let block='';
+  if(site==='MI'||site==='ROOF'){
+    block=['immediateBlock','d30Block'].map((k,idx)=>{const b=m[k],bb=base+'.'+k;return `<div class="card"><div class="card-head">${idx===0?'即刻':endpointLabel(a)}传导阻滞验证</div><div class="card-body"><div class="grid">
+      ${field('起搏位置',bindInput(bb+'.pacingSite',b.pacingSite))}
+      ${field('CL (ms)',bindInput(bb+'.cl',b.cl,'number'))}
+      ${field('跨线传导时间 (ms)',bindInput(bb+'.transTime',b.transTime,'number'))}
+      ${field('激动顺序反转',selectBind(bb+'.orderReversal',b.orderReversal,YESNO))}
+      ${field('高密度标测直接突破',selectBind(bb+'.breakthrough',b.breakthrough,YESNO))}
+      ${field('差异性起搏支持阻滞',selectBind(bb+'.diffPacing',b.diffPacing,YESNO))}
+      ${field('双电位',selectBind(bb+'.doublePotentials',b.doublePotentials,YESNO))}
+      ${field('最终阻滞',selectBind(bb+'.finalBlock',b.finalBlock,YNNA))}
+      ${field('不可评价原因',bindInput(bb+'.naReason',b.naReason,'textarea'))}
+      </div></div></div>`}).join('');
+  }
+  main.innerHTML=`<div class="card"><div class="card-head">${SITE_NAMES[site]}标测</div><div class="card-body"><div class="grid">
+    ${field('消融前标测完成',selectBind(base+'.preMap',m.preMap,YESNO))}
+    ${field('消融后即刻标测完成',selectBind(base+'.postMap',m.postMap,YESNO))}
+    ${field(endpointLabel(a)+'标测完成',selectBind(base+'.d30Map',m.d30Map,YESNO))}
+    ${field('标测/图片编号',bindInput(base+'.mapId',m.mapId))}
+    ${field('备注',bindInput(base+'.note',m.note,'textarea'))}
+    </div><div class="help">消融前只记录标测是否完成，不记录“消融前阻滞”。</div></div></div>${block}`;
+}
+function pathSummary(samples){const depths=samples.map(x=>n(x.depth)).filter(x=>x!=null),ev=samples.filter(x=>x.transmural==='Yes'||x.transmural==='No'),yes=ev.filter(x=>x.transmural==='Yes').length;return {mean:mean(depths),max:depths.length?Math.max(...depths):null,n:ev.length,yes,trans:ev.length?yes/ev.length*100:null}}
+function pathInstruction(site){return site==='MI'?'固定为：瓣环侧 / 中间二分位（1/2） / 肺静脉侧。':site==='ROOF'?'固定为：心耳侧 / 正顶 / 肺静脉侧。':'固定为：RIPV代表切面。'}
+function renderFieldPath(main,a,site){
+  const ai=ui.animal,tt=a.ttc[site],tb=`animals.${ai}.ttc.${site}`,samples=a.pathology[site],sum=pathSummary(samples);
+  main.innerHTML=`<div class="card"><div class="card-head">${SITE_NAMES[site]} — TTC大体评价</div><div class="card-body"><div class="grid">
+    ${field('病灶长度 (mm)',bindInput(tb+'.lesionLength',tt.lesionLength,'number','step="0.1"'))}
+    ${field('平均宽度 (mm)',bindInput(tb+'.widthMean',tt.widthMean,'number','step="0.1"'))}
+    ${field('最大宽度 (mm)',bindInput(tb+'.widthMax',tt.widthMax,'number','step="0.1"'))}
+    ${field('大体连续性 (%)',bindInput(tb+'.continuity',tt.continuity,'number','min="0" max="100"'))}
+    ${field('大体透壁比例 (%)',bindInput(tb+'.grossTrans',tt.grossTrans,'number','min="0" max="100"'))}
+    ${site==='MI'?field('H&E大体评价',bindInput(tb+'.heGross',tt.heGross,'textarea')):''}
+    ${site==='MI'?field('Masson大体评价',bindInput(tb+'.massonGross',tt.massonGross,'textarea')):''}
+    ${field('TTC图片编号',bindInput(tb+'.imageId',tt.imageId))}
+    ${field('备注',bindInput(tb+'.note',tt.note,'textarea'))}
+  </div></div></div>
+  <div class="card"><div class="card-head">H&E / Masson固定解剖采样点</div><div class="card-body">
+    <div class="table-wrap"><table><thead><tr><th>采样点</th><th>组织块</th><th>H&E</th><th>Masson</th><th>壁厚</th><th>病灶深度</th><th>宽度</th><th>透壁</th><th>残余心肌桥</th><th>备注</th></tr></thead><tbody>
+      ${samples.map((x,i)=>{const b=`animals.${ai}.pathology.${site}.${i}`;return `<tr><td><b>${esc(x.label)}</b></td><td>${bindInput(b+'.blockId',x.blockId)}</td><td>${bindInput(b+'.heId',x.heId)}</td><td>${bindInput(b+'.massonId',x.massonId)}</td><td>${bindInput(b+'.wall',x.wall,'number','step="0.01"')}</td><td>${bindInput(b+'.depth',x.depth,'number','step="0.01"')}</td><td>${bindInput(b+'.width',x.width,'number','step="0.01"')}</td><td>${selectBind(b+'.transmural',x.transmural,YNNA)}</td><td>${bindInput(b+'.bridge',x.bridge,'number','step="0.01"')}</td><td>${bindInput(b+'.note',x.note)}</td></tr>`}).join('')}
+    </tbody></table></div>
+    <div class="calc-strip"><div class="calc"><div class="k">平均深度</div><div class="v">${fmt(sum.mean,2,' mm')}</div></div><div class="calc"><div class="k">最大深度</div><div class="v">${fmt(sum.max,2,' mm')}</div></div><div class="calc"><div class="k">透壁采样点</div><div class="v">${sum.n?sum.yes+'/'+sum.n:'—'}</div></div><div class="calc"><div class="k">采样点透壁比例</div><div class="v">${fmt(sum.trans,1,'%')}</div></div></div>
+    <div class="help">${pathInstruction(site)}这里的深度均来自${endpointLabel(a)}终末染色后的组织学测量。</div>
+  </div></div>`;
+}
+
+function ventSiteDepth(s){return n(s.depth)}
+function ventFootprintMean(f){return mean((f.primarySites||[]).map(s=>s.depth))}
+function ventFootprintMax(f){
+  const ds=(f.primarySites||[]).map(s=>n(s.depth)).filter(x=>x!=null);
+  return ds.length?Math.max(...ds):null;
+}
+function ventFootprintTransmuralPct(f){
+  const ev=(f.primarySites||[]).filter(s=>s.transmural==='Yes'||s.transmural==='No');
+  return ev.length?ev.filter(s=>s.transmural==='Yes').length/ev.length*100:null;
+}
+function ventPrimarySiteHasData(s){return !!(s.impBaseline||s.impPrePFA||s.impPostPFA||s.impPreRF||s.impPostRF||s.rfActualAI||s.rfDuration||s.rfPower||s.cfMean||s.stable||s.alarm||s.ttcId||s.heId||s.massonId||s.wall||s.depth||s.width||s.transmural||s.bridge||s.note)}
+function ventPrimaryMatrix(animalIndex,footprintIndex,f,part='all',scope='field'){
+  const pfa=hasPFA(f.treatment),rf=hasRF(f.treatment),na='<span class="matrix-fixed">不适用</span>';
+  const quality=[
+    ['PFA前阻抗 (Ω)',(s,b)=>pfa?bindInput(b+'.impPrePFA',s.impPrePFA,'number','step="0.1"'):na],
+    ['PFA后阻抗 (Ω)',(s,b)=>pfa?bindInput(b+'.impPostPFA',s.impPostPFA,'number','step="0.1"'):na],
+    ['RF前阻抗 (Ω)',(s,b)=>rf?bindInput(b+'.impPreRF',s.impPreRF,'number','step="0.1"'):na],
+    ['RF后阻抗 (Ω)',(s,b)=>rf?bindInput(b+'.impPostRF',s.impPostRF,'number','step="0.1"'):na],
+    ['RF实际 AI',(s,b)=>rf?bindInput(b+'.rfActualAI',s.rfActualAI,'number'):na],
+    ['RF时间 (s)',(s,b)=>rf?bindInput(b+'.rfDuration',s.rfDuration,'number','step="0.1"'):na],
+    ['功率 (W)',(s,b)=>rf?bindInput(b+'.rfPower',s.rfPower,'number','step="0.1"'):na],
+    ['平均 CF (g)',(s,b)=>rf?bindInput(b+'.cfMean',s.cfMean,'number','step="0.1"'):na],
+    ['RF点间距 (mm)',(s,b)=>rf?bindInput(b+'.rfSpacing',s.rfSpacing,'number','step="0.1"'):na],
+    ['导管位置稳定',(s,b)=>selectBind(b+'.stable',s.stable,YESNO)],
+    ['报警 / 中断',(s,b)=>bindInput(b+'.alarm',s.alarm)]
+  ];
+  const pathology=[
+    ['TTC编号',(s,b)=>bindInput(b+'.ttcId',s.ttcId)],
+    ['H&E编号',(s,b)=>bindInput(b+'.heId',s.heId)],
+    ['Masson编号',(s,b)=>bindInput(b+'.massonId',s.massonId)],
+    ['壁厚 (mm)',(s,b)=>bindInput(b+'.wall',s.wall,'number','step="0.01"')],
+    ['病灶深度 (mm)',(s,b)=>bindInput(b+'.depth',s.depth,'number','step="0.01"')],
+    ['病灶宽度 (mm)',(s,b)=>bindInput(b+'.width',s.width,'number','step="0.01"')],
+    ['透壁性',(s,b)=>selectBind(b+'.transmural',s.transmural,YNNA)],
+    ['残余心肌桥 (mm)',(s,b)=>bindInput(b+'.bridge',s.bridge,'number','step="0.01"')],
+    ['备注',(s,b)=>bindInput(b+'.note',s.note)]
+  ];
+  const sections=part==='quality'?[['消融质量',quality]]:part==='pathology'?[['终末 TTC / H&E / Masson',pathology]]:[['消融质量',quality],['终末 TTC / H&E / Masson',pathology]];
+  const sites=f.primarySites||[],body=sections.map(([title,rows])=>`${part==='all'?`<tr class="matrix-section-row"><th colspan="${sites.length+1}">${title}</th></tr>`:''}${rows.map(([label,render])=>`<tr><th>${label}</th>${sites.map((s,j)=>{const b=`animals.${animalIndex}.ventFootprints.${footprintIndex}.primarySites.${j}`;return `<td>${render(s,b)}</td>`}).join('')}</tr>`).join('')}`).join('');
+  return `<div class="table-wrap vp-matrix-wrap vent-matrix-wrap"><table class="vp-matrix vent-matrix points-3 ${scope==='crf'?'crf-vent-matrix':''}"><thead><tr><th>参数</th>${sites.map(s=>`<th><span class="matrix-point-label ${ventPrimarySiteHasData(s)?'has-data':''}">${esc(s.electrode)}</span></th>`).join('')}</tr></thead><tbody>${body}</tbody></table></div>`;
+}
+// ventMax已由ventFootprintMax取代
+
+function renderFieldVent(main,a){
+  if(!a.ventFootprints.length)generateVentFootprintRandomization(a,(state.seed||DEFAULT_SEED)+'-VF-'+(ui.animal+1),false);
+  ui.ventIndex=Math.min(ui.ventIndex,a.ventFootprints.length-1);
+  const f=a.ventFootprints[ui.ventIndex],ai=ui.animal,b=`animals.${ai}.ventFootprints.${ui.ventIndex}`;
+  const chips=a.ventFootprints.map((x,i)=>`<button class="rowchip ${isPFAOnly(x.treatment)?'vp':x.treatment===RF450?'rf':'combo'} ${i===ui.ventIndex?'active':''}" onclick="ui.ventIndex=${i};renderCurrent()">${esc(x.id)}</button>`).join('');
+  const pfa=hasPFA(f.treatment),rf=hasRF(f.treatment);
+  const electrodeOptions=[['','请选择'],...Array.from({length:10},(_,i)=>['E'+(i+1),'E'+(i+1)])];
+
+  const expRows=(f.exploratorySites||[]).map((s,j)=>{
+    const sb=`${b}.exploratorySites.${j}`;
+    return `<tr>
+      <td>${j+1}</td>
+      <td>${selectBind(sb+'.electrode',s.electrode,electrodeOptions)}</td>
+      <td>${pfa?bindInput(sb+'.impPrePFA',s.impPrePFA,'number','step="0.1"'):'<span class="matrix-fixed">不适用</span>'}</td>
+      <td>${pfa?bindInput(sb+'.impPostPFA',s.impPostPFA,'number','step="0.1"'):'<span class="matrix-fixed">不适用</span>'}</td>
+      <td>${bindInput(sb+'.ttcId',s.ttcId)}</td>
+      <td>${bindInput(sb+'.heId',s.heId)}</td>
+      <td>${bindInput(sb+'.massonId',s.massonId)}</td>
+      <td>${bindInput(sb+'.wall',s.wall,'number','step="0.01"')}</td>
+      <td>${bindInput(sb+'.depth',s.depth,'number','step="0.01"')}</td>
+      <td>${selectBind(sb+'.transmural',s.transmural,YNNA)}</td>
+      <td>${bindInput(sb+'.note',s.note)}</td>
+      <td><button class="mini danger" onclick="delVentExploratory(${j})">×</button></td>
+    </tr>`;
+  }).join('');
+
+  main.innerHTML=`<div class="card"><div class="card-head">LV Footprint随机方案 <div><button class="mini" onclick="rerandomizeVentCurrent()">重新随机5个Footprint</button></div></div>
+    <div class="card-body">
+      <div class="rowchips">${chips}</div>
+      <div class="focusbar">
+        <div class="focusbox"><div class="k">Footprint</div><div class="v">${esc(f.id)}</div></div>
+        <div class="focusbox"><div class="k">随机策略</div><div class="v">${strategyCell(f.treatment)}</div></div>
+        <div class="focusbox"><div class="k">预设能量顺序</div><div class="v">${esc(f.sequence||strategySequence(f.treatment))}</div></div>
+        <div class="focusbox"><div class="k">主要取材点平均/最大深度</div><div class="v">${fmt(ventFootprintMean(f),2,' mm')} / ${fmt(ventFootprintMax(f),2,' mm')}</div></div>
+      </div>
+
+      <div class="grid">
+        ${field('LV区域 / 解剖位置',bindInput(b+'.anatomicalSite',f.anatomicalSite))}
+        ${field('Varipulse PFA次数',pfa?bindInput(b+'.vpCount',f.vpCount,'number','min="0"'):'<input disabled class="locked" value="不适用">')}
+        ${field('SF目标AI',rf?'<input disabled class="locked" value="'+esc(f.rfTargetAI||450)+'">':'<input disabled class="locked" value="不适用">')}
+        ${field('实际有效电极数（0–10）',pfa?bindInput(b+'.effectiveElectrodes',f.effectiveElectrodes,'number','min="0" max="10"'):'<input disabled class="locked" value="不适用">')}
+        ${field('TPI阳性占比',pfa?selectBind(b+'.tpi',f.tpi,TPI):'<select disabled class="locked"><option>不适用</option></select>')}
+        ${field('导管位置稳定',selectBind(b+'.stable',f.stable,YESNO))}
+        ${field('报警 / 中断',bindInput(b+'.alarm',f.alarm))}
+        ${field('备注',bindInput(b+'.note',f.note,'textarea'))}
+      </div>
+
+      <div class="section-title"><span>1</span>E3 / E5 / E7 主要位点参数矩阵</div>
+      ${ventPrimaryMatrix(ai,ui.ventIndex,f,'all','field')}
+      <div class="help">${esc(strategySequence(f.treatment))}。横向为固定主要位点 E3 / E5 / E7；纵向统一记录消融质量及终末 TTC、H&E、Masson 结果。</div>
+      <div class="calc-strip">
+        <div class="calc"><div class="k">Footprint平均深度</div><div class="v">${fmt(ventFootprintMean(f),2,' mm')}</div></div>
+        <div class="calc"><div class="k">Footprint最大深度</div><div class="v">${fmt(ventFootprintMax(f),2,' mm')}</div></div>
+        <div class="calc"><div class="k">主要位点透壁比例</div><div class="v">${fmt(ventFootprintTransmuralPct(f),1,'%')}</div></div>
+        <div class="calc"><div class="k">主要位点数</div><div class="v">3</div></div>
+      </div>
+
+      <div class="section-title"><span>2</span>额外 / 探索性取材 <button class="mini" onclick="addVentExploratory()">+ 增加取材位点</button></div>
+      ${f.exploratorySites.length?`<div class="table-wrap"><table><thead><tr>
+        <th>#</th><th>电极位点</th><th>PFA前阻抗</th><th>PFA后阻抗</th><th>TTC</th><th>H&E</th><th>Masson</th><th>壁厚</th><th>病灶深度</th><th>透壁</th><th>备注</th><th></th>
+      </tr></thead><tbody>${expRows}</tbody></table></div>`:'<div class="help">尚未增加额外取材位点。</div>'}
+      <div class="note" style="margin-top:9px">${pfa&&rf?'含PFA与RF的联合Footprint：按预设能量顺序执行，如有偏离请记录于Footprint备注或方案偏离；未追加RF的VP区域可作为探索性内部对照。':rf?'RF-only Footprint：不记录PFA前后阻抗和TPI，重点记录RF前后阻抗与组织学结果。':'VP-only Footprint：不记录RF参数，重点记录PFA次数、TPI、PFA前后阻抗与组织学结果。'}</div>
+      <div class="help">方法学建议：主要index位点在术前预先固定并全研究保持一致，避免根据终末病灶外观事后挑选切面。E3/E5/E7是匹配策略的固定几何位置，不把10个电极位置当作10个独立实验单元。</div>
+    </div></div>`;
+}
+
+function rerandomizeVentCurrent(){
+  const i=ui.animal,a=getA();if(!requireAdmin('重新随机LV Footprint')||!requireAnimalEditable(i,'重新随机LV Footprint'))return;const old=a.ventFootprints.map(f=>`${f.id}:${f.treatment}`).join('|');pushHistory();
+  if(generateVentFootprintRandomization(a,(state.seed||DEFAULT_SEED)+'-VF-'+(ui.animal+1),true)){
+    appendAudit(correctionFor(i).active?'DATA_CORRECTION':'RANDOMIZATION_VENT',{animalId:a.id,path:`animals.${i}.ventFootprints`,oldValue:old,newValue:a.ventFootprints.map(f=>`${f.id}:${f.treatment}`).join('|'),reason:correctionFor(i).active?correctionFor(i).reason:'',note:'重新随机5个LV Footprint'});ui.ventIndex=0;renderCurrent();autoSave();
+  }
+}
+
+function addVentExploratory(){
+  const i=ui.animal,f=getA().ventFootprints[ui.ventIndex],path=`animals.${i}.ventFootprints.${ui.ventIndex}.exploratorySites`;auditMutation(i,'ROW_ADD',path,()=>f.exploratorySites.push(emptyVentIndexSite('', 'exploratory')),'',`探索性位点${f.exploratorySites.length+1}`,'增加探索性取材位点');
+}
+function delVentExploratory(row){
+  const i=ui.animal,f=getA().ventFootprints[ui.ventIndex],old=cloneData(f.exploratorySites[row]);auditMutation(i,'ROW_DELETE',`animals.${i}.ventFootprints.${ui.ventIndex}.exploratorySites.${row}`,()=>f.exploratorySites.splice(row,1),old,'','删除探索性取材位点');
+}
+function renderFieldSafety(main,a){
+  const ai=ui.animal;
+  main.innerHTML=`<div class="card"><div class="card-head">安全性事件 <button class="mini" onclick="addSafety()">+ 增加事件</button></div><div class="card-body">
+    ${a.safety.length?`<div class="table-wrap"><table><thead><tr><th>#</th><th>事件类型</th><th>发生时间点</th><th>部位</th><th>位置/点</th><th>最大ST抬高</th><th>持续时间</th><th>自行恢复</th><th>处理</th><th>备注</th><th></th></tr></thead><tbody>
+      ${a.safety.map((x,i)=>{const b=`animals.${ai}.safety.${i}`;return `<tr><td>${i+1}</td><td>${selectBind(b+'.type',x.type||'', [['',''],['ST段抬高','ST段抬高'],['其他','其他']])}</td><td>${bindInput(b+'.timepoint',x.timepoint||'')}</td><td>${selectBind(b+'.site',x.site||'', [['',''],['MI','二尖瓣峡部'],['ROOF','左房顶部'],['RPV','RIPV'],['VENT','LV'],['OTHER','其他']])}</td><td>${bindInput(b+'.position',x.position||'')}</td><td>${bindInput(b+'.stMax',x.stMax||'','number','step="0.1"')}</td><td>${bindInput(b+'.duration',x.duration||'')}</td><td>${selectBind(b+'.selfResolve',x.selfResolve||'',YESNO)}</td><td>${bindInput(b+'.treatment',x.treatment||'')}</td><td>${bindInput(b+'.note',x.note||'')}</td><td><button class="mini danger" onclick="delSafety(${i})">×</button></td></tr>`}).join('')}
+    </tbody></table></div>`:'<div class="help">尚未记录安全性事件。</div>'}
+  </div></div>`;
+}
+function addSafety(){const i=ui.animal,a=getA();auditMutation(i,'ROW_ADD',`animals.${i}.safety`,()=>a.safety.push({type:'ST段抬高',timepoint:'',site:'',position:'',stMax:'',duration:'',selfResolve:'',treatment:'',note:''}),'','安全性事件','增加安全性事件')}
+function delSafety(row){const i=ui.animal,a=getA(),old=cloneData(a.safety[row]);auditMutation(i,'ROW_DELETE',`animals.${i}.safety.${row}`,()=>a.safety.splice(row,1),old,'','删除安全性事件')}
+
+function renderCRF(){
+  const host=document.getElementById('crfMode'),a=state.animals[ui.crfAnimal],i=ui.crfAnimal;
+  ui.animal=i;
+  host.innerHTML=`<div class="crf-workbar no-print"><div class="crf-nav">${state.animals.map((x,j)=>`<button class="${j===i?'active':''}" onclick="ui.crfAnimal=${j};ui.animal=${j};renderCurrent()">${esc(x.id)}</button>`).join('')}</div><div class="crf-workbar-note">${esc(endpointGroupLabel(a))} · ${roleLabel(a)} · ${esc(a.workflow.armSide)}侧</div></div>
+  ${recordControlPanel(a,i)}
+  <div class="crf-sheet">
+    <div class="crf-cover"><div><div class="eyebrow">Complete case report form</div><h2>${esc(a.id)} · 完整 CRF</h2></div><div><div class="label">终点组别</div><div class="value">${esc(endpointGroupLabel(a))}</div></div><div><div class="label">分配信息</div><div class="value">${esc(a.workflow.armSide)}侧 · ${roleLabel(a)}</div></div><div><div class="label">录入状态</div><div class="value">${a.completion==='Completed'?'已完成':a.completion==='In progress'?'进行中':a.completion==='Withdrawn'?'已退出':'待完成'}</div></div></div>
+    <nav class="crf-section-index no-print" aria-label="CRF分区导航"><a href="#crf-a"><b>A</b>基本信息</a><a href="#crf-b"><b>B</b>方案分配</a><a href="#crf-c"><b>C</b>心房消融</a><a href="#crf-v"><b>V</b>LV F01–F05</a><a href="#crf-d"><b>D</b>标测阻滞</a><a href="#crf-e"><b>E</b>心房组织学</a><a href="#crf-f"><b>F</b>安全性</a><a href="#crf-g"><b>G</b>审核</a></nav>
+    <section class="crf-section" id="crf-a">${crfAnimalInfo(a,i)}</section>
+    <section class="crf-section" id="crf-b">${crfRandomization(a,i)}</section>
+    <section class="crf-section" id="crf-c">${crfAblation(a,i)}</section>
+    <section class="crf-section" id="crf-v">${crfVentricularFootprints(a,i)}</section>
+    <section class="crf-section" id="crf-d">${crfMapping(a,i)}</section>
+    <section class="crf-section" id="crf-e">${crfTTCPath(a,i)}</section>
+    <section class="crf-section" id="crf-f">${crfSafety(a,i)}</section>
+    <section class="crf-section" id="crf-g">${crfAdmin(a,i)}</section>
+  </div>`;
+}
+function crfAnimalInfo(a,i){const b=`animals.${i}`,w=a.workflow,wb=b+'.workflow';return `<div class="section-title"><span>A</span>动物基本信息与流程节点</div>
+  <div class="crf-field-group"><div class="crf-subhead">动物与手术信息</div><div class="grid">
+  ${field('动物编号',bindInput(b+'.id',a.id))}
+  ${field('性别',selectBind(b+'.sex',a.sex,[['',''],['Male','雄性'],['Female','雌性']]))}
+  ${field('体重 (kg)',bindInput(b+'.weight',a.weight,'number','step="0.1"'))}
+  ${field('手术日期',bindInput(b+'.procedureDate',a.procedureDate,'date'))}
+  ${field(endpointDateLabel(a),bindInput(b+'.d30Date',a.d30Date,'date'))}
+  ${field('操作者',bindInput(b+'.investigator',a.investigator))}
+  ${field('麻醉方案',bindInput(b+'.anesthesia',a.anesthesia))}
+  ${field('ACT范围 (s)',bindInput(b+'.act',a.act))}
+  ${field('病理盲法编码',bindInput(b+'.blindCode',a.blindCode))}
+  ${field('完成状态',selectBind(b+'.completion',a.completion,[['','未设置'],['In progress','进行中'],['Completed','完成'],['Incomplete','未完成'],['Withdrawn','退出']]))}
+  </div></div>
+  <div class="crf-field-group"><div class="crf-subhead">方案节点、通路与动物级悬空阻抗</div><div class="grid">
+  ${field('研究阶段',`<input disabled class="locked" value="${esc(endpointGroupLabel(a))}">`)}
+  ${field('方案侧别',`<input disabled class="locked" value="${esc(w.armSide)}侧">`)}
+  ${field('动物角色',`<input disabled class="locked" value="${roleLabel(a)}">`)}
+  ${field('终点时间点',bindInput(wb+'.assessmentTime',w.assessmentTime))}
+  ${field('动脉通路条数',bindInput(wb+'.arterialAccess',w.arterialAccess,'number','min="1"'))}
+  ${field('静脉通路条数',bindInput(wb+'.venousAccess',w.venousAccess,'number','min="1"'))}
+  ${field('ICE + Vizigo 房间隔穿刺',selectBind(wb+'.iceTransseptal',w.iceTransseptal,YESNO))}
+  ${field('Pen基质标测 LA',selectBind(wb+'.penMappingLA',w.penMappingLA,YESNO))}
+  ${field('Pen基质标测 LV',selectBind(wb+'.penMappingLV',w.penMappingLV,YESNO))}
+  ${field('LA悬空阻抗 (Ω)',bindInput(wb+'.floatingImpedanceLA',w.floatingImpedanceLA,'number','step="0.1"'))}
+  ${field('LV悬空阻抗 (Ω)',bindInput(wb+'.floatingImpedanceLV',w.floatingImpedanceLV,'number','step="0.1"'))}
+  ${field('VP校准完成',selectBind(wb+'.vpCalibration',w.vpCalibration,YESNO))}
+  </div><div class="help">悬空阻抗为动物级基准：每只猪 LA / LV 各录入一次；每个 PFA / RF 位置的即时值在相应消融矩阵中分别录入为“PFA前阻抗”与“RF前阻抗”。</div></div>`}
+
+function crfRandomization(a,i){return `<div class="section-title"><span>B</span>方案分配</div>
+  <div class="table-wrap"><table class="crf-table-compact"><thead><tr><th>侧别</th><th>终点</th><th>角色</th><th>MI</th><th>Roof</th><th>RIPV</th><th>LV（5 FP）</th></tr></thead><tbody><tr><td class="center"><b>${esc(a.workflow.armSide||a.randomCode)}</b></td><td>${esc(endpointGroupLabel(a))}</td><td>${roleLabel(a)}</td><td>${strategyCell(a.miTreatment,'',true)}</td><td>${strategyCell(a.roofTreatment,'',true)}</td><td>${strategyCell(a.rpvTreatment,'',true)}</td><td><div class="strategy-stack">${a.ventFootprints.map(f=>strategyCell(f.treatment,f.id,true)).join('')}</div></td></tr></tbody></table></div>
+  <div class="help">本区仅显示本动物的方案分配；实际能量参数和顺序在 C 区记录。</div>`}
+function atrialAblationTable(a,i,site){
+  const t=treatmentFor(a,site),vp=a.ablation[site].vp,rf=a.ablation[site].rf;
+  const vpBlock=`<div class="crf-subhead">Varipulse · ${vp.length}点参数矩阵</div>${atrialVPMatrix(i,site,vp,t,'crf')}`;
+  return `<div class="card crf-site-card site-${site.toLowerCase()} ${hasRF(t)?'site-has-rf':'site-pfa-only'}"><div class="card-head"><span>${SITE_NAMES[site]}</span>${tBadge(t)}</div><div class="card-body">
+  ${vpBlock}
+  ${hasRF(t)?`<div class="crf-subhead">STSF RF · ${rf.length}点参数矩阵</div>${atrialRFMatrix(i,site,rf,'crf')}`:'<div class="help">该部位为纯VP方案：SF 450 RF数据不适用。</div>'}
+  </div></div>`;
+}
+
+function crfAblation(a,i){return `<div class="section-title"><span>C</span>心房消融与质量记录</div><div class="crf-subhead">左房 MI / Roof / RIPV</div>${ATRIAL_SITES.map(s=>atrialAblationTable(a,i,s)).join('')}`}
+function crfVentricularFootprints(a,i){
+  return `<div class="section-title no-print"><span>V</span>LV Footprint 独立 CRF · F01–F05</div>${a.ventFootprints.map((f,j)=>{
+    const b=`animals.${i}.ventFootprints.${j}`,pfa=hasPFA(f.treatment),sum={mean:ventFootprintMean(f),max:ventFootprintMax(f),trans:ventFootprintTransmuralPct(f)};
+    const exploratory=f.exploratorySites?.length?`<div class="vent-page-exploratory"><div class="crf-subhead">探索性额外取材</div><div class="table-wrap"><table class="crf-table-wide"><thead><tr><th>#</th><th>电极位点</th><th>PFA前阻抗</th><th>PFA后阻抗</th><th>TTC</th><th>H&E</th><th>Masson</th><th>壁厚 (mm)</th><th>深度 (mm)</th><th>透壁</th><th>备注</th></tr></thead><tbody>${f.exploratorySites.map((s,k)=>{const sb=`${b}.exploratorySites.${k}`,na='<span class="matrix-fixed">不适用</span>';return `<tr><td>${k+1}</td><td>${bindInput(sb+'.electrode',s.electrode)}</td><td>${pfa?bindInput(sb+'.impPrePFA',s.impPrePFA,'number','step="0.1"'):na}</td><td>${pfa?bindInput(sb+'.impPostPFA',s.impPostPFA,'number','step="0.1"'):na}</td><td>${bindInput(sb+'.ttcId',s.ttcId)}</td><td>${bindInput(sb+'.heId',s.heId)}</td><td>${bindInput(sb+'.massonId',s.massonId)}</td><td>${bindInput(sb+'.wall',s.wall,'number','step="0.01"')}</td><td>${bindInput(sb+'.depth',s.depth,'number','step="0.01"')}</td><td>${selectBind(sb+'.transmural',s.transmural,YNNA)}</td><td>${bindInput(sb+'.note',s.note)}</td></tr>`}).join('')}</tbody></table></div></div>`:'';
+    return `<article class="vent-print-page" data-footprint="${esc(f.id)}"><div class="vent-page-head"><div><div class="eyebrow">Ventricular footprint case report form</div><h3>${esc(a.id)} · ${esc(f.id)}</h3></div><div class="vent-page-identity"><span>${esc(endpointGroupLabel(a))}</span><span>LV悬空阻抗 ${esc(a.workflow.floatingImpedanceLV||'—')} Ω</span>${strategyCell(f.treatment,'',true)}</div></div>
+      <div class="vent-page-meta">
+        ${field('LV区域 / 解剖位置',bindInput(b+'.anatomicalSite',f.anatomicalSite))}
+        ${field('随机策略',`<div class="vent-meta-static">${esc(tLabel(f.treatment))}</div>`)}
+        ${field('预设能量顺序',`<div class="vent-meta-static">${esc(f.sequence||strategySequence(f.treatment))}</div>`)}
+        ${field('VP PFA次数',pfa?bindInput(b+'.vpCount',f.vpCount,'number','min="0"'):'<div class="vent-meta-static muted">不适用</div>')}
+        ${field('SF目标AI',hasRF(f.treatment)?`<div class="vent-meta-static">${esc(f.rfTargetAI||450)}</div>`:'<div class="vent-meta-static muted">不适用</div>')}
+        ${field('有效电极数',pfa?bindInput(b+'.effectiveElectrodes',f.effectiveElectrodes,'number','min="0" max="10"'):'<div class="vent-meta-static muted">不适用</div>')}
+        ${field('TPI阳性占比',pfa?selectBind(b+'.tpi',f.tpi,TPI):'<div class="vent-meta-static muted">不适用</div>')}
+        ${field('整体导管稳定',selectBind(b+'.stable',f.stable,YESNO))}
+        ${field('整体报警 / 中断',bindInput(b+'.alarm',f.alarm))}
+        ${field('Footprint备注',bindInput(b+'.note',f.note))}
+      </div>
+      ${ventPrimaryMatrix(i,j,f,'all','crf')}
+      <div class="vent-page-summary"><span>平均深度 <b>${fmt(sum.mean,2,' mm')}</b></span><span>最大深度 <b>${fmt(sum.max,2,' mm')}</b></span><span>透壁比例 <b>${fmt(sum.trans,1,'%')}</b></span><span>固定主要位点 <b>E3 / E5 / E7</b></span></div>
+      ${exploratory}
+      <div class="vent-page-foot">${esc(a.id)} · ${esc(f.id)} · 独立打印页</div>
+    </article>`;
+  }).join('')}`;
+}
+function blockCRF(b,i,site,k,label){b=b||emptyBlock();const p=`animals.${i}.mapping.${site}.${k}`;return `<tr><td><b>${label}</b></td><td>${bindInput(p+'.pacingSite',b.pacingSite)}</td><td>${bindInput(p+'.cl',b.cl,'number')}</td><td>${bindInput(p+'.transTime',b.transTime,'number')}</td><td>${selectBind(p+'.orderReversal',b.orderReversal,YESNO)}</td><td>${selectBind(p+'.breakthrough',b.breakthrough,YESNO)}</td><td>${selectBind(p+'.diffPacing',b.diffPacing,YESNO)}</td><td>${selectBind(p+'.doublePotentials',b.doublePotentials,YESNO)}</td><td>${selectBind(p+'.finalBlock',b.finalBlock,YNNA)}</td><td>${bindInput(p+'.naReason',b.naReason)}</td></tr>`}
+function crfMapping(a,i){return `<div class="section-title"><span>D</span>标测与传导阻滞</div>
+  <div class="crf-subhead">标测完成情况</div><div class="table-wrap"><table class="crf-table-compact"><thead><tr><th>部位</th><th>消融前</th><th>消融后即刻</th><th>${endpointLabel(a)}终点</th><th>标测 / 图片编号</th><th>备注</th></tr></thead><tbody>
+  ${['MI','ROOF','RPV','VENT'].map(s=>{const m=a.mapping[s],b=`animals.${i}.mapping.${s}`;return `<tr><td>${SITE_NAMES[s]}</td><td>${selectBind(b+'.preMap',m.preMap,YESNO)}</td><td>${selectBind(b+'.postMap',m.postMap,YESNO)}</td><td>${selectBind(b+'.d30Map',m.d30Map,YESNO)}</td><td>${bindInput(b+'.mapId',m.mapId)}</td><td>${bindInput(b+'.note',m.note)}</td></tr>`}).join('')}
+  </tbody></table></div>
+  <div class="crf-subhead">线性传导阻滞验证</div><div class="table-wrap"><table class="crf-table-wide"><thead><tr><th>部位 / 时间</th><th>起搏位置</th><th>CL (ms)</th><th>跨线时间 (ms)</th><th>激动顺序反转</th><th>直接突破</th><th>差异性起搏</th><th>双电位</th><th>最终阻滞</th><th>不可评价原因</th></tr></thead><tbody>
+  ${blockCRF(a.mapping.MI.immediateBlock,i,'MI','immediateBlock','MI 即刻')}${blockCRF(a.mapping.MI.d30Block,i,'MI','d30Block',`MI ${endpointLabel(a)}`)}
+  ${blockCRF(a.mapping.ROOF.immediateBlock,i,'ROOF','immediateBlock','Roof 即刻')}${blockCRF(a.mapping.ROOF.d30Block,i,'ROOF','d30Block',`Roof ${endpointLabel(a)}`)}
+  </tbody></table></div><div class="help">RIPV 和 LV 仅记录标测完成情况；MI 与 Roof 进行线性阻滞验证。</div>`}
+
+function crfTTCPath(a,i){
+  return `<div class="section-title"><span>E</span>TTC与 ${endpointLabel(a)} 终末染色 / 组织学</div><div class="crf-subhead">心房线级取材</div>
+  ${ATRIAL_SITES.map(site=>{const tt=a.ttc[site],tb=`animals.${i}.ttc.${site}`,ss=a.pathology[site],sum=pathSummary(ss);return `<div class="card crf-site-card site-${site.toLowerCase()}"><div class="card-head"><span>${SITE_NAMES[site]}</span>${tBadge(treatmentFor(a,site))}</div><div class="card-body">
+    <div class="grid">${field('病灶长度 (mm)',bindInput(tb+'.lesionLength',tt.lesionLength,'number','step="0.1"'))}${field('平均宽度 (mm)',bindInput(tb+'.widthMean',tt.widthMean,'number','step="0.1"'))}${field('最大宽度 (mm)',bindInput(tb+'.widthMax',tt.widthMax,'number','step="0.1"'))}${field('大体连续性 (%)',bindInput(tb+'.continuity',tt.continuity,'number','min="0" max="100"'))}${field('大体透壁比例 (%)',bindInput(tb+'.grossTrans',tt.grossTrans,'number','min="0" max="100"'))}${field('TTC图片编号',bindInput(tb+'.imageId',tt.imageId))}${site==='MI'?field('H&E大体评价',bindInput(tb+'.heGross',tt.heGross,'textarea')):''}${site==='MI'?field('Masson大体评价',bindInput(tb+'.massonGross',tt.massonGross,'textarea')):''}${field('备注',bindInput(tb+'.note',tt.note,'textarea'))}</div>
+    <div class="table-wrap" style="margin-top:9px"><table class="crf-table-wide"><thead><tr><th>固定采样点</th><th>组织块</th><th>H&E</th><th>Masson</th><th>壁厚 (mm)</th><th>病灶深度 (mm)</th><th>宽度 (mm)</th><th>透壁</th><th>残余心肌桥 (mm)</th><th>备注</th></tr></thead><tbody>
+    ${ss.map((x,j)=>{const b=`animals.${i}.pathology.${site}.${j}`;return `<tr><td><b>${esc(x.label)}</b></td><td>${bindInput(b+'.blockId',x.blockId)}</td><td>${bindInput(b+'.heId',x.heId)}</td><td>${bindInput(b+'.massonId',x.massonId)}</td><td>${bindInput(b+'.wall',x.wall,'number','step="0.01"')}</td><td>${bindInput(b+'.depth',x.depth,'number','step="0.01"')}</td><td>${bindInput(b+'.width',x.width,'number','step="0.01"')}</td><td>${selectBind(b+'.transmural',x.transmural,YNNA)}</td><td>${bindInput(b+'.bridge',x.bridge,'number','step="0.01"')}</td><td>${bindInput(b+'.note',x.note)}</td></tr>`}).join('')}
+    </tbody></table></div><div class="crf-footprint-summary"><span>平均深度 <b>${fmt(sum.mean,2,' mm')}</b></span><span>最大深度 <b>${fmt(sum.max,2,' mm')}</b></span><span>透壁采样点 <b>${sum.n?sum.yes+'/'+sum.n:'—'}</b></span></div>
+    </div></div>`}).join('')}`}
+function crfSafety(a,i){return `<div class="section-title"><span>F</span>安全性事件 <button class="mini no-print" style="margin-left:auto" onclick="addSafety()">+ 增加事件</button></div>${a.safety.length?`<div class="table-wrap"><table class="crf-table-wide"><thead><tr><th>#</th><th>事件类型</th><th>发生时间点</th><th>部位</th><th>位置 / 点</th><th>最大ST抬高 (mm)</th><th>持续时间</th><th>自行恢复</th><th>处理</th><th>备注</th><th class="no-print"></th></tr></thead><tbody>${a.safety.map((x,j)=>{const b=`animals.${i}.safety.${j}`;return `<tr><td>${j+1}</td><td>${selectBind(b+'.type',x.type,[['','请选择'],['ST段抬高','ST段抬高'],['其他','其他']])}</td><td>${bindInput(b+'.timepoint',x.timepoint)}</td><td>${selectBind(b+'.site',x.site,[['','请选择'],['MI','二尖瓣峡部'],['ROOF','左房顶部'],['RPV','RIPV'],['VENT','LV'],['OTHER','其他']])}</td><td>${bindInput(b+'.position',x.position)}</td><td>${bindInput(b+'.stMax',x.stMax,'number','step="0.1"')}</td><td>${bindInput(b+'.duration',x.duration)}</td><td>${selectBind(b+'.selfResolve',x.selfResolve,YESNO)}</td><td>${bindInput(b+'.treatment',x.treatment)}</td><td>${bindInput(b+'.note',x.note)}</td><td class="no-print"><button class="mini danger" onclick="delSafety(${j})">×</button></td></tr>`}).join('')}</tbody></table></div>`:'<div class="crf-empty">尚未记录安全性事件。</div>'}`}
+function crfAdmin(a,i){const b=`animals.${i}`;return `<div class="section-title"><span>G</span>研究者记录与审核</div><div class="crf-field-group crf-admin"><div class="grid2 grid">
+  ${field('现场速记',bindInput(b+'.quickNotes',a.quickNotes,'textarea'))}${field('研究者最终备注',bindInput(b+'.finalComments',a.finalComments,'textarea'))}
+  ${field('审核人',bindInput(b+'.reviewer',a.reviewer))}${field('审核日期',bindInput(b+'.reviewDate',a.reviewDate,'date'))}${field('签名 / 缩写',bindInput(b+'.signature',a.signature))}
+  </div></div>`}
+
+function lineResult(a,site){
+  const ss=a.pathology[site],sum=pathSummary(ss),m=a.mapping[site];
+  return {animal:a.id,randomCode:a.randomCode,phase:endpointLabel(a),role:a.workflow.isBackup==='Yes'?'备用':'核心',site:SITE_NAMES[site],treatment:treatmentFor(a,site),
+    immediateBlock:m.immediateBlock?.finalBlock||'',d30Block:m.d30Block?.finalBlock||'',
+    sampledN:sum.n,transmuralN:sum.yes,transmuralPct:sum.trans,meanDepth:sum.mean,maxDepth:sum.max};
+}
+function groupLine(site,treatment,phase){
+  const rows=state.animals.map(a=>lineResult(a,site)).filter(x=>x.treatment===treatment&&x.phase===phase);
+  const depth=rows.map(x=>x.meanDepth).filter(x=>x!=null),trans=rows.map(x=>x.transmuralPct).filter(x=>x!=null);
+  const endpointBlocks=rows.map(x=>phase==='2 h'?x.immediateBlock:x.d30Block),blocks=endpointBlocks.filter(x=>x==='Yes'||x==='No');
+  const evaluableN=rows.filter((x,i)=>x.meanDepth!=null||x.transmuralPct!=null||endpointBlocks[i]==='Yes'||endpointBlocks[i]==='No').length;
+  return {n:rows.length,evaluableN,depthMean:mean(depth),depthSD:sd(depth),transMean:mean(trans),blockYes:blocks.filter(x=>x==='Yes').length,blockN:blocks.length}
+}
+
+function ventByAnimal(a,treatment){
+  const fps=a.ventFootprints.filter(x=>x.treatment===treatment);
+  const ds=fps.map(ventFootprintMean).filter(x=>x!=null);
+  return {n:ds.length,mean:mean(ds),footprints:fps};
+}
+
+function renderAnalysis(){
+  const h=document.getElementById('analysisMode'),completed=state.animals.filter(a=>a.completion==='Completed').length;
+  const lineRows=['2 h','28天'].flatMap(phase=>ATRIAL_SITES.flatMap(site=>[PFA4,PFA2_RF450].map(t=>({phase,site,t,...groupLine(site,t,phase)})).filter(x=>x.n)));
+  const ventAnimal=state.animals.map(a=>({id:a.id,phase:endpointLabel(a),role:a.workflow.isBackup==='Yes'?'备用':'核心',values:Object.fromEntries(VENT_STRATEGIES.map(t=>[t,ventByAnimal(a,t)]))}));
+  const strategyStats=VENT_STRATEGIES.map(t=>{
+    const acute=ventAnimal.filter(x=>x.phase==='2 h').map(x=>x.values[t].mean).filter(x=>x!=null),long=ventAnimal.filter(x=>x.phase==='28天').map(x=>x.values[t].mean).filter(x=>x!=null);
+    return {t,acute,long,acuteN:acute.length,longN:long.length};
+  });
+  const totalFP=state.animals.reduce((s,a)=>s+a.ventFootprints.length,0);
+  const phaseCount=state.animals.reduce((o,a)=>{const k=endpointLabel(a);o[k]=(o[k]||0)+1;return o},{});
+  const strategyCount=VENT_STRATEGIES.map(t=>state.animals.reduce((s,a)=>s+a.ventFootprints.filter(f=>f.treatment===t).length,0));
+  const coreCount=state.animals.filter(a=>a.workflow.isBackup!=='Yes').length,backupCount=state.animals.length-coreCount;
+  const lineEvaluable=lineRows.reduce((s,x)=>s+x.evaluableN,0),ventEvaluable=strategyStats.reduce((s,x)=>s+x.acuteN+x.longN,0);
+  h.innerHTML=`<div class="card"><div class="card-head">研究总览</div><div class="card-body">${randomizationPanel()}
+    <div class="metric-grid">
+      <div class="metric"><div class="k">动物构成</div><div><div class="v">${state.animals.length}</div><div class="sub">核心 ${coreCount} · 备用 ${backupCount}</div></div></div>
+      <div class="metric progress-metric"><div class="k">流程完成</div><div><div class="v">${completed}/${state.animals.length}</div><div class="sub">待完成 ${Math.max(0,state.animals.length-completed)}</div></div></div>
+      <div class="metric"><div class="k">终点分组</div><div><div class="v split"><span><small>2 h</small>${phaseCount['2 h']||0}</span><span><small>28 d</small>${phaseCount['28天']||0}</span></div><div class="sub">即刻与长期分层统计</div></div></div>
+      <div class="metric"><div class="k">LV Footprint</div><div><div class="v">${totalFP}</div><div class="sub">5 种策略 · 每种 ${strategyCount[0]||0}</div></div></div>
+    </div>
+    <div class="analysis-note"><b>统计口径</b> 2 h 与 28 d 分层展示；心房以动物内的线级结果汇总，LV先在每个Footprint内汇总E3 / E5 / E7，再进行猪内配对比较。切面不作为独立 n；备用猪保留单独标识。</div>
+  </div></div>
+  <div class="card"><div class="card-head">MI / Roof / RIPV 线级结果</div><div class="card-body">
+    ${lineEvaluable?`<div class="stats-heading"><div class="title">已录入结果</div><div class="meta">可评价记录 ${lineEvaluable}</div></div>`:`<div class="stats-empty">尚无可评价的组织学或阻滞结果；下表先展示各终点的方案分配数。</div>`}
+    <div class="table-wrap"><table class="result-table"><thead><tr><th>终点</th><th>部位</th><th>策略</th><th>分配 n</th><th>可评价 n</th><th>平均深度 ± SD</th><th>透壁率</th><th>阻滞 是/可评价</th></tr></thead><tbody>
+    ${lineRows.map((x,i)=>`<tr class="${i&&lineRows[i-1].phase!==x.phase?'phase-start':''}"><td><span class="phase-pill ${x.phase==='2 h'?'acute':'long'}">${x.phase==='2 h'?'2 h':'28 d'}</span></td><td><b>${SITE_NAMES[x.site]}</b></td><td>${tBadge(x.t)}</td><td>${x.n}</td><td>${x.evaluableN||'—'}</td><td>${x.depthMean==null?'—':x.depthMean.toFixed(2)+(x.depthSD==null?'':' ± '+x.depthSD.toFixed(2))+' mm'}</td><td>${fmt(x.transMean,1,'%')}</td><td>${x.blockN?x.blockYes+'/'+x.blockN:'—'}</td></tr>`).join('')}
+    </tbody></table></div><div class="help">2 h 组显示即刻阻滞；28 d 组显示长期终点阻滞。未录入结果不计入可评价 n。</div>
+  </div></div>
+  <div class="card"><div class="card-head">LV 5种策略：Footprint级结果</div><div class="card-body">
+    ${ventEvaluable?'':`<div class="stats-empty">尚无可评价的LV Footprint染色深度；表格保留动物与终点结构，录入后会自动汇总。</div>`}
+    <div class="table-wrap"><table><thead><tr><th>动物</th><th>阶段</th><th>角色</th>${VENT_STRATEGIES.map(t=>`<th>${strategyCell(t)}</th>`).join('')}</tr></thead><tbody>
+    ${ventAnimal.map(x=>`<tr><td><b>${esc(x.id)}</b></td><td><span class="phase-pill ${x.phase==='2 h'?'acute':'long'}">${x.phase==='2 h'?'2 h':'28 d'}</span></td><td>${esc(x.role)}</td>${VENT_STRATEGIES.map(t=>`<td>${x.values[t].n?`<b>${fmt(x.values[t].mean,2,' mm')}</b><div class="help">可评价 ${x.values[t].n}</div>`:'<span class="help">未录入</span>'}</td>`).join('')}</tr>`).join('')}
+    </tbody></table></div>
+    <div class="calc-strip">${strategyStats.map(x=>`<div class="calc"><div class="k">${esc(tLabel(x.t))}</div><div class="phase-result"><div class="phase-result-row"><span class="label">2 h</span><span class="value">${x.acuteN?fmt(mean(x.acute),2,' mm'):'尚无数据'} <span class="n">n=${x.acuteN}</span></span></div><div class="phase-result-row"><span class="label">28 d</span><span class="value">${x.longN?fmt(mean(x.long),2,' mm'):'尚无数据'} <span class="n">n=${x.longN}</span></span></div></div></div>`).join('')}</div>
+    <div class="help">上方分层均值中，n 为可评价 Footprint 数。主要 index 位点 E3 / E5 / E7 在 Footprint 内先汇总；探索性额外取材不并入均值。</div>
+  </div></div>
+  <div class="card"><div class="card-head">动物录入状态</div><div class="card-body"><div class="dash-grid">${state.animals.map((a,i)=>pigCard(a,i)).join('')}</div></div></div>`;
+}
+
+function formatDateTime(value){if(!value)return '—';const d=new Date(value);return Number.isNaN(d.getTime())?esc(value):d.toLocaleString('zh-CN',{hour12:false})}
+function formatAuditAction(action){return ({USER_REGISTER:'首次注册',USER_LOGIN:'用户登录',USER_LOGOUT:'用户退出',LOGIN_FAILED:'登录失败',DATA_CHANGE:'数据录入',DATA_CORRECTION:'数据更正',ROW_ADD:'增加记录',ROW_COPY:'复制记录',ROW_DELETE:'删除记录',RECORD_LOCK:'数据锁定',CORRECTION_OPEN:'发起更正',CORRECTION_CLOSE:'完成更正',LOCK_CHECK_FAILED:'锁定校验失败',SCHEMA_MIGRATION:'方案结构升级',RANDOMIZATION_ATRIAL:'房性随机化',RANDOMIZATION_VENT:'LV随机化',RANDOMIZATION_VENT_ALL:'全部LV随机化',BACKUP_EXPORT:'生成备份',BACKUP_IMPORT:'导入备份',BACKUP_RESTORE:'恢复备份',LOCAL_DATA_LOAD:'读取本地数据',STUDY_DATA_RESET:'清空研究数据',SYSTEM_VALIDATION:'系统自检',VALIDATION_EXPORT:'导出验证记录',AUDIT_EXPORT:'导出稽查轨迹',UNDO:'撤销',REDO:'恢复'})[action]||action}
+function validationCheck(id,label,ok,detail='',severity='error'){return {id,label,ok:!!ok,detail,severity}}
+async function collectSystemChecks(){
+  const checks=[];
+  checks.push(validationCheck('schema','数据结构',state.version===PROTOCOL_VERSION&&state.protocolVersion===PROTOCOL_VERSION&&state.animals.length===6,`方案 ${state.protocolVersion||'—'} · 动物 ${state.animals.length}`));
+  const ids=state.animals.map(a=>a.id);checks.push(validationCheck('animal_ids','动物编号唯一',new Set(ids).size===6&&ids.every(Boolean),ids.join(' / ')));
+  const pairOk=[[0,1],[2,3],[4,5]].every(pair=>new Set(pair.map(i=>state.animals[i].workflow.armSide)).size===2);checks.push(validationCheck('randomization','A/B 一边一头随机结构',pairOk,'P01/02、P03/04、P05/06 各含 A 与 B'));
+  const atrialRowsOk=state.animals.every(a=>['MI','ROOF'].every(site=>a.ablation[site].vp.length===DEFAULT_ATRIAL_VP_ROWS&&a.ablation[site].rf.length===DEFAULT_ATRIAL_RF_ROWS)&&a.ablation.RPV.vp.length===DEFAULT_RPV_VP_ROWS&&a.ablation.RPV.rf.length===DEFAULT_RPV_RF_ROWS);checks.push(validationCheck('atrial_rows','心房消融位置结构',atrialRowsOk,'MI / Roof：VP 6点 + RF 10点；RIPV：VP 3点 + RF 6点'));
+  const impedanceSchemaOk=state.animals.every(a=>Object.hasOwn(a.workflow,'floatingImpedanceLA')&&Object.hasOwn(a.workflow,'floatingImpedanceLV')&&ATRIAL_SITES.every(site=>a.ablation[site].vp.every(x=>Object.hasOwn(x,'impPrePFA')&&Object.hasOwn(x,'impPostPFA'))&&a.ablation[site].rf.every(x=>Object.hasOwn(x,'impPreRF')&&Object.hasOwn(x,'impPostRF')))&&a.ventFootprints.every(f=>f.primarySites.every(s=>Object.hasOwn(s,'impPrePFA')&&Object.hasOwn(s,'impPostPFA')&&Object.hasOwn(s,'impPreRF')&&Object.hasOwn(s,'impPostRF'))&&f.exploratorySites.every(s=>Object.hasOwn(s,'impPrePFA')&&Object.hasOwn(s,'impPostPFA'))));checks.push(validationCheck('impedance_schema','阻抗字段层级',impedanceSchemaOk,'动物级悬空阻抗唯一；PFA与RF的前后阻抗仅属于各自能量位置'));
+  const ventOk=state.animals.every(a=>ventStrategySetComplete(a.ventFootprints));checks.push(validationCheck('vent_strategies','LV 5策略完整',ventOk,'每只动物各1个 VP4、VP2、VP2+RF、RF、RF+VP2'));
+  const electrodeOk=state.animals.every(a=>a.ventFootprints.every(f=>JSON.stringify(f.primarySites.map(s=>s.electrode))===JSON.stringify(VENT_PRIMARY_ELECTRODES)));checks.push(validationCheck('electrodes','主要位点 E3 / E5 / E7',electrodeOk,'全部 Footprint 固定3个主要位点'));
+  checks.push(validationCheck('users','用户注册表',state.compliance.users.length>0,`已注册 ${state.compliance.users.length} 名用户`));
+  const registeredAdmin=state.compliance.users.find(u=>u.name===ADMIN_NAME),adminConfigOk=ADMIN_NAME==='刘佳林'&&ADMIN_PASSWORD_SHA256.length===64&&(!registeredAdmin||registeredAdmin.role==='Administrator');checks.push(validationCheck('administrator','管理员配置',adminConfigOk,registeredAdmin?`${ADMIN_NAME} 已注册为管理员`:`${ADMIN_NAME} 已配置，尚未首次登录`));
+  const audit=verifyAuditTrail();checks.push(validationCheck('audit_chain','稽查轨迹链',audit.ok,audit.message));
+  const locked=state.animals.filter(a=>a.recordControl.status==='Locked'&&!a.recordControl.correction.active),badLocks=locked.filter(a=>!a.recordControl.dataHash||computeAnimalHash(a)!==a.recordControl.dataHash);checks.push(validationCheck('record_locks','锁定记录校验',badLocks.length===0,locked.length?`已锁定 ${locked.length} 只；异常 ${badLocks.map(a=>a.id).join('、')||'0'}`:'尚无锁定动物'));
+  let storageOk=true;try{const key=STORAGE+'_self_test';localStorage.setItem(key,'ok');storageOk=localStorage.getItem(key)==='ok';localStorage.removeItem(key)}catch(e){storageOk=false}checks.push(validationCheck('storage','本地保存读写',storageOk,storageOk?'读写测试通过':'浏览器阻止本地保存'));
+  const testPackage=await createBackupPackage(),backupResult=await verifyBackupPackage(testPackage);checks.push(validationCheck('backup','备份校验往返',backupResult.ok,backupResult.message));
+  const issues=qc();checks.push(validationCheck('data_qc','数据完整性检查',issues.length===0,issues.length?`${issues.length} 项待核查；不影响系统功能校验`:'未发现规则提示','warning'));
+  return checks;
+}
+async function runSystemValidation(){
+  if(!requireLogin('运行系统自检'))return;setStatus('正在运行系统自检…');const checks=await collectSystemChecks(),record={id:'VAL-'+Date.now().toString(36),ranAt:isoNow(),ranBy:currentUser().name,systemBuild:SYSTEM_BUILD,status:checks.every(x=>x.ok||x.severity==='warning')?'PASS':'REVIEW',checks};
+  state.compliance.validation.latest=record;state.compliance.validation.history=[record,...(state.compliance.validation.history||[])].slice(0,20);appendAudit('SYSTEM_VALIDATION',{newValue:record.status,note:`${checks.filter(x=>x.ok).length}/${checks.length} 项通过`});autoSave();renderAll();setStatus(record.status==='PASS'?'系统自检通过':'系统自检完成，有项目待核查');
+}
+function exportValidationReport(){
+  if(!requireLogin('导出系统验证记录'))return;const latest=state.compliance.validation.latest;if(!latest)return alert('请先运行系统自检。');appendAudit('VALIDATION_EXPORT',{note:latest.id});autoSave();download(`系统自检记录_${latest.id}.json`,JSON.stringify({systemBuild:SYSTEM_BUILD,protocolVersion:PROTOCOL_VERSION,exportedAt:isoNow(),record:latest},null,2),'application/json');renderAll();
+}
+function exportAuditTrail(){
+  if(!requireLogin('导出稽查轨迹'))return;appendAudit('AUDIT_EXPORT',{note:`导出 ${state.compliance.auditTrail.length+1} 条记录`});autoSave();download(`稽查轨迹_${new Date().toISOString().slice(0,10)}.json`,JSON.stringify({systemBuild:SYSTEM_BUILD,exportedAt:isoNow(),chain:verifyAuditTrail(),records:state.compliance.auditTrail},null,2),'application/json');renderAll();
+}
+function renderGovernance(){
+  const host=document.getElementById('governanceMode'),user=currentUser(),audit=verifyAuditTrail(),latest=state.compliance.validation.latest,trail=state.compliance.auditTrail||[],locked=state.animals.filter(a=>a.recordControl.status==='Locked').length,corrections=state.animals.filter(a=>a.recordControl.correction?.active).length,backups=state.compliance.backupIndex||[];
+  const checks=latest?.checks||[];
+  host.innerHTML=`<div class="governance-hero"><div class="governance-callout"><h2>数据治理与记录控制</h2><p>普通用户按姓名归属操作；管理员刘佳林需密码验证。未登录时研究字段自动只读，清空、备份恢复、导入和重新随机等系统级操作仅限管理员。</p><div class="governance-actions"><button class="primary" onclick="runSystemValidation()" ${user?'':'disabled'}>运行系统自检</button><button onclick="exportValidatedBackup()" ${user?'':'disabled'}>生成校验备份</button><button onclick="restoreSnapshot()" ${isAdmin()?'':'disabled'}>恢复最近备份</button><button onclick="exportAuditTrail()" ${user?'':'disabled'}>导出稽查轨迹</button></div></div>
+  <div class="governance-status"><div class="governance-stat"><div class="k">当前会话</div><div class="v">${user?esc(user.name):'只读'}</div><div class="sub">${user?(isAdmin()?'管理员 · 系统级权限':'普通用户 · 数据录入权限'):'登录后才可编辑'}</div></div><div class="governance-stat"><div class="k">记录控制</div><div class="v">${locked}/6</div><div class="sub">已锁定 · ${corrections} 个更正中</div></div><div class="governance-stat"><div class="k">稽查轨迹</div><div class="v">${trail.length}</div><div class="sub">${audit.ok?'链校验通过':'链校验异常'}</div></div><div class="governance-stat"><div class="k">校验备份</div><div class="v">${backups.length}</div><div class="sub">本页记录的最近备份</div></div></div></div>
+  <div class="card"><div class="card-head">动物记录锁定与更正</div><div class="card-body"><div class="control-grid">${state.animals.map((a,i)=>{const s=lockState(a),c=a.recordControl.correction;let action=a.recordControl.status!=='Locked'?`<button class="mini" onclick="lockAnimal(${i})" ${user?'':'disabled'}>锁定</button>`:c.active?(c.openedBy===user?.id?`<button class="mini primary" onclick="finishCorrection(${i})">完成并重锁</button>`:`<button class="mini" disabled>${esc(c.openedByName||'其他用户')} 更正中</button>`):`<button class="mini" onclick="beginCorrection(${i})" ${user?'':'disabled'}>数据更正</button>`;return `<div class="animal-control"><div class="head"><b>${esc(a.id)}</b><span class="lock-badge ${s.tone}">${s.label}</span></div><div class="meta">${a.recordControl.status==='Locked'?(c.active?`原因：${esc(c.reason)}`:`锁定人：${esc(a.recordControl.lockedByName||'—')}<br>校验值：${esc(a.recordControl.dataHash||'—')}`):`终点：${esc(endpointGroupLabel(a))}<br>完成状态：${esc(a.completion||'待完成')}`}</div><div class="actions"><button class="mini" onclick="ui.animal=${i};ui.crfAnimal=${i};setMode('field')">查看记录</button>${action}</div></div>`}).join('')}</div></div></div>
+  <div class="card"><div class="card-head"><span>系统自检 / 验证记录</span><span class="help">${latest?`${formatDateTime(latest.ranAt)} · ${esc(latest.ranBy)} · ${latest.status}`:'尚未运行'}</span></div><div class="card-body">${checks.length?`<div class="validation-list">${checks.map(x=>`<div class="validation-row ${x.ok?'pass':x.severity==='warning'?'warn':'fail'}"><span class="mark">${x.ok?'✓':x.severity==='warning'?'i':'!'}</span><div><b>${esc(x.label)}</b><div class="detail">${esc(x.detail)}</div></div><span class="state">${x.ok?'通过':x.severity==='warning'?'提示':'待核查'}</span></div>`).join('')}</div><div class="governance-actions"><button onclick="exportValidationReport()" ${user?'':'disabled'}>导出本次验证记录</button></div>`:`<div class="stats-empty">尚未生成系统自检记录。自检覆盖方案结构、随机化、主要位点、锁定校验、稽查轨迹、本地保存和备份校验。</div>`}</div></div>
+  <div class="card"><div class="card-head">最近备份</div><div class="card-body">${backups.length?`<div class="table-wrap"><table><thead><tr><th>时间</th><th>创建者</th><th>类型</th><th>算法</th><th>校验值</th></tr></thead><tbody>${backups.slice(0,10).map(b=>`<tr><td>${formatDateTime(b.createdAt)}</td><td>${esc(b.createdBy)}</td><td>${b.kind==='manual'?'手动':'自动'}</td><td>${esc(b.algorithm)}</td><td>${esc(b.checksum)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="stats-empty">尚无校验备份。系统每5分钟尝试保存一个滚动备份，最多保留5份实际文件。</div>'}</div></div>
+  <div class="card"><div class="card-head"><span>稽查轨迹</span><span class="help">${audit.ok?'链校验通过':'异常：'+esc(audit.message)} · 显示最近200条</span></div><div class="card-body"><div class="table-wrap"><table class="audit-table"><thead><tr><th>时间</th><th>用户</th><th>操作</th><th>动物</th><th>字段 / 原因</th><th>变更内容</th></tr></thead><tbody>${trail.length?trail.slice(-200).reverse().map(x=>`<tr><td>${formatDateTime(x.timestamp)}</td><td>${esc(x.userName)}</td><td><b>${esc(formatAuditAction(x.action))}</b></td><td>${esc(x.animalId||'—')}</td><td><div>${esc(x.path||'—')}</div>${x.reason?`<div class="audit-detail">原因：${esc(x.reason)}</div>`:''}</td><td><div class="audit-detail">${x.oldValue?`原：${esc(x.oldValue)}<br>`:''}${x.newValue?`新：${esc(x.newValue)}<br>`:''}${x.note?`说明：${esc(x.note)}`:''}</div></td></tr>`).join(''):`<tr><td colspan="6" class="center">尚无稽查记录</td></tr>`}</tbody></table></div></div></div>
+  <div class="governance-disclaimer"><b>适用边界：</b>管理员密码仅在本地单文件中校验，没有服务器、可信时间戳、电子签名证书和独立权限后台；能访问 HTML 源文件的人仍可能分析或绕过本地验证。因此本页不能被表述为已经完成正式 GCP/GLP 计算机化系统验证，也不能替代经验证的 EDC/eCRF。</div>`;
+}
+
+function pigCard(a,i){
+  const score=completionScore(a);
+  const status=a.completion==='Completed'?'已完成':'待完成';
+  return `<div class="pig-card" onclick="ui.animal=${i};ui.crfAnimal=${i};setMode('field')"><div class="id" style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span>${esc(a.id)}</span><span class="badge ${a.completion==='Completed'?'green':'gray'}">${status}</span></div><div style="margin:6px 0 3px"><span class="phase-pill ${endpointLabel(a)==='2 h'?'acute':'long'}">${endpointLabel(a)==='2 h'?'2 h':'28 d'}</span> <span class="badge gray">${a.workflow.isBackup==='Yes'?'备用':'核心'} · ${esc(a.workflow.armSide)}侧</span></div><div class="progress"><span style="width:${score}%"></span></div><div class="help">CRF 完成度 ${score}% · 点击进入录入</div></div>`
+}
+
+function completionScore(a){
+  const arr=[a.weight,a.procedureDate,a.d30Date,a.completion,a.workflow.iceTransseptal,a.workflow.penMappingLA,a.workflow.penMappingLV,a.workflow.floatingImpedanceLA,a.workflow.floatingImpedanceLV,a.workflow.vpCalibration,a.workflow.preAblationImpedance,a.workflow.postAblationImpedance,a.workflow.ablationComplete,a.workflow.postMappingLA,a.workflow.postMappingLV,a.workflow.ttcComplete,a.workflow.ttcImageId,a.workflow.photoId,a.workflow.specimenHE,a.workflow.specimenMasson,a.ttc.MI.heGross,a.ttc.MI.massonGross];
+  ATRIAL_SITES.forEach(s=>arr.push(a.mapping[s].preMap,a.mapping[s].postMap,a.mapping[s].d30Map));
+  let done=arr.filter(Boolean).length,total=arr.length;
+  ATRIAL_SITES.forEach(s=>{total+=2;if(a.mapping[s].d30Block?.finalBlock)done++;if(a.pathology[s].some(x=>x.depth||x.transmural))done++});
+  total+=2;
+  if(a.ventFootprints.some(f=>f.tpi||f.effectiveElectrodes||f.primarySites.some(s=>s.impPrePFA||s.impPostPFA||s.impPreRF||s.impPostRF)))done++;
+  if(a.ventFootprints.some(f=>ventFootprintMean(f)!=null))done++;
+  return Math.round(done/total*100)
+}
+function exportLineCSV(){const rows=state.animals.flatMap(a=>ATRIAL_SITES.map(s=>lineResult(a,s))).map(x=>{const animal=state.animals.find(a=>a.id===x.animal);return ({
+  '动物编号':x.animal,'随机码':x.randomCode,'阶段':endpointLabel(animal),'LA悬空阻抗Ω':animal.workflow.floatingImpedanceLA,'部位':x.site,'策略':tLabel(x.treatment),'即刻阻滞':yn(x.immediateBlock),'终点阻滞':yn(x.d30Block),
+  '可评价采样点':x.sampledN,'透壁采样点':x.transmuralN,'采样点透壁比例%':x.transmuralPct??'','平均染色深度mm':x.meanDepth??'','最大染色深度mm':x.maxDepth??''
+})});download('MI_Roof_RIPV_线级结果_20260827.csv',csv(rows),'text/csv;charset=utf-8')}
+function exportAtrialPathCSV(){const rows=[];state.animals.forEach(a=>ATRIAL_SITES.forEach(s=>a.pathology[s].forEach(x=>rows.push({
+  '动物编号':a.id,'随机码':a.randomCode,'LA悬空阻抗Ω':a.workflow.floatingImpedanceLA,'部位':SITE_NAMES[s],'策略':tLabel(treatmentFor(a,s)),'采样点':x.label,'组织块':x.blockId,'H&E':x.heId,'Masson':x.massonId,'H&E大体评价':s==='MI'?a.ttc.MI.heGross:'','Masson大体评价':s==='MI'?a.ttc.MI.massonGross:'','壁厚mm':x.wall,'病灶深度mm':x.depth,'病灶宽度mm':x.width,'透壁':yn(x.transmural),'残余心肌桥mm':x.bridge
+}))));download('MI_Roof_RIPV_染色采样点_20260827.csv',csv(rows),'text/csv;charset=utf-8')}
+
+function exportVentricularCSV(){
+  const rows=[];state.animals.forEach(a=>a.ventFootprints.forEach(f=>rows.push({
+    '动物编号':a.id,'阶段':endpointLabel(a),'角色':a.workflow.isBackup==='Yes'?'备用':'核心','LV悬空阻抗Ω':a.workflow.floatingImpedanceLV,'Footprint编号':f.id,'策略':tLabel(f.treatment),'预设能量顺序':f.sequence||strategySequence(f.treatment),'LV区域':f.anatomicalSite,
+    'VP次数':hasPFA(f.treatment)?f.vpCount:'','实际有效电极数':hasPFA(f.treatment)?f.effectiveElectrodes:'','TPI阳性占比%':hasPFA(f.treatment)?f.tpi:'',
+    '主要index位点':(f.primarySites||[]).map(s=>s.electrode).join('/'),
+    '主要切面可评价数':(f.primarySites||[]).filter(s=>n(s.depth)!=null).length,
+    'Footprint平均深度mm':ventFootprintMean(f)??'','Footprint最大深度mm':ventFootprintMax(f)??'',
+    '主要位点透壁比例%':ventFootprintTransmuralPct(f)??'','备注':f.note
+  })));download('LV_Footprint级结果_v8.csv',csv(rows),'text/csv;charset=utf-8')
+}
+
+function exportVentSiteCSV(){
+  const rows=[];state.animals.forEach(a=>a.ventFootprints.forEach(f=>(f.primarySites||[]).forEach((s,i)=>rows.push({
+    '动物编号':a.id,'阶段':endpointLabel(a),'角色':a.workflow.isBackup==='Yes'?'备用':'核心','LV悬空阻抗Ω':a.workflow.floatingImpedanceLV,'Footprint编号':f.id,'策略':tLabel(f.treatment),'预设能量顺序':f.sequence||strategySequence(f.treatment),'LV区域':f.anatomicalSite,'主要位点序号':i+1,'电极位点':s.electrode,
+    'VP次数':hasPFA(f.treatment)?f.vpCount:'','有效电极数':hasPFA(f.treatment)?f.effectiveElectrodes:'','TPI阳性占比%':hasPFA(f.treatment)?f.tpi:'',
+    'PFA前阻抗Ω':hasPFA(f.treatment)?s.impPrePFA:'','PFA后阻抗Ω':hasPFA(f.treatment)?s.impPostPFA:'','RF前阻抗Ω':hasRF(f.treatment)?s.impPreRF:'','RF后阻抗Ω':hasRF(f.treatment)?s.impPostRF:'',
+    '实际AI':hasRF(f.treatment)?s.rfActualAI:'','RF时间s':hasRF(f.treatment)?s.rfDuration:'','功率W':hasRF(f.treatment)?s.rfPower:'',
+    '平均CFg':hasRF(f.treatment)?s.cfMean:'','RF点间距mm':hasRF(f.treatment)?s.rfSpacing:'',
+    'TTC':s.ttcId,'H&E':s.heId,'Masson':s.massonId,'壁厚mm':s.wall,'病灶深度mm':s.depth,'病灶宽度mm':s.width,
+    '透壁':yn(s.transmural),'残余心肌桥mm':s.bridge,'备注':s.note
+  }))));download('LV_主要index取材点_v8.csv',csv(rows),'text/csv;charset=utf-8')
+}
+function exportVentExploratoryCSV(){
+  const rows=[];state.animals.forEach(a=>a.ventFootprints.forEach(f=>(f.exploratorySites||[]).forEach((s,i)=>rows.push({
+    '动物编号':a.id,'阶段':endpointLabel(a),'角色':a.workflow.isBackup==='Yes'?'备用':'核心','LV悬空阻抗Ω':a.workflow.floatingImpedanceLV,'Footprint编号':f.id,'策略':tLabel(f.treatment),'LV区域':f.anatomicalSite,'探索性位点序号':i+1,'电极位点':s.electrode,
+    'PFA前阻抗Ω':hasPFA(f.treatment)?s.impPrePFA:'','PFA后阻抗Ω':hasPFA(f.treatment)?s.impPostPFA:'','TTC':s.ttcId,'H&E':s.heId,'Masson':s.massonId,'壁厚mm':s.wall,
+    '病灶深度mm':s.depth,'透壁':yn(s.transmural),'备注':s.note,
+    '分析定位':hasPFA(f.treatment)&&hasRF(f.treatment)?'联合Footprint内非RF区域，仅探索性':hasRF(f.treatment)?'RF策略额外取材，仅探索性':'VP策略额外取材，仅探索性'
+  }))));download('LV_探索性额外取材_20260827.csv',csv(rows),'text/csv;charset=utf-8')
+}
+function exportAblationCSV(){
+  const rows=[],base=(a,s,t,type,index)=>({'动物编号':a.id,'阶段':endpointLabel(a),'LA悬空阻抗Ω':a.workflow.floatingImpedanceLA,'部位':SITE_NAMES[s],'策略':tLabel(t),'记录类型':type,'编号':index,'VP次数':'','TPI%':'','PFA前阻抗Ω':'','PFA后阻抗Ω':'','RF前阻抗Ω':'','RF后阻抗Ω':'','目标AI':'','实际AI':'','RF时间s':'','功率W':'','平均CFg':'','RF阻抗下降Ω':'','点间距mm':'','稳定':'','备注':''});
+  state.animals.forEach(a=>ATRIAL_SITES.forEach(s=>{
+    const t=treatmentFor(a,s);
+    a.ablation[s].vp.forEach((x,i)=>rows.push({...base(a,s,t,'Varipulse位置',i+1),'VP次数':x.count,'TPI%':x.tpi,'PFA前阻抗Ω':hasPFA(t)?x.impPrePFA:'','PFA后阻抗Ω':hasPFA(t)?x.impPostPFA:'','稳定':yn(x.stable),'备注':x.note||x.alarm}));
+    if(hasRF(t))a.ablation[s].rf.forEach((x,i)=>rows.push({...base(a,s,t,'SF 450 RF点',i+1),'目标AI':450,'实际AI':x.actualAI,'RF时间s':x.duration,'功率W':x.power,'平均CFg':x.cfMean,'RF前阻抗Ω':x.impPreRF,'RF后阻抗Ω':x.impPostRF,'RF阻抗下降Ω':x.impDrop,'点间距mm':x.spacing,'稳定':yn(x.stable),'备注':x.alarm}));
+  }));
+  download('消融质量_20260827.csv',csv(rows),'text/csv;charset=utf-8')
+}
+function exportSafetyCSV(){const rows=[];state.animals.forEach(a=>a.safety.forEach((x,i)=>rows.push({'动物编号':a.id,'序号':i+1,'事件':x.type,'时间':x.timepoint,'部位':x.site,'位置':x.position,'最大ST抬高mm':x.stMax,'持续时间':x.duration,'自行恢复':yn(x.selfResolve),'处理':x.treatment,'备注':x.note})));download('安全事件_v8.csv',csv(rows),'text/csv;charset=utf-8')}
+
+function printCurrent(){ui.mode='crf';renderCurrent();setTimeout(()=>window.print(),80)}
+function printAll(){
+  const oldCrf=ui.crfAnimal,oldAnimal=ui.animal,pages=[];
+  state.animals.forEach((a,i)=>{ui.crfAnimal=i;renderCRF();pages.push(document.getElementById('crfMode').innerHTML)});
+  const w=window.open('','_blank');
+  if(!w){ui.crfAnimal=oldCrf;ui.animal=oldAnimal;renderCRF();return alert('打印窗口被浏览器拦截，请允许本页打开新窗口。')}
+  const divider='<div style="height:0;break-after:page;page-break-after:always"></div>';
+  w.document.write('<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><title>全部CRF</title><style>'+document.querySelector('style').innerHTML+'</style></head><body>'+pages.join(divider)+'</body></html>');
+  w.document.close();
+  ui.crfAnimal=oldCrf;ui.animal=oldAnimal;renderCRF();
+  setTimeout(()=>w.print(),120);
+}
+
+
+function qc(){
+  const out=[];
+  state.animals.forEach(a=>{
+    if(!a.weight)out.push(a.id+'：体重未填');
+    if(!a.procedureDate)out.push(a.id+'：手术日期未填');
+    if(!a.d30Date)out.push(a.id+'：'+endpointDateLabel(a)+'未填');
+    if(a.workflow.arterialAccess!==1)out.push(a.id+'：动脉通路条数应为1');
+    if(a.workflow.venousAccess!==2)out.push(a.id+'：静脉通路条数应为2');
+    if(a.workflow.isBackup==='Yes'&&a.workflow.studyPhase!==ENDPOINT_LONG)out.push(a.id+'：备用猪应归入长期28 d组');
+    if(!a.workflow.iceTransseptal)out.push(a.id+'：ICE + Vizigo 房间隔穿刺未记录');
+    const atrialStarted=ATRIAL_SITES.some(s=>a.ablation[s].vp.some(x=>x.tpi||x.impPrePFA||x.impPostPFA||x.stable||x.alarm||x.note)||a.ablation[s].rf.some(x=>x.actualAI||x.duration||x.power||x.cfMean||x.impPreRF||x.impPostRF||x.impDrop||x.stable||x.alarm));
+    const ventStarted=a.ventFootprints.some(ventFootprintHasData);
+    if(atrialStarted&&!a.workflow.floatingImpedanceLA)out.push(`${a.id}：已录入左房消融数据，但LA悬空阻抗未填`);
+    if(ventStarted&&!a.workflow.floatingImpedanceLV)out.push(`${a.id}：已录入LV数据，但LV悬空阻抗未填`);
+    const legacyLA=[...new Set(ATRIAL_SITES.flatMap(s=>a.ablation[s].vp.map(x=>String(x.impBaseline??'').trim())).filter(Boolean))],legacyLV=[...new Set(a.ventFootprints.flatMap(f=>[...(f.primarySites||[]),...(f.exploratorySites||[])].map(x=>String(x.impBaseline??'').trim())).filter(Boolean))];
+    if(!a.workflow.floatingImpedanceLA&&legacyLA.length>1)out.push(`${a.id}：旧版左房点级阻抗存在多个值，请确认唯一LA悬空阻抗`);
+    if(!a.workflow.floatingImpedanceLV&&legacyLV.length>1)out.push(`${a.id}：旧版LV点级阻抗存在多个值，请确认唯一LV悬空阻抗`);
+    ATRIAL_SITES.forEach(s=>{
+      const t=treatmentFor(a,s),exp=vpCountFor(t);
+      a.ablation[s].vp.forEach((x,i)=>{
+        if(x.count!==''&&Number(x.count)!==exp)out.push(`${a.id} ${SITE_NAMES[s]} 位置${i+1}：VP次数不等于预设${exp}`);
+        const pfaStarted=hasPFA(t)&&(x.tpi||x.impPrePFA||x.impPostPFA);
+        if(pfaStarted&&!x.impPrePFA)out.push(`${a.id} ${SITE_NAMES[s]} 位置${i+1}：PFA前阻抗缺失`);
+        if(pfaStarted&&!x.impPostPFA)out.push(`${a.id} ${SITE_NAMES[s]} 位置${i+1}：PFA后阻抗缺失`);
+        if(hasPFA(t)&&x.tpi===''&&x.impPostPFA)out.push(`${a.id} ${SITE_NAMES[s]} 位置${i+1}：TPI缺失`);
+        if(x.impPostRF)out.push(`${a.id} ${SITE_NAMES[s]} VP${i+1}：存在旧版RF后阻抗 ${x.impPostRF} Ω，请核对后录入对应RF逐点矩阵`);
+      });
+      if(hasRF(t))a.ablation[s].rf.forEach((x,i)=>{
+        if(x.targetAI!==''&&Number(x.targetAI)!==450)out.push(`${a.id} ${SITE_NAMES[s]} RF${i+1}：目标AI不为450`);
+        if(x.spacing!==''&&Number(x.spacing)!==4)out.push(`${a.id} ${SITE_NAMES[s]} RF${i+1}：点间距不为4mm`);
+        const rfStarted=x.actualAI||x.duration||x.power||x.cfMean||x.impPreRF||x.impPostRF||x.impDrop;
+        if(rfStarted&&!x.impPreRF)out.push(`${a.id} ${SITE_NAMES[s]} RF${i+1}：RF前阻抗缺失`);
+        if(rfStarted&&!x.impPostRF)out.push(`${a.id} ${SITE_NAMES[s]} RF${i+1}：RF后阻抗缺失`);
+      });
+    });
+    const strategyMissing=VENT_STRATEGIES.filter(t=>a.ventFootprints.filter(x=>x.treatment===t).length!==1);
+    if(a.ventFootprints.length!==VENT_FOOTPRINT_COUNT||strategyMissing.length)out.push(`${a.id}：LV应各有1个VP4、VP2、VP2+RF、RF、RF+VP2 Footprint，当前${a.ventFootprints.length}个；异常策略：${strategyMissing.map(tLabel).join('、')||'无'}`);
+    a.ventFootprints.forEach(f=>{
+      const exp=vpCountFor(f.treatment);
+      if(hasPFA(f.treatment)&&f.vpCount!==''&&Number(f.vpCount)!==exp)out.push(`${a.id} ${f.id}：VP次数不等于预设${exp}`);
+      if(hasPFA(f.treatment)&&f.effectiveElectrodes!==''&&(Number(f.effectiveElectrodes)<0||Number(f.effectiveElectrodes)>10))out.push(`${a.id} ${f.id}：有效电极数应为0–10`);
+      const es=(f.primarySites||[]).map(s=>s.electrode).filter(Boolean);
+      if(es.length!==3)out.push(`${a.id} ${f.id}：3个主要index位点未完整填写`);
+      if(new Set(es).size!==es.length)out.push(`${a.id} ${f.id}：主要index位点存在重复`);
+      if(hasPFA(f.treatment))(f.primarySites||[]).forEach(s=>{const started=s.impPrePFA||s.impPostPFA||s.impPreRF||s.impPostRF||s.rfActualAI||s.ttcId||s.depth;if(started&&!s.impPrePFA)out.push(`${a.id} ${f.id} ${s.electrode}：PFA前阻抗缺失`);if(started&&!s.impPostPFA)out.push(`${a.id} ${f.id} ${s.electrode}：PFA后阻抗缺失`)});
+      if(hasRF(f.treatment)){if(f.rfTargetAI!==''&&Number(f.rfTargetAI)!==450)out.push(`${a.id} ${f.id}：目标AI不为450`);(f.primarySites||[]).forEach(s=>{if(s.rfSpacing!==''&&Number(s.rfSpacing)!==4)out.push(`${a.id} ${f.id} ${s.electrode}：RF点间距不为4mm`);const started=s.rfActualAI||s.rfDuration||s.rfPower||s.cfMean||s.impPreRF||s.impPostRF;if(started&&!s.impPreRF)out.push(`${a.id} ${f.id} ${s.electrode}：RF前阻抗缺失`);if(started&&!s.impPostRF)out.push(`${a.id} ${f.id} ${s.electrode}：RF后阻抗缺失`)})}
+      if(hasPFA(f.treatment))(f.exploratorySites||[]).forEach((s,i)=>{const started=s.impPrePFA||s.impPostPFA||s.ttcId||s.heId||s.massonId||s.depth;if(started&&!s.impPrePFA)out.push(`${a.id} ${f.id} 探索位点${i+1}：PFA前阻抗缺失`);if(started&&!s.impPostPFA)out.push(`${a.id} ${f.id} 探索位点${i+1}：PFA后阻抗缺失`)});
+    });
+  });
+  return out;
+}
+
+setInterval(snapshot,300000);
+// 统一接收动态渲染表单的失焦变更，确保现场录入仍同步回主状态对象。
+document.addEventListener('change',onBoundChange);
+window.addEventListener('beforeunload',saveLocal);
+
+(function init(){
+  const saved=localStorage.getItem(STORAGE);
+  if(saved){try{state=JSON.parse(saved);ensureState();setStatus('已自动恢复本地草稿')}catch(e){state=freshState()}}
+  ensureState();sessionUserId=safeSessionGet();if(sessionUserId&&!state.compliance.users.some(u=>u.id===sessionUserId)){sessionUserId='';safeSessionSet('')}
+  if(currentUser()?.role==='Administrator'&&safeAdminAuthGet()!=='ADMIN_AUTH_V1'){sessionUserId='';safeSessionSet('');safeAdminAuthSet('')}
+  renderAll();
+  if(schemaMigrationApplied){saveLocal();schemaMigrationApplied=false;setStatus('已升级为 LV 五策略方案并保留既有数据')}
+  if(!isLoggedIn())setTimeout(showLoginDialog,80);
+})();
+</script>
+</body>
+</html>
