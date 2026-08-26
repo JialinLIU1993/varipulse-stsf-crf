@@ -40,7 +40,12 @@ h1{font-size:20px;line-height:1.2;margin:0;letter-spacing:-.02em}.subtitle{font-
 .strategy{display:flex;align-items:center;justify-content:space-between;gap:2mm;padding:1.9mm 2.2mm;margin-left:.8mm;border:.3mm solid color-mix(in srgb,var(--accent) 38%,#fff);background:color-mix(in srgb,var(--accent) 7%,#fff);border-radius:1.5mm}.strategy-main{font-size:3.65mm;line-height:1.12;font-weight:850;color:var(--accent)}.strategy-sequence{font-size:2.2mm;line-height:1.2;text-align:right;color:#4f4f55;max-width:42%}.fp-id{display:inline-flex;align-items:center;justify-content:center;min-width:12mm;border:.3mm solid var(--accent);border-radius:1.2mm;padding:.7mm 1.5mm;margin-right:1.5mm;color:var(--accent);font-size:2.8mm;font-weight:850;vertical-align:.4mm}
 .meta-strip{display:flex;align-items:center;gap:1.6mm;padding-left:.8mm;font-size:2.45mm;color:#3f3f44;font-weight:650}.meta-strip span{padding:.7mm 1.5mm;border:.25mm solid #c9c9cf;border-radius:99px;white-space:nowrap}.meta-strip .batch{max-width:34mm;overflow:hidden;text-overflow:ellipsis}
 .write-area{display:grid;grid-template-columns:1fr 1fr;gap:1.5mm 3mm;align-content:start;padding:.2mm 0 0 .8mm}.write-line{display:flex;align-items:flex-end;min-width:0;gap:1.5mm;font-size:2.35mm;color:#49494f;white-space:nowrap}.write-line.wide{grid-column:1/-1}.write-line i{display:block;flex:1;min-width:8mm;height:3.8mm;border-bottom:.28mm solid #6f6f75}.write-line .prefill{flex:1;height:3.8mm;border-bottom:.28mm solid #6f6f75;font-size:2.55mm;color:#1d1d1f;font-style:normal;font-weight:700;overflow:hidden;text-overflow:ellipsis;text-align:center}
-.card-foot{display:flex;align-items:center;justify-content:space-between;gap:2mm;padding:1.5mm 0 0 .8mm;border-top:.25mm solid #d0d0d5;font-size:2.2mm;color:#55555b}.checks{letter-spacing:.02em;white-space:nowrap}.study-tag{font-weight:650;white-space:nowrap}
+.card-foot{display:flex;align-items:flex-end;justify-content:center;padding:0 0 0 .8mm;color:#1d1d1f}
+.scale-ruler{position:relative;width:80mm;height:5.8mm;flex:0 0 80mm;color:#111}
+.ruler-labels{position:absolute;inset:0 0 auto;height:2mm;font-size:1.65mm;line-height:1;font-weight:700;font-variant-numeric:tabular-nums}
+.ruler-labels span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}.ruler-labels span:first-child{transform:none}.ruler-labels span:last-child{transform:translateX(-100%)}
+.ruler-ticks{position:absolute;left:0;bottom:0;width:80mm;height:3.7mm;border-bottom:.3mm solid #111;background-image:linear-gradient(to right,#111 0 .22mm,transparent .22mm),linear-gradient(to right,#111 0 .28mm,transparent .28mm),linear-gradient(to right,#111 0 .34mm,transparent .34mm);background-size:1mm 1.6mm,5mm 2.6mm,10mm 3.7mm;background-position:left bottom;background-repeat:repeat-x}
+.ruler-ticks::after{content:"";position:absolute;right:0;bottom:0;width:.34mm;height:3.7mm;background:#111}
 .screen-note{max-width:1120px;margin:0 auto 20px;font-size:12px;line-height:1.7;color:#66666d}.screen-note b{color:#2e2e32}
 @media(max-width:900px){.controls{grid-template-columns:repeat(2,minmax(130px,1fr))}.footprint-map{grid-template-columns:repeat(2,minmax(130px,1fr))}.footprint-map-title{grid-column:1/-1}.control-head{align-items:flex-start;flex-direction:column}.sheet{margin-left:0}.preview-wrap{padding-bottom:20px}}
 @page{size:A4 portrait;margin:0}
@@ -82,7 +87,7 @@ h1{font-size:20px;line-height:1.2;margin:0;letter-spacing:-.02em}.subtitle{font-
     <div class="status-row"><span>心房：A 侧 MI / Roof 为 VP 4×；B 侧为 VP 2× + SF 450 RF；RIPV 均为 VP 2× + SF 450 RF。</span><span id="sourceStatus" class="status-ok">使用方案默认分组</span></div>
   </section>
 
-  <div class="screen-note no-print"><b>使用方法：</b>选择动物后会自动填入默认侧别、终点及 F01–F05 对应关系；如果 CRF 中重新随机过，请点击“从当前 CRF 读取分组”。建议打印比例选择 100%，关闭浏览器页眉页脚。</div>
+  <div class="screen-note no-print"><b>使用方法：</b>选择动物后会自动填入默认侧别、终点及 F01–F05 对应关系；如果 CRF 中重新随机过，请点击“从当前 CRF 读取分组”。每张标签下缘为真实 0–8 cm 标尺；打印比例必须选择 100%（不要“适合页面”），并关闭浏览器页眉页脚。</div>
 
   <div class="preview-wrap">
     <section class="sheet" aria-label="A4 TTC 拍照标签">
@@ -157,7 +162,7 @@ function cardHTML(card,index){
   const fp=card.chamber==='LV'?$('fp-'+key).value.trim().toUpperCase():'';
   const batch=$('batch').value.trim(),date=$('procedureDate').value,ttc=$('ttcTime').value,operator=$('operator').value.trim();
   return `<article class="label-card tone-${s.tone}">
-    <div class="card-head"><div class="site"><small>${esc(card.chamber)} · ${esc(card.code)}</small>${esc(card.site)}</div><div class="animal">${esc(id)}</div></div>
+    <div class="card-head"><div class="site"><small>${esc(card.chamber)} · ${esc(card.code)} · ${String(index+1).padStart(2,'0')} / 08</small>${esc(card.site)}</div><div class="animal">${esc(id)}</div></div>
     <div class="strategy"><div class="strategy-main">${fp?`<span class="fp-id">${esc(fp)}</span>`:''}${esc(s.label)}</div><div class="strategy-sequence">${esc(s.sequence)}</div></div>
     <div class="meta-strip"><span>${esc(endpoint)}</span><span>${esc(side)} 组</span><span>${esc(role)}</span>${batch?`<span class="batch">${esc(batch)}</span>`:''}</div>
     <div class="write-area">
@@ -166,7 +171,7 @@ function cardHTML(card,index){
       <div class="write-line"><span>取材日期</span><span class="prefill">${esc(display(date,'　　-　-　'))}</span></div><div class="write-line"><span>TTC 时间</span><span class="prefill">${esc(display(ttc,'　:　'))}</span></div>
       <div class="write-line wide"><span>记录者</span><span class="prefill">${esc(display(operator,'　　　　　　　　　'))}</span></div>
     </div>
-    <div class="card-foot"><span class="checks">□ 全景　□ 近景　□ 比例尺　□ 标签同框</span><span class="study-tag">${String(index+1).padStart(2,'0')} / 08</span></div>
+    <div class="card-foot"><div class="scale-ruler" aria-label="0 到 8 厘米真实比例尺"><div class="ruler-labels"><span style="left:0">0</span><span style="left:12.5%">1</span><span style="left:25%">2</span><span style="left:37.5%">3</span><span style="left:50%">4</span><span style="left:62.5%">5</span><span style="left:75%">6</span><span style="left:87.5%">7</span><span style="left:100%">8 cm</span></div><div class="ruler-ticks"></div></div></div>
   </article>`;
 }
 function render(){
