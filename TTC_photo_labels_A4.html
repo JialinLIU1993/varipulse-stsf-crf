@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" href="data:,">
-<title>TTC 大体染色拍照标签 · A4</title>
+<title>TTC Gross Staining Photo Labels - A4</title>
 <style>
 :root{
   --ink:#17171a;--muted:#66666d;--line:#b8b8bf;--paper:#fff;--canvas:#ececf1;
@@ -62,36 +62,36 @@ h1{font-size:20px;line-height:1.2;margin:0;letter-spacing:-.02em}.subtitle{font-
 </head>
 <body>
 <main class="app-shell">
-  <section class="control-panel no-print" aria-label="打印设置">
+  <section class="control-panel no-print" aria-label="Print settings">
     <div class="control-head">
-      <div class="control-title"><span class="symbol" aria-hidden="true"></span><div><h1>TTC 大体染色拍照标签</h1><div class="subtitle">A4 纵向 · 8 张标签 · 打印后沿虚线剪裁</div></div></div>
-      <div class="actions"><button onclick="loadCRFState()">从当前 CRF 读取分组</button><button onclick="resetForm()">恢复默认</button><button class="primary" onclick="window.print()">打印 / 保存 PDF</button></div>
+      <div class="control-title"><span class="symbol" aria-hidden="true"></span><div><h1>TTC Gross Staining Photo Labels</h1><div class="subtitle">A4 portrait · 8 cut-out labels · Cut along dashed lines</div></div></div>
+      <div class="actions"><button onclick="loadCRFState()">Load current CRF allocation</button><button onclick="resetForm()">Reset</button><button class="primary" onclick="window.print()">Print / Save PDF</button></div>
     </div>
     <div class="controls">
-      <div class="control"><label for="animal">动物编号</label><select id="animal"></select></div>
-      <div class="control"><label for="endpoint">研究终点</label><select id="endpoint"><option value="2 h">即刻 2 h</option><option value="28 d">长期 28 d</option></select></div>
-      <div class="control"><label for="side">房性方案侧别</label><select id="side"><option value="A">A · VP</option><option value="B">B · VP + RF</option></select></div>
-      <div class="control"><label for="procedureDate">实验 / 取材日期</label><input id="procedureDate" type="date"></div>
-      <div class="control"><label for="ttcTime">TTC 染色时间</label><input id="ttcTime" type="time"></div>
-      <div class="control"><label for="batch">TTC 批次</label><input id="batch" placeholder="如 TTC-01"></div>
-      <div class="control"><label for="operator">拍照 / 记录者</label><input id="operator" placeholder="姓名"></div>
+      <div class="control"><label for="animal">Animal ID</label><select id="animal"></select></div>
+      <div class="control"><label for="endpoint">Study endpoint</label><select id="endpoint"><option value="2 h">Acute 2 h</option><option value="28 d">Long-term 28 d</option></select></div>
+      <div class="control"><label for="side">Atrial allocation</label><select id="side"><option value="A">Arm A · VP</option><option value="B">Arm B · VP + RF</option></select></div>
+      <div class="control"><label for="procedureDate">Procedure / harvest date</label><input id="procedureDate" type="date"></div>
+      <div class="control"><label for="ttcTime">TTC staining time</label><input id="ttcTime" type="time"></div>
+      <div class="control"><label for="batch">TTC batch</label><input id="batch" placeholder="e.g. TTC-01"></div>
+      <div class="control"><label for="operator">Photographer / recorder</label><input id="operator" placeholder="Name"></div>
     </div>
     <div class="footprint-map">
-      <div class="footprint-map-title">LV Footprint 对应</div>
+      <div class="footprint-map-title">LV Footprint assignment</div>
       <div class="control"><label>VP 4×</label><input id="fp-vp4" maxlength="3" placeholder="F__"></div>
       <div class="control"><label>VP 2×</label><input id="fp-vp2" maxlength="3" placeholder="F__"></div>
       <div class="control"><label>VP 2× + RF</label><input id="fp-vp2rf" maxlength="3" placeholder="F__"></div>
       <div class="control"><label>RF 450</label><input id="fp-rf" maxlength="3" placeholder="F__"></div>
       <div class="control"><label>RF + VP 2×</label><input id="fp-rfvp2" maxlength="3" placeholder="F__"></div>
     </div>
-    <div class="status-row"><span>心房：A 侧 MI / Roof 为 VP 4×；B 侧为 VP 2× + SF 450 RF；RIPV 均为 VP 2× + SF 450 RF。</span><span id="sourceStatus" class="status-ok">使用方案默认分组</span></div>
+    <div class="status-row"><span>Atrial allocation: Arm A MI / Roof = VP 4×; Arm B MI / Roof = VP 2× + SF 450 RF; RIPV = VP 2× + SF 450 RF in both arms.</span><span id="sourceStatus" class="status-ok">Using protocol defaults</span></div>
   </section>
 
-  <div class="screen-note no-print"><b>使用方法：</b>选择动物后会自动填入默认侧别、终点及 F01–F05 对应关系；如果 CRF 中重新随机过，请点击“从当前 CRF 读取分组”。每张标签下缘为真实 0–8 cm 标尺；打印比例必须选择 100%（不要“适合页面”），并关闭浏览器页眉页脚。</div>
+  <div class="screen-note no-print"><b>Instructions:</b> Select an animal to populate its arm, endpoint, and F01-F05 assignment. If the CRF allocation was rerandomized, choose "Load current CRF allocation." Each label has a true-size 0-8 cm ruler. Print at 100% scale, do not use "Fit to page," and disable browser headers and footers.</div>
 
   <div class="preview-wrap">
-    <section class="sheet" aria-label="A4 TTC 拍照标签">
-      <header class="sheet-header"><div><div class="sheet-kicker">20260827 Dual-form · Dual-energy study</div><div class="sheet-title">TTC 大体染色拍照标签</div></div><div id="sheetMeta" class="sheet-meta"></div></header>
+    <section class="sheet" aria-label="A4 TTC photo labels">
+      <header class="sheet-header"><div><div class="sheet-kicker">20260827 Dual-form · Dual-energy study</div><div class="sheet-title">TTC Gross Staining Photo Labels</div></div><div id="sheetMeta" class="sheet-meta"></div></header>
       <div id="labelGrid" class="label-grid"></div>
     </section>
   </div>
@@ -115,14 +115,14 @@ const DEFAULTS={
   P06:{side:'A',endpoint:'28 d',fp:{rf:'F01',vp2:'F02',vp2rf:'F03',vp4:'F04',rfvp2:'F05'}}
 };
 const CARD_PLAN=[
-  {chamber:'LA',code:'MI',site:'二尖瓣峡部线',strategy:'atrial'},
-  {chamber:'LA',code:'ROOF',site:'左房顶部线',strategy:'atrial'},
-  {chamber:'LA',code:'RIPV',site:'右下肺静脉',strategy:'vp2rf'},
-  {chamber:'LV',code:'VP4',site:'左室 Footprint',strategy:'vp4'},
-  {chamber:'LV',code:'VP2',site:'左室 Footprint',strategy:'vp2'},
-  {chamber:'LV',code:'VP2+RF',site:'左室 Footprint',strategy:'vp2rf'},
-  {chamber:'LV',code:'RF',site:'左室 Footprint',strategy:'rf'},
-  {chamber:'LV',code:'RF+VP2',site:'左室 Footprint',strategy:'rfvp2'}
+  {chamber:'LA',code:'MI',site:'Mitral Isthmus Line',strategy:'atrial'},
+  {chamber:'LA',code:'ROOF',site:'Left Atrial Roof Line',strategy:'atrial'},
+  {chamber:'LA',code:'RIPV',site:'Right Inferior Pulmonary Vein',strategy:'vp2rf'},
+  {chamber:'LV',code:'VP4',site:'LV Footprint',strategy:'vp4'},
+  {chamber:'LV',code:'VP2',site:'LV Footprint',strategy:'vp2'},
+  {chamber:'LV',code:'VP2+RF',site:'LV Footprint',strategy:'vp2rf'},
+  {chamber:'LV',code:'RF',site:'LV Footprint',strategy:'rf'},
+  {chamber:'LV',code:'RF+VP2',site:'LV Footprint',strategy:'rfvp2'}
 ];
 let crfState=null;
 const $=id=>document.getElementById(id);
@@ -136,7 +136,7 @@ function strategyKey(value){
   return 'vp4';
 }
 function currentAnimal(){return $('animal').value}
-function roleFor(id){return ['P05','P06'].includes(id)?'备用 / 追加':'核心'}
+function roleFor(id){return ['P05','P06'].includes(id)?'Backup / Add-on':'Core'}
 function dataFor(id){
   const fallback=DEFAULTS[id];if(!crfState)return fallback;
   const a=crfState.animals?.find(x=>x.id===id);if(!a)return fallback;
@@ -149,11 +149,11 @@ function applyAnimalDefaults(){
   Object.entries(d.fp).forEach(([key,value])=>{const el=$('fp-'+key);if(el)el.value=value||''});render();
 }
 function loadCRFState(){
-  try{const parsed=JSON.parse(localStorage.getItem(CRF_STORAGE)||'null');if(!parsed?.animals?.length)throw new Error('未找到同源 CRF 数据');crfState=parsed;$('sourceStatus').textContent='已读取当前浏览器 CRF 分组';applyAnimalDefaults()}
-  catch(error){crfState=null;$('sourceStatus').textContent='未读取到 CRF，继续使用方案默认分组';applyAnimalDefaults()}
+  try{const parsed=JSON.parse(localStorage.getItem(CRF_STORAGE)||'null');if(!parsed?.animals?.length)throw new Error('No same-origin CRF data found');crfState=parsed;$('sourceStatus').textContent='Current browser CRF allocation loaded';applyAnimalDefaults()}
+  catch(error){crfState=null;$('sourceStatus').textContent='CRF data unavailable; using protocol defaults';applyAnimalDefaults()}
 }
 function resetForm(){
-  crfState=null;$('animal').value='P01';$('procedureDate').value='';$('ttcTime').value='';$('batch').value='';$('operator').value='';$('sourceStatus').textContent='使用方案默认分组';applyAnimalDefaults();
+  crfState=null;$('animal').value='P01';$('procedureDate').value='';$('ttcTime').value='';$('batch').value='';$('operator').value='';$('sourceStatus').textContent='Using protocol defaults';applyAnimalDefaults();
 }
 function display(value,blank='____________'){return String(value||'').trim()||blank}
 function cardHTML(card,index){
@@ -164,26 +164,26 @@ function cardHTML(card,index){
   return `<article class="label-card tone-${s.tone}">
     <div class="card-head"><div class="site"><small>${esc(card.chamber)} · ${esc(card.code)} · ${String(index+1).padStart(2,'0')} / 08</small>${esc(card.site)}</div><div class="animal">${esc(id)}</div></div>
     <div class="strategy"><div class="strategy-main">${fp?`<span class="fp-id">${esc(fp)}</span>`:''}${esc(s.label)}</div><div class="strategy-sequence">${esc(s.sequence)}</div></div>
-    <div class="meta-strip"><span>${esc(endpoint)}</span><span>${esc(side)} 组</span><span>${esc(role)}</span>${batch?`<span class="batch">${esc(batch)}</span>`:''}</div>
+    <div class="meta-strip"><span>${esc(endpoint)}</span><span>Arm ${esc(side)}</span><span>${esc(role)}</span>${batch?`<span class="batch">${esc(batch)}</span>`:''}</div>
     <div class="write-area">
-      <div class="write-line"><span>标本 / 切面编号</span><i></i></div><div class="write-line"><span>拍照序号</span><i></i></div>
-      <div class="write-line wide"><span>解剖定位 / 切面方向</span><i></i></div>
-      <div class="write-line"><span>取材日期</span><span class="prefill">${esc(display(date,'　　-　-　'))}</span></div><div class="write-line"><span>TTC 时间</span><span class="prefill">${esc(display(ttc,'　:　'))}</span></div>
-      <div class="write-line wide"><span>记录者</span><span class="prefill">${esc(display(operator,'　　　　　　　　　'))}</span></div>
+      <div class="write-line"><span>Specimen / section ID</span><i></i></div><div class="write-line"><span>Photo No.</span><i></i></div>
+      <div class="write-line wide"><span>Anatomical site / section orientation</span><i></i></div>
+      <div class="write-line"><span>Harvest date</span><span class="prefill">${esc(display(date,'____-__-__'))}</span></div><div class="write-line"><span>TTC time</span><span class="prefill">${esc(display(ttc,'__:__'))}</span></div>
+      <div class="write-line wide"><span>Recorder</span><span class="prefill">${esc(display(operator,'____________________'))}</span></div>
     </div>
-    <div class="card-foot"><div class="scale-ruler" aria-label="0 到 8 厘米真实比例尺"><div class="ruler-labels"><span style="left:0">0</span><span style="left:12.5%">1</span><span style="left:25%">2</span><span style="left:37.5%">3</span><span style="left:50%">4</span><span style="left:62.5%">5</span><span style="left:75%">6</span><span style="left:87.5%">7</span><span style="left:100%">8 cm</span></div><div class="ruler-ticks"></div></div></div>
+    <div class="card-foot"><div class="scale-ruler" aria-label="True-size ruler, 0 to 8 centimeters"><div class="ruler-labels"><span style="left:0">0</span><span style="left:12.5%">1</span><span style="left:25%">2</span><span style="left:37.5%">3</span><span style="left:50%">4</span><span style="left:62.5%">5</span><span style="left:75%">6</span><span style="left:87.5%">7</span><span style="left:100%">8 cm</span></div><div class="ruler-ticks"></div></div></div>
   </article>`;
 }
 function render(){
   const id=currentAnimal(),side=$('side').value,endpoint=$('endpoint').value,date=$('procedureDate').value;
   $('labelGrid').innerHTML=CARD_PLAN.map(cardHTML).join('');
-  $('sheetMeta').innerHTML=`<strong>${esc(id)} · ${esc(endpoint)} · ${esc(side)} 组</strong><br>${esc(roleFor(id))}${date?' · '+esc(date):''}`;
+  $('sheetMeta').innerHTML=`<strong>${esc(id)} · ${esc(endpoint)} · Arm ${esc(side)}</strong><br>${esc(roleFor(id))}${date?' · '+esc(date):''}`;
 }
 function init(){
   $('animal').innerHTML=Object.keys(DEFAULTS).map(id=>`<option value="${id}">${id}</option>`).join('');
   $('animal').addEventListener('change',applyAnimalDefaults);
   ['endpoint','side','procedureDate','ttcTime','batch','operator','fp-vp4','fp-vp2','fp-vp2rf','fp-rf','fp-rfvp2'].forEach(id=>$(id).addEventListener('input',render));
-  try{const parsed=JSON.parse(localStorage.getItem(CRF_STORAGE)||'null');if(parsed?.animals?.length){crfState=parsed;$('sourceStatus').textContent='已自动读取当前浏览器 CRF 分组'}}catch(ignore){}
+  try{const parsed=JSON.parse(localStorage.getItem(CRF_STORAGE)||'null');if(parsed?.animals?.length){crfState=parsed;$('sourceStatus').textContent='Current browser CRF allocation loaded automatically'}}catch(ignore){}
   applyAnimalDefaults();
 }
 init();
