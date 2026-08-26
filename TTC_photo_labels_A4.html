@@ -37,9 +37,9 @@ h1{font-size:20px;line-height:1.2;margin:0;letter-spacing:-.02em}.subtitle{font-
 .label-card::after{content:"✂";position:absolute;right:1.4mm;top:.6mm;font-size:2.4mm;color:#909097;background:#fff;padding-left:1mm}
 .tone-blue{--accent:var(--blue)}.tone-green{--accent:var(--green)}.tone-orange{--accent:var(--orange)}.tone-red{--accent:var(--red)}.tone-purple{--accent:var(--purple)}
 .card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:3mm;padding-left:.8mm}.site{font-size:4.1mm;line-height:1.12;font-weight:850;letter-spacing:-.02em}.site small{display:block;font-size:2.35mm;letter-spacing:.08em;color:#5f5f65;margin-bottom:.7mm;text-transform:uppercase}.animal{font-size:4.6mm;line-height:1;font-weight:900;letter-spacing:.02em;padding-right:3.2mm;white-space:nowrap}
-.strategy{display:flex;align-items:center;justify-content:space-between;gap:2mm;padding:1.9mm 2.2mm;margin-left:.8mm;border:.3mm solid color-mix(in srgb,var(--accent) 38%,#fff);background:color-mix(in srgb,var(--accent) 7%,#fff);border-radius:1.5mm}.strategy-main{font-size:3.65mm;line-height:1.12;font-weight:850;color:var(--accent)}.strategy-sequence{font-size:2.2mm;line-height:1.2;text-align:right;color:#4f4f55;max-width:42%}.fp-id{display:inline-flex;align-items:center;justify-content:center;min-width:12mm;border:.3mm solid var(--accent);border-radius:1.2mm;padding:.7mm 1.5mm;margin-right:1.5mm;color:var(--accent);font-size:2.8mm;font-weight:850;vertical-align:.4mm}
+.strategy{display:flex;align-items:center;padding:1.9mm 2.2mm;margin-left:.8mm;border:.3mm solid color-mix(in srgb,var(--accent) 38%,#fff);background:color-mix(in srgb,var(--accent) 7%,#fff);border-radius:1.5mm}.strategy-main{display:flex;align-items:center;gap:1.5mm;font-size:3.65mm;line-height:1.12;font-weight:850;color:var(--accent)}.fp-id{display:inline-flex;align-items:center;justify-content:center;min-width:12mm;border:.3mm solid var(--accent);border-radius:1.2mm;padding:.7mm 1.5mm;color:var(--accent);font-size:2.8mm;font-weight:850}
 .meta-strip{display:flex;align-items:center;gap:1.6mm;padding-left:.8mm;font-size:2.45mm;color:#3f3f44;font-weight:650}.meta-strip span{padding:.7mm 1.5mm;border:.25mm solid #c9c9cf;border-radius:99px;white-space:nowrap}.meta-strip .batch{max-width:34mm;overflow:hidden;text-overflow:ellipsis}
-.write-area{display:grid;grid-template-columns:1fr 1fr;gap:1.5mm 3mm;align-content:start;padding:.2mm 0 0 .8mm}.write-line{display:flex;align-items:flex-end;min-width:0;gap:1.5mm;font-size:2.35mm;color:#49494f;white-space:nowrap}.write-line.wide{grid-column:1/-1}.write-line i{display:block;flex:1;min-width:8mm;height:3.8mm;border-bottom:.28mm solid #6f6f75}.write-line .prefill{flex:1;height:3.8mm;border-bottom:.28mm solid #6f6f75;font-size:2.55mm;color:#1d1d1f;font-style:normal;font-weight:700;overflow:hidden;text-overflow:ellipsis;text-align:center}
+.write-area{display:grid;grid-template-columns:1fr 1fr;gap:2.4mm 3mm;align-content:center;padding:0 0 0 .8mm}.write-line{display:flex;align-items:flex-end;min-width:0;gap:1.5mm;font-size:2.4mm;color:#49494f;white-space:nowrap}.write-line i{display:block;flex:1;min-width:8mm;height:5mm;border-bottom:.28mm solid #6f6f75}.write-line .prefill{flex:1;height:5mm;border-bottom:.28mm solid #6f6f75;font-size:2.55mm;color:#1d1d1f;font-style:normal;font-weight:700;overflow:hidden;text-overflow:ellipsis;text-align:center}
 .card-foot{display:flex;align-items:flex-end;justify-content:center;padding:0 0 0 .8mm;color:#1d1d1f}
 .scale-ruler{position:relative;width:80mm;height:5.8mm;flex:0 0 80mm;color:#111}
 .ruler-labels{position:absolute;inset:0 0 auto;height:2mm;font-size:1.65mm;line-height:1;font-weight:700;font-variant-numeric:tabular-nums}
@@ -74,7 +74,7 @@ h1{font-size:20px;line-height:1.2;margin:0;letter-spacing:-.02em}.subtitle{font-
       <div class="control"><label for="procedureDate">Procedure / harvest date</label><input id="procedureDate" type="date"></div>
       <div class="control"><label for="ttcTime">TTC staining time</label><input id="ttcTime" type="time"></div>
       <div class="control"><label for="batch">TTC batch</label><input id="batch" placeholder="e.g. TTC-01"></div>
-      <div class="control"><label for="operator">Photographer / recorder</label><input id="operator" placeholder="Name"></div>
+      <div class="control"><label for="operator">Sheet recorder</label><input id="operator" placeholder="Name"></div>
     </div>
     <div class="footprint-map">
       <div class="footprint-map-title">LV Footprint assignment</div>
@@ -100,11 +100,11 @@ h1{font-size:20px;line-height:1.2;margin:0;letter-spacing:-.02em}.subtitle{font-
 <script>
 const CRF_STORAGE='vp_stsf_porcine_v8';
 const STRATEGY={
-  vp4:{label:'VP 4× PFA',sequence:'VP ×4 PFA',tone:'blue'},
-  vp2:{label:'VP 2× PFA',sequence:'VP ×2 PFA',tone:'green'},
-  vp2rf:{label:'VP 2× PFA + SF 450 RF',sequence:'VP ×2 PFA → SF 450 RF',tone:'orange'},
-  rf:{label:'SF 450 RF',sequence:'SF 450 RF',tone:'red'},
-  rfvp2:{label:'SF 450 RF + VP 2× PFA',sequence:'SF 450 RF → VP ×2 PFA',tone:'purple'}
+  vp4:{label:'VP 4× PFA',tone:'blue'},
+  vp2:{label:'VP 2× PFA',tone:'green'},
+  vp2rf:{label:'VP 2× PFA + SF 450 RF',tone:'orange'},
+  rf:{label:'SF 450 RF',tone:'red'},
+  rfvp2:{label:'SF 450 RF + VP 2× PFA',tone:'purple'}
 };
 const DEFAULTS={
   P01:{side:'B',endpoint:'2 h',fp:{vp2rf:'F01',rfvp2:'F02',vp4:'F03',rf:'F04',vp2:'F05'}},
@@ -160,24 +160,22 @@ function cardHTML(card,index){
   const id=currentAnimal(),side=$('side').value,endpoint=$('endpoint').value,role=roleFor(id);
   const key=card.strategy==='atrial'?(side==='A'?'vp4':'vp2rf'):card.strategy,s=STRATEGY[key];
   const fp=card.chamber==='LV'?$('fp-'+key).value.trim().toUpperCase():'';
-  const batch=$('batch').value.trim(),date=$('procedureDate').value,ttc=$('ttcTime').value,operator=$('operator').value.trim();
+  const batch=$('batch').value.trim(),date=$('procedureDate').value,ttc=$('ttcTime').value;
   return `<article class="label-card tone-${s.tone}">
     <div class="card-head"><div class="site"><small>${esc(card.chamber)} · ${esc(card.code)} · ${String(index+1).padStart(2,'0')} / 08</small>${esc(card.site)}</div><div class="animal">${esc(id)}</div></div>
-    <div class="strategy"><div class="strategy-main">${fp?`<span class="fp-id">${esc(fp)}</span>`:''}${esc(s.label)}</div><div class="strategy-sequence">${esc(s.sequence)}</div></div>
+    <div class="strategy"><div class="strategy-main">${fp?`<span class="fp-id">${esc(fp)}</span>`:''}${esc(s.label)}</div></div>
     <div class="meta-strip"><span>${esc(endpoint)}</span><span>Arm ${esc(side)}</span><span>${esc(role)}</span>${batch?`<span class="batch">${esc(batch)}</span>`:''}</div>
     <div class="write-area">
-      <div class="write-line"><span>Specimen / section ID</span><i></i></div><div class="write-line"><span>Photo No.</span><i></i></div>
-      <div class="write-line wide"><span>Anatomical site / section orientation</span><i></i></div>
+      <div class="write-line"><span>Specimen ID</span><i></i></div><div class="write-line"><span>Photo No.</span><i></i></div>
       <div class="write-line"><span>Harvest date</span><span class="prefill">${esc(display(date,'____-__-__'))}</span></div><div class="write-line"><span>TTC time</span><span class="prefill">${esc(display(ttc,'__:__'))}</span></div>
-      <div class="write-line wide"><span>Recorder</span><span class="prefill">${esc(display(operator,'____________________'))}</span></div>
     </div>
     <div class="card-foot"><div class="scale-ruler" aria-label="True-size ruler, 0 to 8 centimeters"><div class="ruler-labels"><span style="left:0">0</span><span style="left:12.5%">1</span><span style="left:25%">2</span><span style="left:37.5%">3</span><span style="left:50%">4</span><span style="left:62.5%">5</span><span style="left:75%">6</span><span style="left:87.5%">7</span><span style="left:100%">8 cm</span></div><div class="ruler-ticks"></div></div></div>
   </article>`;
 }
 function render(){
-  const id=currentAnimal(),side=$('side').value,endpoint=$('endpoint').value,date=$('procedureDate').value;
+  const id=currentAnimal(),side=$('side').value,endpoint=$('endpoint').value,date=$('procedureDate').value,operator=$('operator').value.trim();
   $('labelGrid').innerHTML=CARD_PLAN.map(cardHTML).join('');
-  $('sheetMeta').innerHTML=`<strong>${esc(id)} · ${esc(endpoint)} · Arm ${esc(side)}</strong><br>${esc(roleFor(id))}${date?' · '+esc(date):''}`;
+  $('sheetMeta').innerHTML=`<strong>${esc(id)} · ${esc(endpoint)} · Arm ${esc(side)}</strong><br>${esc(roleFor(id))}${date?' · '+esc(date):''}${operator?' · Recorder: '+esc(operator):''}`;
 }
 function init(){
   $('animal').innerHTML=Object.keys(DEFAULTS).map(id=>`<option value="${id}">${id}</option>`).join('');
