@@ -532,14 +532,14 @@ button:disabled{cursor:not-allowed;opacity:.46;transform:none!important;box-shad
       <span class="app-symbol" aria-hidden="true"></span>
       <div>
         <h1>Varipulse ± STSF 猪实验 CRF</h1>
-        <div class="sub">20260827 双形双能动物实验｜P01–P02 即刻 2 h｜P03–P06 长期 28 d</div>
+        <div class="sub">20260827 双形双能动物实验｜Pig A / D 即刻 2 h｜Pig B / C / E / F 长期 28 d</div>
       </div>
     </div>
     <div class="header-meta">
       <span class="meta-chip"><strong>房间隔</strong> ICE + Vizigo</span>
       <span class="meta-chip"><strong>标测</strong> Pen</span>
       <span class="meta-chip"><strong>通路</strong> 动脉1 / 静脉2</span>
-      <span class="meta-chip"><strong>分组</strong> A = VP · B = VP + RF</span>
+      <span class="meta-chip"><strong>分组</strong> Pig A–C = 4VP · Pig D–F = 2VP + RF</span>
     </div>
     <div class="session-panel no-print" id="userSession"></div>
   </div>
@@ -631,6 +631,15 @@ const SITE_NAMES={MI:'二尖瓣峡部线',ROOF:'左房顶部线',RPV:'右下肺�
 const PROTOCOL_VERSION='20260827';
 const ENDPOINT_ACUTE='Acute 2 h';
 const ENDPOINT_LONG='Long-term 28 d';
+const PIG_PLAN=[
+  {id:'Pig A',group:'4VP',armSide:'A',studyPhase:ENDPOINT_ACUTE,assessmentTime:'2 h',isBackup:'No',legacyId:'P02',ventSeedIndex:2},
+  {id:'Pig B',group:'4VP',armSide:'A',studyPhase:ENDPOINT_LONG,assessmentTime:'28 d',isBackup:'No',legacyId:'P03',ventSeedIndex:3},
+  {id:'Pig C',group:'4VP',armSide:'A',studyPhase:ENDPOINT_LONG,assessmentTime:'28 d',isBackup:'Yes',legacyId:'P06',ventSeedIndex:6},
+  {id:'Pig D',group:'2VP+450RF',armSide:'B',studyPhase:ENDPOINT_ACUTE,assessmentTime:'2 h',isBackup:'No',legacyId:'P01',ventSeedIndex:1},
+  {id:'Pig E',group:'2VP+450RF',armSide:'B',studyPhase:ENDPOINT_LONG,assessmentTime:'28 d',isBackup:'No',legacyId:'P04',ventSeedIndex:4},
+  {id:'Pig F',group:'2VP+450RF',armSide:'B',studyPhase:ENDPOINT_LONG,assessmentTime:'28 d',isBackup:'Yes',legacyId:'P05',ventSeedIndex:5}
+];
+const PIG_IDS=PIG_PLAN.map(x=>x.id);
 const DEFAULT_SEED='260811';
 const STORAGE='vp_stsf_porcine_v8';
 const SNAPSHOT='vp_stsf_porcine_v8_snapshot';
@@ -645,7 +654,7 @@ const DEFAULT_ATRIAL_VP_ROWS=6;
 const DEFAULT_ATRIAL_RF_ROWS=10;
 const DEFAULT_RPV_VP_ROWS=3;
 const DEFAULT_RPV_RF_ROWS=6;
-const SYSTEM_BUILD='v8.1-macOS-governance-14-lv5fp';
+const SYSTEM_BUILD='v8.1-macOS-governance-15-pigAF';
 const BACKUP_FORMAT='VP_CRF_BACKUP_V1';
 
 let ui={mode:'field',animal:0,site:'MI',stage:'ablation',vpIndex:0,rfIndex:0,ventIndex:0,crfAnimal:0};
@@ -714,7 +723,7 @@ function normalizeStrategy(t){
 function endpointLabel(a){return a?.workflow?.studyPhase===ENDPOINT_LONG?'28天':'2 h'}
 function endpointDateLabel(a){return a?.workflow?.studyPhase===ENDPOINT_LONG?'28天终点评估日期':'2 h 终点评估日期'}
 function endpointGroupLabel(a){return a?.workflow?.studyPhase===ENDPOINT_LONG?'长期组 · 28 d':'即刻组 · 2 h'}
-function roleLabel(a){return a?.workflow?.isBackup==='Yes'?'备用':'核心'}
+function roleLabel(a){return a?.workflow?.isBackup==='Yes'?'备用 / 追加':'核心'}
 const ROLE_OPTIONS=[['No','核心'],['Yes','备用']];
 function emptyVentFootprint(id,treatment){
   return {id,treatment,sequence:strategySequence(treatment),vpCount:vpCountFor(treatment),rfTargetAI:rfTargetFor(treatment),
@@ -728,9 +737,48 @@ function emptyAtrialAblation(site){
   return {vp:Array.from({length:vpRows},()=>emptyVP(vpCount)),rf:Array.from({length:rfRows},()=>emptyRF(450))};
 }
 
+function pigPlanKey(plan){return `${plan.armSide}|${plan.studyPhase}|${plan.isBackup}`}
+function animalPlanKey(a){
+  const treatment=normalizeStrategy(a?.miTreatment),armSide=a?.workflow?.armSide||(treatment===PFA2_RF450?'B':'A');
+  const studyPhase=a?.workflow?.studyPhase===ENDPOINT_LONG?ENDPOINT_LONG:ENDPOINT_ACUTE;
+  const isBackup=a?.workflow?.isBackup==='Yes'?'Yes':'No';
+  return `${armSide}|${studyPhase}|${isBackup}`;
+}
+function reorderAnimalsForPigPlan(animals){
+  const source=(animals||[]).slice(0,6);
+  if(PIG_IDS.every(id=>source.some(a=>a?.id===id))){
+    const byId=new Map(source.map(a=>[a.id,a]));
+    return {animals:PIG_IDS.map(id=>byId.get(id)),migrations:[]};
+  }
+  const pool=source.map((animal,index)=>({animal,index})),ordered=[],migrations=[];
+  PIG_PLAN.forEach((plan,index)=>{
+    let match=pool.findIndex(x=>animalPlanKey(x.animal)===pigPlanKey(plan));
+    if(match<0)match=pool.findIndex(x=>x.animal?.id===plan.legacyId);
+    if(match<0)match=0;
+    const picked=pool.splice(match,1)[0],animal=picked?.animal||emptyAnimal(index),oldId=animal.id||`Index ${picked?.index??index+1}`;
+    animal.id=plan.id;ordered.push(animal);
+    if(oldId!==plan.id)migrations.push({index,oldId,newId:plan.id});
+  });
+  return {animals:ordered,migrations};
+}
+function applyFixedPigPlan(target){
+  target.animals.forEach((a,index)=>{
+    const plan=PIG_PLAN[index];if(!plan)return;
+    a.id=plan.id;a.randomCode=plan.group;
+    a.workflow=a.workflow||emptyWorkflow();
+    a.workflow.armSide=plan.armSide;a.workflow.studyPhase=plan.studyPhase;a.workflow.isBackup=plan.isBackup;a.workflow.assessmentTime=plan.assessmentTime;
+    a.workflow.arterialAccess=1;a.workflow.venousAccess=2;
+    a.miTreatment=plan.armSide==='A'?PFA4:PFA2_RF450;
+    a.roofTreatment=plan.armSide==='A'?PFA4:PFA2_RF450;
+    a.rpvTreatment=PFA2_RF450;
+    syncAtrialProtocol(a,'MI');syncAtrialProtocol(a,'ROOF');syncAtrialProtocol(a,'RPV');
+  });
+}
+function ventSeedFor(index,seed=DEFAULT_SEED){return `${seed}-VF-${PIG_PLAN[index]?.ventSeedIndex||index+1}`}
+
 function emptyAnimal(i){
   return {
-    id:'P'+String(i+1).padStart(2,'0'),randomCode:'',miTreatment:'',roofTreatment:'',rpvTreatment:'',
+    id:PIG_PLAN[i]?.id||`Pig ${String.fromCharCode(65+i)}`,randomCode:'',miTreatment:'',roofTreatment:'',rpvTreatment:'',
     sex:'',weight:'',procedureDate:'',d30Date:'',investigator:'',anesthesia:'',act:'',transseptal:'',blindCode:'',completion:'',
     protocol:{version:PROTOCOL_VERSION,atrialPFAOnly:4,atrialComboVP:2,ai:450,rfSpacing:4,rfPower:'',ventFootprints:VENT_FOOTPRINT_COUNT,ventSchema:VENT_SCHEMA,ventStrategies:VENT_STRATEGIES.join(' | '),ventPrimarySites:'E3/E5/E7',atrialRowSchema:ATRIAL_ROW_SCHEMA},
     workflow:emptyWorkflow(),
@@ -751,8 +799,8 @@ function emptyAnimal(i){
 
 function freshState(){
   const s={version:PROTOCOL_VERSION,protocolVersion:PROTOCOL_VERSION,seed:DEFAULT_SEED,createdAt:new Date().toISOString(),compliance:freshCompliance(),animals:Array.from({length:6},(_,i)=>emptyAnimal(i))};
-  applyAtrialRandomization(s,DEFAULT_SEED,false);
-  s.animals.forEach((a,i)=>generateVentFootprintRandomization(a,DEFAULT_SEED+'-VF-'+(i+1),false));
+  applyFixedPigPlan(s);
+  s.animals.forEach((a,i)=>generateVentFootprintRandomization(a,ventSeedFor(i,DEFAULT_SEED),false));
   return s;
 }
 
@@ -858,7 +906,7 @@ function applyEditPermissions(){
   const globalAllowed=isLoggedIn()&&state.animals.every(a=>a.recordControl?.status!=='Locked');
   const adminGlobalAllowed=isAdmin()&&state.animals.every(a=>a.recordControl?.status!=='Locked');
   const seed=document.getElementById('seedInput');if(seed){seed.disabled=!adminGlobalAllowed;seed.dataset.editLocked=String(!adminGlobalAllowed);seed.title=adminGlobalAllowed?'':'仅管理员可修改随机种子'}
-  const adminPattern=/rerandomizeAtrial|regenerateAllVent|rerandomizeVentCurrent|resetAll|loadLocal\(|restoreSnapshot/;
+  const adminPattern=/regenerateAllVent|rerandomizeVentCurrent|resetAll|loadLocal\(|restoreSnapshot/;
   const historyPattern=/undo\(|redo\(/;
   const localPattern=/addVP|dupVP|delVP|addRF|delRF|rerandomizeVentCurrent|addVentExploratory|delVentExploratory|addSafety|delSafety/;
   document.querySelectorAll('button[onclick]').forEach(button=>{const code=button.getAttribute('onclick')||'';if(adminPattern.test(code))button.disabled=!adminGlobalAllowed;else if(historyPattern.test(code))button.disabled=!globalAllowed;else if(localPattern.test(code))button.disabled=!canEditAnimal(ui.mode==='crf'?ui.crfAnimal:ui.animal)});
@@ -873,28 +921,6 @@ function shuffle(arr,seed){
   for(let i=a.length-1;i>0;i--){let j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
   return a;
 }
-function applyAtrialRandomization(target,seed,confirmOverwrite=true){
-  if(confirmOverwrite && hasStudyData() && !confirm('重新生成20260827方案分配会改变房间隔靶点和备用猪的侧别。已有数据可能与分配不一致，确定继续？'))return false;
-  // 每一对动物保持“一边一头”：P01/P02、P03/P04、P05/P06各有一只A侧和一只B侧。
-  const codes=[];
-  [['A','B'],['A','B'],['A','B']].forEach((pair,i)=>codes.push(...shuffle(pair,seed+'-PAIR-'+(i+1))));
-  target.seed=seed;
-  target.animals.forEach((a,i)=>{
-    a.randomCode=codes[i];
-    a.workflow=a.workflow||emptyWorkflow();
-    a.workflow.armSide=codes[i];
-    a.workflow.studyPhase=i<2?ENDPOINT_ACUTE:ENDPOINT_LONG;
-    a.workflow.isBackup=i>=4?'Yes':'No';
-    a.workflow.assessmentTime=i<2?'2 h':'28 d';
-    a.workflow.arterialAccess=1;a.workflow.venousAccess=2;
-    a.miTreatment=codes[i]==='A'?PFA4:PFA2_RF450;
-    a.roofTreatment=codes[i]==='A'?PFA4:PFA2_RF450;
-    a.rpvTreatment=PFA2_RF450;
-    syncAtrialProtocol(a,'MI');syncAtrialProtocol(a,'ROOF');syncAtrialProtocol(a,'RPV');
-  });
-  return true;
-}
-
 function generateVentFootprintRandomization(a,seed,confirmOverwrite=true){
   if(confirmOverwrite && a.ventFootprints.some(ventFootprintHasData) &&
      !confirm(`${a.id}已有LV Footprint数据。重新随机会清空现有LV Footprint，继续？`))return false;
@@ -904,7 +930,7 @@ function generateVentFootprintRandomization(a,seed,confirmOverwrite=true){
 }
 function treatmentFor(a,site){return site==='MI'?a.miTreatment:site==='ROOF'?a.roofTreatment:site==='RPV'?a.rpvTreatment:''}
 function syncAtrialProtocol(a,site){
-  const t=normalizeStrategy(treatmentFor(a,site)),exp=vpCountFor(t),block=a.ablation[site];
+  const t=normalizeStrategy(treatmentFor(a,site)),exp=vpCountFor(t),block=a.ablation?.[site];
   if(!block)return;
   block.vp.forEach(x=>{if(x.count===''||x.count==null||[0,2,4].includes(Number(x.count)))x.count=exp});
   block.rf.forEach(x=>{x.targetAI=450;if(!hasRF(t)){x.actualAI='';x.duration='';x.power='';x.cfMean='';x.impPreRF='';x.impPostRF='';x.impDrop=''}});
@@ -1025,8 +1051,8 @@ function importJSON(e){
   }catch(err){alert('备份读取失败：'+err.message)}finally{input.value=''}};r.readAsText(f,'utf-8');
 }
 function resetAll(){
-  if(!requireAdmin('清空研究数据')||!requireGlobalEditable('清空研究数据'))return;if(!confirm('确定清空全部录入数据并恢复6只猪随机初始方案？用户、验证记录和稽查轨迹会保留。'))return;
-  pushHistory();const compliance=cloneData(state.compliance),previousSummary=state.animals.map(a=>({id:a.id,status:a.completion||'未完成'}));state=freshState();state.compliance=compliance;ensureState();appendAudit('STUDY_DATA_RESET',{oldValue:previousSummary,note:'恢复初始随机方案'});renderAll();autoSave();
+  if(!requireAdmin('清空研究数据')||!requireGlobalEditable('清空研究数据'))return;if(!confirm('确定清空全部录入数据并恢复 Pig A–Pig F 固定分组方案？用户、验证记录和稽查轨迹会保留。'))return;
+  pushHistory();const compliance=cloneData(state.compliance),previousSummary=state.animals.map(a=>({id:a.id,status:a.completion||'未完成'}));state=freshState();state.compliance=compliance;ensureState();appendAudit('STUDY_DATA_RESET',{oldValue:previousSummary,note:'恢复 Pig A–Pig F 固定分组方案'});renderAll();autoSave();
 }
 function pushHistory(){if(historyLock)return;history.push(JSON.stringify(state));if(history.length>20)history.shift();future=[]}
 function restoreHistoryState(serialized,action){const compliance=cloneData(state.compliance);historyLock=true;state=JSON.parse(serialized);historyLock=false;ensureState();state.compliance=compliance;ensureState();appendAudit(action,{note:'用户界面历史操作'});renderAll();autoSave()}
@@ -1066,6 +1092,7 @@ function ensureState(){
   while(state.animals.length<6)state.animals.push(emptyAnimal(state.animals.length));
   state.animals=state.animals.slice(0,6);
   state.animals=state.animals.map((a,i)=>a&&typeof a==='object'?a:emptyAnimal(i));
+  const pigOrderMigration=reorderAnimalsForPigPlan(state.animals);state.animals=pigOrderMigration.animals;
   state.compliance=state.compliance&&typeof state.compliance==='object'?state.compliance:freshCompliance();
   const complianceDef=freshCompliance();
   Object.keys(complianceDef).forEach(k=>{if(state.compliance[k]===undefined)state.compliance[k]=complianceDef[k]});
@@ -1077,10 +1104,10 @@ function ensureState(){
   state.compliance.validation.history=Array.isArray(state.compliance.validation.history)?state.compliance.validation.history:[];
   state.compliance.backupIndex=Array.isArray(state.compliance.backupIndex)?state.compliance.backupIndex:[];
   const schemaMigrations=[];
-  const needsAtrialPlan=state.animals.some(a=>!a.miTreatment||!a.roofTreatment||!a.rpvTreatment);
   state.protocolVersion=PROTOCOL_VERSION;state.version=PROTOCOL_VERSION;
+  applyFixedPigPlan(state);
   state.animals.forEach((a,i)=>{
-    a.id=a.id||'P'+String(i+1).padStart(2,'0');
+    const pigPlan=PIG_PLAN[i];a.id=pigPlan.id;
     const simpleAnimalDef=emptyAnimal(i);
     const needsAtrialRowMigration=a.protocol?.atrialRowSchema!==ATRIAL_ROW_SCHEMA;
     ['randomCode','sex','weight','procedureDate','d30Date','investigator','anesthesia','act','transseptal','blindCode','completion','quickNotes','finalComments','reviewer','reviewDate','signature'].forEach(k=>{if(a[k]===undefined)a[k]=simpleAnimalDef[k]});
@@ -1090,9 +1117,9 @@ function ensureState(){
     a.workflow=a.workflow||emptyWorkflow();
     const workflowDef=emptyWorkflow();
     Object.keys(workflowDef).forEach(k=>{if(a.workflow[k]===undefined)a.workflow[k]=workflowDef[k]});
-    a.workflow.studyPhase=a.workflow.studyPhase|| (i<2?ENDPOINT_ACUTE:ENDPOINT_LONG);
-    a.workflow.assessmentTime=a.workflow.assessmentTime|| (a.workflow.studyPhase===ENDPOINT_LONG?'28 d':'2 h');
-    a.workflow.isBackup=a.workflow.isBackup|| (i>=4?'Yes':'No');
+    a.workflow.studyPhase=pigPlan.studyPhase;
+    a.workflow.assessmentTime=pigPlan.assessmentTime;
+    a.workflow.isBackup=pigPlan.isBackup;
     a.workflow.arterialAccess=a.workflow.arterialAccess??1;a.workflow.venousAccess=a.workflow.venousAccess??2;
     a.mapping=a.mapping||{};
     ['MI','ROOF','RPV','VENT'].forEach(s=>{
@@ -1124,6 +1151,7 @@ function ensureState(){
       });
       a.protocol.atrialRowSchema=ATRIAL_ROW_SCHEMA;
     }
+    ATRIAL_SITES.forEach(s=>syncAtrialProtocol(a,s));
     a.ttc=a.ttc||{};
     ['MI','ROOF','RPV','VENT'].forEach(s=>{if(!a.ttc[s])a.ttc[s]=emptyTTC();const def=emptyTTC();Object.keys(def).forEach(k=>{if(a.ttc[s][k]===undefined)a.ttc[s][k]=def[k]});delete a.ttc[s].fusion});
     a.pathology=a.pathology||{};
@@ -1132,7 +1160,7 @@ function ensureState(){
       if(!Array.isArray(a.pathology[s])||!a.pathology[s].length)a.pathology[s]=labels.map(emptyPath);
       a.pathology[s].forEach((x,j)=>{const def=emptyPath(labels[j]||x.label||('采样点'+(j+1)));Object.keys(def).forEach(k=>{if(x[k]===undefined)x[k]=def[k]});if(s==='RPV'&&['RPV代表切面','RSPV代表切面'].includes(x.label))x.label='RIPV代表切面'});
     });
-    const ventMigration=migrateVentFootprints(a,(state.seed||DEFAULT_SEED)+'-VF-'+(i+1));
+    const ventMigration=migrateVentFootprints(a,ventSeedFor(i,state.seed||DEFAULT_SEED));
     if(ventMigration.changed)schemaMigrations.push({animal:a,index:i,mode:ventMigration.mode});
     a.ventFootprints.forEach((f,j)=>{
       f.id=f.id||'F'+String(j+1).padStart(2,'0');
@@ -1180,7 +1208,11 @@ function ensureState(){
     a.recordControl.correction=a.recordControl.correction&&typeof a.recordControl.correction==='object'?a.recordControl.correction:recordDef.correction;
     Object.keys(recordDef.correction).forEach(k=>{if(a.recordControl.correction[k]===undefined)a.recordControl.correction[k]=recordDef.correction[k]});
   });
-  if(needsAtrialPlan)applyAtrialRandomization(state,state.seed||DEFAULT_SEED,false);
+  pigOrderMigration.migrations.forEach(({index,oldId,newId})=>{
+    schemaMigrationApplied=true;const a=state.animals[index];
+    if(a.recordControl.status==='Locked'&&!a.recordControl.correction.active)a.recordControl.dataHash=computeAnimalHash(a);
+    appendAudit('SCHEMA_MIGRATION',{animalId:newId,path:`animals.${index}.id`,oldValue:oldId,newValue:newId,note:`按固定心房分组与终点将旧动物编号 ${oldId} 迁移为 ${newId}，保留全部已录数据`});
+  });
   schemaMigrations.forEach(({animal:a,index,mode})=>{
     schemaMigrationApplied=true;
     const oldHash=a.recordControl.dataHash||'';
@@ -1281,7 +1313,7 @@ function auditMutation(i,action,path,mutator,oldValue='',newValue='',note=''){
 
 function randomizationPanel(){
   const rows=state.animals.map((a,i)=>`<tr>
-    <td>${esc(a.id)}</td><td>${esc(a.workflow.studyPhase)}</td><td class="center"><b>${esc(a.workflow.armSide||a.randomCode)}</b></td><td>${a.workflow.isBackup==='Yes'?'备用':'核心'}</td>
+    <td>${esc(a.id)}</td><td>${esc(endpointGroupLabel(a))}</td><td class="center"><b>${esc(a.randomCode)}</b></td><td>${roleLabel(a)}</td>
     <td>${strategyCell(a.miTreatment,'',true)}</td>
     <td>${strategyCell(a.roofTreatment,'',true)}</td>
     <td>${strategyCell(a.rpvTreatment,'',true)}</td>
@@ -1290,25 +1322,20 @@ function randomizationPanel(){
   </tr>`).join('');
   return `<div class="random-box">
     <div class="random-grid">
-      ${field('随机种子',`<input id="seedInput" value="${esc(state.seed||DEFAULT_SEED)}">`)}
-      <div class="protocol-key"><span class="protocol-key-title">方案侧别</span><span><b>A</b>：MI / Roof VP 4×</span><span><b>B</b>：MI / Roof VP 2× + RF450</span><span><b>RIPV</b>：均为VP 2× + RF450</span></div>
-      <div><button onclick="rerandomizeAtrial()">重新生成一边一头分配</button></div>
+      ${field('LV 随机种子',`<input id="seedInput" value="${esc(state.seed||DEFAULT_SEED)}">`)}
+      <div class="protocol-key"><span class="protocol-key-title">固定心房分组</span><span><b>Pig A–C</b>：MI / Roof = 4VP</span><span><b>Pig D–F</b>：MI / Roof = 2VP + RF450</span><span><b>RIPV</b>：全部 2VP + RF450</span></div>
       <div><button onclick="regenerateAllVent()">全部LV Footprint重新随机</button></div>
     </div>
-    <div class="table-wrap" style="margin-top:9px"><table class="randomization-table"><thead><tr><th>动物</th><th>阶段</th><th>侧别</th><th>角色</th><th>MI</th><th>Roof</th><th>RIPV</th><th>LV（5 FP）</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
-    <div class="help">P01/P02为即刻2 h；P03/P04为长期28 d；P05/P06为加入长期组的备用猪，A/B两侧各一只。LV每只猪固定5个独立策略：VP 4×、VP 2×、VP 2× + SF 450 RF、SF 450 RF、SF 450 RF + VP 2×；Footprint内固定E3/E5/E7为主要取材位点。</div>
+    <div class="table-wrap" style="margin-top:9px"><table class="randomization-table"><thead><tr><th>动物</th><th>染色终点</th><th>心房分组</th><th>角色</th><th>MI</th><th>Roof</th><th>RIPV</th><th>LV（5 FP）</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="help">Pig A：4VP、即刻2 h；Pig B / C：4VP、长期28 d；Pig D：2VP + RF450、即刻2 h；Pig E / F：2VP + RF450、长期28 d。Pig C / F 保留“备用 / 追加”标记。LV每只猪固定5个独立策略，Footprint内固定 E3 / E5 / E7 为主要取材位点。</div>
   </div>`;
-}
-function rerandomizeAtrial(){
-  if(!requireAdmin('重新生成房性方案分配')||!requireGlobalEditable('重新生成房性方案分配'))return;const seed=document.getElementById('seedInput')?.value||DEFAULT_SEED,oldValue=state.animals.map(a=>`${a.id}:${a.workflow.armSide}`).join('|');pushHistory();
-  if(applyAtrialRandomization(state,seed,true)){appendAudit('RANDOMIZATION_ATRIAL',{path:'seed',oldValue,newValue:seed,note:'重新生成A/B一边一头分配'});renderCurrent();autoSave()}
 }
 
 function regenerateAllVent(){
   if(!requireAdmin('重新生成全部LV随机方案')||!requireGlobalEditable('重新生成LV随机方案'))return;
   if(hasStudyData()&&!confirm('将重建6只猪的LV Footprint随机表。已有LV Footprint数据会被清空，继续？'))return;
   const seed=document.getElementById('seedInput')?.value||state.seed||DEFAULT_SEED;pushHistory();
-  state.animals.forEach((a,i)=>generateVentFootprintRandomization(a,seed+'-VF-'+(i+1),false));
+  state.animals.forEach((a,i)=>generateVentFootprintRandomization(a,ventSeedFor(i,seed),false));
   appendAudit('RANDOMIZATION_VENT_ALL',{path:'animals.*.ventFootprints',newValue:seed,note:'重建全部LV Footprint随机表'});renderCurrent();autoSave();
 }
 function goAnimal(i){ui.animal=i;ui.crfAnimal=i;if(ui.mode==='analysis')ui.mode='field';renderCurrent()}
@@ -1341,7 +1368,7 @@ function renderField(){
   const host=document.getElementById('fieldMode'),a=getA(),t=ui.site==='VENT'?'Footprint级1:1随机':treatmentFor(a,ui.site);
   host.innerHTML=`<div class="field-nav">${pigTabs()}${siteTabs()}${stageTabs()}</div>${recordControlPanel(a,ui.animal)}
     <div class="focusbar">
-      <div class="focusbox"><div class="k">当前动物</div><div class="v">${esc(a.id)}｜随机码 ${esc(a.randomCode)}</div></div>
+      <div class="focusbox"><div class="k">当前动物</div><div class="v">${esc(a.id)}｜心房分组 ${esc(a.randomCode)}</div></div>
       <div class="focusbox"><div class="k">当前部位</div><div class="v">${SITE_NAMES[ui.site]}</div></div>
       <div class="focusbox"><div class="k">消融策略</div><div class="v">${ui.site==='VENT'?'5个Footprint：VP4 / VP2 / VP2+RF / RF / RF+VP2':strategyCell(t)}</div></div>
     </div>
@@ -1359,9 +1386,9 @@ function renderFieldWorkflow(main,a){
   main.innerHTML=`<div class="card"><div class="card-head">20260827 流程与时间点</div><div class="card-body">
     <div class="grid">
       ${field('研究阶段',`<input disabled class="locked" value="${esc(endpointGroupLabel(a))}">`)}
-      ${field('方案侧别',`<input disabled class="locked" value="${esc(w.armSide)}侧">`)}
+      ${field('心房分组',`<input disabled class="locked" value="${esc(a.randomCode)}">`)}
       ${field('动物角色',`<input disabled class="locked" value="${roleLabel(a)}">`)}
-      ${field('终点评估时间',bindInput(b+'.assessmentTime',w.assessmentTime))}
+      ${field('终点评估时间',`<input disabled class="locked" value="${esc(w.assessmentTime)}">`)}
       ${field('动脉通路条数',bindInput(b+'.arterialAccess',w.arterialAccess,'number','min="1"'))}
       ${field('静脉通路条数',bindInput(b+'.venousAccess',w.venousAccess,'number','min="1"'))}
       ${field('ICE + Vizigo 房间隔穿刺',selectBind(b+'.iceTransseptal',w.iceTransseptal,YESNO))}
@@ -1541,7 +1568,7 @@ function ventPrimaryMatrix(animalIndex,footprintIndex,f,part='all',scope='field'
 // ventMax已由ventFootprintMax取代
 
 function renderFieldVent(main,a){
-  if(!a.ventFootprints.length)generateVentFootprintRandomization(a,(state.seed||DEFAULT_SEED)+'-VF-'+(ui.animal+1),false);
+  if(!a.ventFootprints.length)generateVentFootprintRandomization(a,ventSeedFor(ui.animal,state.seed||DEFAULT_SEED),false);
   ui.ventIndex=Math.min(ui.ventIndex,a.ventFootprints.length-1);
   const f=a.ventFootprints[ui.ventIndex],ai=ui.animal,b=`animals.${ai}.ventFootprints.${ui.ventIndex}`;
   const chips=a.ventFootprints.map((x,i)=>`<button class="rowchip ${isPFAOnly(x.treatment)?'vp':x.treatment===RF450?'rf':'combo'} ${i===ui.ventIndex?'active':''}" onclick="ui.ventIndex=${i};renderCurrent()">${esc(x.id)}</button>`).join('');
@@ -1608,7 +1635,7 @@ function renderFieldVent(main,a){
 
 function rerandomizeVentCurrent(){
   const i=ui.animal,a=getA();if(!requireAdmin('重新随机LV Footprint')||!requireAnimalEditable(i,'重新随机LV Footprint'))return;const old=a.ventFootprints.map(f=>`${f.id}:${f.treatment}`).join('|');pushHistory();
-  if(generateVentFootprintRandomization(a,(state.seed||DEFAULT_SEED)+'-VF-'+(ui.animal+1),true)){
+  if(generateVentFootprintRandomization(a,ventSeedFor(ui.animal,state.seed||DEFAULT_SEED),true)){
     appendAudit(correctionFor(i).active?'DATA_CORRECTION':'RANDOMIZATION_VENT',{animalId:a.id,path:`animals.${i}.ventFootprints`,oldValue:old,newValue:a.ventFootprints.map(f=>`${f.id}:${f.treatment}`).join('|'),reason:correctionFor(i).active?correctionFor(i).reason:'',note:'重新随机5个LV Footprint'});ui.ventIndex=0;renderCurrent();autoSave();
   }
 }
@@ -1633,10 +1660,10 @@ function delSafety(row){const i=ui.animal,a=getA(),old=cloneData(a.safety[row]);
 function renderCRF(){
   const host=document.getElementById('crfMode'),a=state.animals[ui.crfAnimal],i=ui.crfAnimal;
   ui.animal=i;
-  host.innerHTML=`<div class="crf-workbar no-print"><div class="crf-nav">${state.animals.map((x,j)=>`<button class="${j===i?'active':''}" onclick="ui.crfAnimal=${j};ui.animal=${j};renderCurrent()">${esc(x.id)}</button>`).join('')}</div><div class="crf-workbar-note">${esc(endpointGroupLabel(a))} · ${roleLabel(a)} · ${esc(a.workflow.armSide)}侧</div></div>
+  host.innerHTML=`<div class="crf-workbar no-print"><div class="crf-nav">${state.animals.map((x,j)=>`<button class="${j===i?'active':''}" onclick="ui.crfAnimal=${j};ui.animal=${j};renderCurrent()">${esc(x.id)}</button>`).join('')}</div><div class="crf-workbar-note">${esc(endpointGroupLabel(a))} · ${roleLabel(a)} · ${esc(a.randomCode)}</div></div>
   ${recordControlPanel(a,i)}
   <div class="crf-sheet">
-    <div class="crf-cover"><div><div class="eyebrow">Complete case report form</div><h2>${esc(a.id)} · 完整 CRF</h2></div><div><div class="label">终点组别</div><div class="value">${esc(endpointGroupLabel(a))}</div></div><div><div class="label">分配信息</div><div class="value">${esc(a.workflow.armSide)}侧 · ${roleLabel(a)}</div></div><div><div class="label">录入状态</div><div class="value">${a.completion==='Completed'?'已完成':a.completion==='In progress'?'进行中':a.completion==='Withdrawn'?'已退出':'待完成'}</div></div></div>
+    <div class="crf-cover"><div><div class="eyebrow">Complete case report form</div><h2>${esc(a.id)} · 完整 CRF</h2></div><div><div class="label">终点组别</div><div class="value">${esc(endpointGroupLabel(a))}</div></div><div><div class="label">心房分组</div><div class="value">${esc(a.randomCode)} · ${roleLabel(a)}</div></div><div><div class="label">录入状态</div><div class="value">${a.completion==='Completed'?'已完成':a.completion==='In progress'?'进行中':a.completion==='Withdrawn'?'已退出':'待完成'}</div></div></div>
     <nav class="crf-section-index no-print" aria-label="CRF分区导航"><a href="#crf-a"><b>A</b>基本信息</a><a href="#crf-b"><b>B</b>方案分配</a><a href="#crf-c"><b>C</b>心房消融</a><a href="#crf-v"><b>V</b>LV F01–F05</a><a href="#crf-d"><b>D</b>标测阻滞</a><a href="#crf-e"><b>E</b>心房组织学</a><a href="#crf-f"><b>F</b>安全性</a><a href="#crf-g"><b>G</b>审核</a></nav>
     <section class="crf-section" id="crf-a">${crfAnimalInfo(a,i)}</section>
     <section class="crf-section" id="crf-b">${crfRandomization(a,i)}</section>
@@ -1650,7 +1677,7 @@ function renderCRF(){
 }
 function crfAnimalInfo(a,i){const b=`animals.${i}`,w=a.workflow,wb=b+'.workflow';return `<div class="section-title"><span>A</span>动物基本信息与流程节点</div>
   <div class="crf-field-group"><div class="crf-subhead">动物与手术信息</div><div class="grid">
-  ${field('动物编号',bindInput(b+'.id',a.id))}
+  ${field('动物编号',`<input disabled class="locked" value="${esc(a.id)}">`)}
   ${field('性别',selectBind(b+'.sex',a.sex,[['',''],['Male','雄性'],['Female','雌性']]))}
   ${field('体重 (kg)',bindInput(b+'.weight',a.weight,'number','step="0.1"'))}
   ${field('手术日期',bindInput(b+'.procedureDate',a.procedureDate,'date'))}
@@ -1663,9 +1690,9 @@ function crfAnimalInfo(a,i){const b=`animals.${i}`,w=a.workflow,wb=b+'.workflow'
   </div></div>
   <div class="crf-field-group"><div class="crf-subhead">方案节点、通路与动物级悬空阻抗</div><div class="grid">
   ${field('研究阶段',`<input disabled class="locked" value="${esc(endpointGroupLabel(a))}">`)}
-  ${field('方案侧别',`<input disabled class="locked" value="${esc(w.armSide)}侧">`)}
+  ${field('心房分组',`<input disabled class="locked" value="${esc(a.randomCode)}">`)}
   ${field('动物角色',`<input disabled class="locked" value="${roleLabel(a)}">`)}
-  ${field('终点时间点',bindInput(wb+'.assessmentTime',w.assessmentTime))}
+  ${field('终点时间点',`<input disabled class="locked" value="${esc(w.assessmentTime)}">`)}
   ${field('动脉通路条数',bindInput(wb+'.arterialAccess',w.arterialAccess,'number','min="1"'))}
   ${field('静脉通路条数',bindInput(wb+'.venousAccess',w.venousAccess,'number','min="1"'))}
   ${field('ICE + Vizigo 房间隔穿刺',selectBind(wb+'.iceTransseptal',w.iceTransseptal,YESNO))}
@@ -1677,7 +1704,7 @@ function crfAnimalInfo(a,i){const b=`animals.${i}`,w=a.workflow,wb=b+'.workflow'
   </div><div class="help">悬空阻抗为动物级基准：每只猪 LA / LV 各录入一次；每个 PFA / RF 位置的即时值在相应消融矩阵中分别录入为“PFA前阻抗”与“RF前阻抗”。</div></div>`}
 
 function crfRandomization(a,i){return `<div class="section-title"><span>B</span>方案分配</div>
-  <div class="table-wrap"><table class="crf-table-compact"><thead><tr><th>侧别</th><th>终点</th><th>角色</th><th>MI</th><th>Roof</th><th>RIPV</th><th>LV（5 FP）</th></tr></thead><tbody><tr><td class="center"><b>${esc(a.workflow.armSide||a.randomCode)}</b></td><td>${esc(endpointGroupLabel(a))}</td><td>${roleLabel(a)}</td><td>${strategyCell(a.miTreatment,'',true)}</td><td>${strategyCell(a.roofTreatment,'',true)}</td><td>${strategyCell(a.rpvTreatment,'',true)}</td><td><div class="strategy-stack">${a.ventFootprints.map(f=>strategyCell(f.treatment,f.id,true)).join('')}</div></td></tr></tbody></table></div>
+  <div class="table-wrap"><table class="crf-table-compact"><thead><tr><th>心房分组</th><th>终点</th><th>角色</th><th>MI</th><th>Roof</th><th>RIPV</th><th>LV（5 FP）</th></tr></thead><tbody><tr><td class="center"><b>${esc(a.randomCode)}</b></td><td>${esc(endpointGroupLabel(a))}</td><td>${roleLabel(a)}</td><td>${strategyCell(a.miTreatment,'',true)}</td><td>${strategyCell(a.roofTreatment,'',true)}</td><td>${strategyCell(a.rpvTreatment,'',true)}</td><td><div class="strategy-stack">${a.ventFootprints.map(f=>strategyCell(f.treatment,f.id,true)).join('')}</div></td></tr></tbody></table></div>
   <div class="help">本区仅显示本动物的方案分配；实际能量参数和顺序在 C 区记录。</div>`}
 function atrialAblationTable(a,i,site){
   const t=treatmentFor(a,site),vp=a.ablation[site].vp,rf=a.ablation[site].rf;
@@ -1739,7 +1766,7 @@ function crfAdmin(a,i){const b=`animals.${i}`;return `<div class="section-title"
 
 function lineResult(a,site){
   const ss=a.pathology[site],sum=pathSummary(ss),m=a.mapping[site];
-  return {animal:a.id,randomCode:a.randomCode,phase:endpointLabel(a),role:a.workflow.isBackup==='Yes'?'备用':'核心',site:SITE_NAMES[site],treatment:treatmentFor(a,site),
+  return {animal:a.id,randomCode:a.randomCode,phase:endpointLabel(a),role:roleLabel(a),site:SITE_NAMES[site],treatment:treatmentFor(a,site),
     immediateBlock:m.immediateBlock?.finalBlock||'',d30Block:m.d30Block?.finalBlock||'',
     sampledN:sum.n,transmuralN:sum.yes,transmuralPct:sum.trans,meanDepth:sum.mean,maxDepth:sum.max};
 }
@@ -1760,7 +1787,7 @@ function ventByAnimal(a,treatment){
 function renderAnalysis(){
   const h=document.getElementById('analysisMode'),completed=state.animals.filter(a=>a.completion==='Completed').length;
   const lineRows=['2 h','28天'].flatMap(phase=>ATRIAL_SITES.flatMap(site=>[PFA4,PFA2_RF450].map(t=>({phase,site,t,...groupLine(site,t,phase)})).filter(x=>x.n)));
-  const ventAnimal=state.animals.map(a=>({id:a.id,phase:endpointLabel(a),role:a.workflow.isBackup==='Yes'?'备用':'核心',values:Object.fromEntries(VENT_STRATEGIES.map(t=>[t,ventByAnimal(a,t)]))}));
+  const ventAnimal=state.animals.map(a=>({id:a.id,phase:endpointLabel(a),role:roleLabel(a),values:Object.fromEntries(VENT_STRATEGIES.map(t=>[t,ventByAnimal(a,t)]))}));
   const strategyStats=VENT_STRATEGIES.map(t=>{
     const acute=ventAnimal.filter(x=>x.phase==='2 h').map(x=>x.values[t].mean).filter(x=>x!=null),long=ventAnimal.filter(x=>x.phase==='28天').map(x=>x.values[t].mean).filter(x=>x!=null);
     return {t,acute,long,acuteN:acute.length,longN:long.length};
@@ -1803,7 +1830,7 @@ async function collectSystemChecks(){
   const checks=[];
   checks.push(validationCheck('schema','数据结构',state.version===PROTOCOL_VERSION&&state.protocolVersion===PROTOCOL_VERSION&&state.animals.length===6,`方案 ${state.protocolVersion||'—'} · 动物 ${state.animals.length}`));
   const ids=state.animals.map(a=>a.id);checks.push(validationCheck('animal_ids','动物编号唯一',new Set(ids).size===6&&ids.every(Boolean),ids.join(' / ')));
-  const pairOk=[[0,1],[2,3],[4,5]].every(pair=>new Set(pair.map(i=>state.animals[i].workflow.armSide)).size===2);checks.push(validationCheck('randomization','A/B 一边一头随机结构',pairOk,'P01/02、P03/04、P05/06 各含 A 与 B'));
+  const allocationOk=state.animals.every((a,i)=>{const p=PIG_PLAN[i],expected=p.armSide==='A'?PFA4:PFA2_RF450;return a.id===p.id&&a.randomCode===p.group&&a.workflow.armSide===p.armSide&&a.workflow.studyPhase===p.studyPhase&&a.workflow.assessmentTime===p.assessmentTime&&a.workflow.isBackup===p.isBackup&&normalizeStrategy(a.miTreatment)===expected&&normalizeStrategy(a.roofTreatment)===expected&&normalizeStrategy(a.rpvTreatment)===PFA2_RF450});checks.push(validationCheck('allocation','Pig A–F 固定分组与终点',allocationOk,'Pig A/D：2 h；Pig B/C/E/F：28 d；Pig A–C：4VP；Pig D–F：2VP+450RF'));
   const atrialRowsOk=state.animals.every(a=>['MI','ROOF'].every(site=>a.ablation[site].vp.length===DEFAULT_ATRIAL_VP_ROWS&&a.ablation[site].rf.length===DEFAULT_ATRIAL_RF_ROWS)&&a.ablation.RPV.vp.length===DEFAULT_RPV_VP_ROWS&&a.ablation.RPV.rf.length===DEFAULT_RPV_RF_ROWS);checks.push(validationCheck('atrial_rows','心房消融位置结构',atrialRowsOk,'MI / Roof：VP 6点 + RF 10点；RIPV：VP 3点 + RF 6点'));
   const impedanceSchemaOk=state.animals.every(a=>Object.hasOwn(a.workflow,'floatingImpedanceLA')&&Object.hasOwn(a.workflow,'floatingImpedanceLV')&&ATRIAL_SITES.every(site=>a.ablation[site].vp.every(x=>Object.hasOwn(x,'impPrePFA')&&Object.hasOwn(x,'impPostPFA'))&&a.ablation[site].rf.every(x=>Object.hasOwn(x,'impPreRF')&&Object.hasOwn(x,'impPostRF')))&&a.ventFootprints.every(f=>f.primarySites.every(s=>Object.hasOwn(s,'impPrePFA')&&Object.hasOwn(s,'impPostPFA')&&Object.hasOwn(s,'impPreRF')&&Object.hasOwn(s,'impPostRF'))&&f.exploratorySites.every(s=>Object.hasOwn(s,'impPrePFA')&&Object.hasOwn(s,'impPostPFA'))));checks.push(validationCheck('impedance_schema','阻抗字段层级',impedanceSchemaOk,'动物级悬空阻抗唯一；PFA与RF的前后阻抗仅属于各自能量位置'));
   const ventOk=state.animals.every(a=>ventStrategySetComplete(a.ventFootprints));checks.push(validationCheck('vent_strategies','LV 5策略完整',ventOk,'每只动物各1个 VP4、VP2、VP2+RF、RF、RF+VP2'));
@@ -1842,7 +1869,7 @@ function renderGovernance(){
 function pigCard(a,i){
   const score=completionScore(a);
   const status=a.completion==='Completed'?'已完成':'待完成';
-  return `<div class="pig-card" onclick="ui.animal=${i};ui.crfAnimal=${i};setMode('field')"><div class="id" style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span>${esc(a.id)}</span><span class="badge ${a.completion==='Completed'?'green':'gray'}">${status}</span></div><div style="margin:6px 0 3px"><span class="phase-pill ${endpointLabel(a)==='2 h'?'acute':'long'}">${endpointLabel(a)==='2 h'?'2 h':'28 d'}</span> <span class="badge gray">${a.workflow.isBackup==='Yes'?'备用':'核心'} · ${esc(a.workflow.armSide)}侧</span></div><div class="progress"><span style="width:${score}%"></span></div><div class="help">CRF 完成度 ${score}% · 点击进入录入</div></div>`
+  return `<div class="pig-card" onclick="ui.animal=${i};ui.crfAnimal=${i};setMode('field')"><div class="id" style="display:flex;align-items:center;justify-content:space-between;gap:8px"><span>${esc(a.id)}</span><span class="badge ${a.completion==='Completed'?'green':'gray'}">${status}</span></div><div style="margin:6px 0 3px"><span class="phase-pill ${endpointLabel(a)==='2 h'?'acute':'long'}">${endpointLabel(a)==='2 h'?'2 h':'28 d'}</span> <span class="badge gray">${a.workflow.isBackup==='Yes'?'备用 / 追加':'核心'} · ${esc(a.randomCode)}</span></div><div class="progress"><span style="width:${score}%"></span></div><div class="help">CRF 完成度 ${score}% · 点击进入录入</div></div>`
 }
 
 function completionScore(a){
@@ -1856,16 +1883,16 @@ function completionScore(a){
   return Math.round(done/total*100)
 }
 function exportLineCSV(){const rows=state.animals.flatMap(a=>ATRIAL_SITES.map(s=>lineResult(a,s))).map(x=>{const animal=state.animals.find(a=>a.id===x.animal);return ({
-  '动物编号':x.animal,'随机码':x.randomCode,'阶段':endpointLabel(animal),'LA悬空阻抗Ω':animal.workflow.floatingImpedanceLA,'部位':x.site,'策略':tLabel(x.treatment),'即刻阻滞':yn(x.immediateBlock),'终点阻滞':yn(x.d30Block),
+  '动物编号':x.animal,'心房分组':x.randomCode,'阶段':endpointLabel(animal),'LA悬空阻抗Ω':animal.workflow.floatingImpedanceLA,'部位':x.site,'策略':tLabel(x.treatment),'即刻阻滞':yn(x.immediateBlock),'终点阻滞':yn(x.d30Block),
   '可评价采样点':x.sampledN,'透壁采样点':x.transmuralN,'采样点透壁比例%':x.transmuralPct??'','平均染色深度mm':x.meanDepth??'','最大染色深度mm':x.maxDepth??''
 })});download('MI_Roof_RIPV_线级结果_20260827.csv',csv(rows),'text/csv;charset=utf-8')}
 function exportAtrialPathCSV(){const rows=[];state.animals.forEach(a=>ATRIAL_SITES.forEach(s=>a.pathology[s].forEach(x=>rows.push({
-  '动物编号':a.id,'随机码':a.randomCode,'LA悬空阻抗Ω':a.workflow.floatingImpedanceLA,'部位':SITE_NAMES[s],'策略':tLabel(treatmentFor(a,s)),'采样点':x.label,'组织块':x.blockId,'H&E':x.heId,'Masson':x.massonId,'H&E大体评价':s==='MI'?a.ttc.MI.heGross:'','Masson大体评价':s==='MI'?a.ttc.MI.massonGross:'','壁厚mm':x.wall,'病灶深度mm':x.depth,'病灶宽度mm':x.width,'透壁':yn(x.transmural),'残余心肌桥mm':x.bridge
+  '动物编号':a.id,'心房分组':a.randomCode,'LA悬空阻抗Ω':a.workflow.floatingImpedanceLA,'部位':SITE_NAMES[s],'策略':tLabel(treatmentFor(a,s)),'采样点':x.label,'组织块':x.blockId,'H&E':x.heId,'Masson':x.massonId,'H&E大体评价':s==='MI'?a.ttc.MI.heGross:'','Masson大体评价':s==='MI'?a.ttc.MI.massonGross:'','壁厚mm':x.wall,'病灶深度mm':x.depth,'病灶宽度mm':x.width,'透壁':yn(x.transmural),'残余心肌桥mm':x.bridge
 }))));download('MI_Roof_RIPV_染色采样点_20260827.csv',csv(rows),'text/csv;charset=utf-8')}
 
 function exportVentricularCSV(){
   const rows=[];state.animals.forEach(a=>a.ventFootprints.forEach(f=>rows.push({
-    '动物编号':a.id,'阶段':endpointLabel(a),'角色':a.workflow.isBackup==='Yes'?'备用':'核心','LV悬空阻抗Ω':a.workflow.floatingImpedanceLV,'Footprint编号':f.id,'策略':tLabel(f.treatment),'预设能量顺序':f.sequence||strategySequence(f.treatment),'LV区域':f.anatomicalSite,
+    '动物编号':a.id,'心房分组':a.randomCode,'阶段':endpointLabel(a),'角色':roleLabel(a),'LV悬空阻抗Ω':a.workflow.floatingImpedanceLV,'Footprint编号':f.id,'策略':tLabel(f.treatment),'预设能量顺序':f.sequence||strategySequence(f.treatment),'LV区域':f.anatomicalSite,
     'VP次数':hasPFA(f.treatment)?f.vpCount:'','实际有效电极数':hasPFA(f.treatment)?f.effectiveElectrodes:'','TPI阳性占比%':hasPFA(f.treatment)?f.tpi:'',
     '主要index位点':(f.primarySites||[]).map(s=>s.electrode).join('/'),
     '主要切面可评价数':(f.primarySites||[]).filter(s=>n(s.depth)!=null).length,
@@ -1876,7 +1903,7 @@ function exportVentricularCSV(){
 
 function exportVentSiteCSV(){
   const rows=[];state.animals.forEach(a=>a.ventFootprints.forEach(f=>(f.primarySites||[]).forEach((s,i)=>rows.push({
-    '动物编号':a.id,'阶段':endpointLabel(a),'角色':a.workflow.isBackup==='Yes'?'备用':'核心','LV悬空阻抗Ω':a.workflow.floatingImpedanceLV,'Footprint编号':f.id,'策略':tLabel(f.treatment),'预设能量顺序':f.sequence||strategySequence(f.treatment),'LV区域':f.anatomicalSite,'主要位点序号':i+1,'电极位点':s.electrode,
+    '动物编号':a.id,'心房分组':a.randomCode,'阶段':endpointLabel(a),'角色':roleLabel(a),'LV悬空阻抗Ω':a.workflow.floatingImpedanceLV,'Footprint编号':f.id,'策略':tLabel(f.treatment),'预设能量顺序':f.sequence||strategySequence(f.treatment),'LV区域':f.anatomicalSite,'主要位点序号':i+1,'电极位点':s.electrode,
     'VP次数':hasPFA(f.treatment)?f.vpCount:'','有效电极数':hasPFA(f.treatment)?f.effectiveElectrodes:'','TPI阳性占比%':hasPFA(f.treatment)?f.tpi:'',
     'PFA前阻抗Ω':hasPFA(f.treatment)?s.impPrePFA:'','PFA后阻抗Ω':hasPFA(f.treatment)?s.impPostPFA:'','RF前阻抗Ω':hasRF(f.treatment)?s.impPreRF:'','RF后阻抗Ω':hasRF(f.treatment)?s.impPostRF:'',
     '实际AI':hasRF(f.treatment)?s.rfActualAI:'','RF时间s':hasRF(f.treatment)?s.rfDuration:'','功率W':hasRF(f.treatment)?s.rfPower:'',
@@ -1887,14 +1914,14 @@ function exportVentSiteCSV(){
 }
 function exportVentExploratoryCSV(){
   const rows=[];state.animals.forEach(a=>a.ventFootprints.forEach(f=>(f.exploratorySites||[]).forEach((s,i)=>rows.push({
-    '动物编号':a.id,'阶段':endpointLabel(a),'角色':a.workflow.isBackup==='Yes'?'备用':'核心','LV悬空阻抗Ω':a.workflow.floatingImpedanceLV,'Footprint编号':f.id,'策略':tLabel(f.treatment),'LV区域':f.anatomicalSite,'探索性位点序号':i+1,'电极位点':s.electrode,
+    '动物编号':a.id,'心房分组':a.randomCode,'阶段':endpointLabel(a),'角色':roleLabel(a),'LV悬空阻抗Ω':a.workflow.floatingImpedanceLV,'Footprint编号':f.id,'策略':tLabel(f.treatment),'LV区域':f.anatomicalSite,'探索性位点序号':i+1,'电极位点':s.electrode,
     'PFA前阻抗Ω':hasPFA(f.treatment)?s.impPrePFA:'','PFA后阻抗Ω':hasPFA(f.treatment)?s.impPostPFA:'','TTC':s.ttcId,'H&E':s.heId,'Masson':s.massonId,'壁厚mm':s.wall,
     '病灶深度mm':s.depth,'透壁':yn(s.transmural),'备注':s.note,
     '分析定位':hasPFA(f.treatment)&&hasRF(f.treatment)?'联合Footprint内非RF区域，仅探索性':hasRF(f.treatment)?'RF策略额外取材，仅探索性':'VP策略额外取材，仅探索性'
   }))));download('LV_探索性额外取材_20260827.csv',csv(rows),'text/csv;charset=utf-8')
 }
 function exportAblationCSV(){
-  const rows=[],base=(a,s,t,type,index)=>({'动物编号':a.id,'阶段':endpointLabel(a),'LA悬空阻抗Ω':a.workflow.floatingImpedanceLA,'部位':SITE_NAMES[s],'策略':tLabel(t),'记录类型':type,'编号':index,'VP次数':'','TPI%':'','PFA前阻抗Ω':'','PFA后阻抗Ω':'','RF前阻抗Ω':'','RF后阻抗Ω':'','目标AI':'','实际AI':'','RF时间s':'','功率W':'','平均CFg':'','RF阻抗下降Ω':'','点间距mm':'','稳定':'','备注':''});
+  const rows=[],base=(a,s,t,type,index)=>({'动物编号':a.id,'心房分组':a.randomCode,'阶段':endpointLabel(a),'LA悬空阻抗Ω':a.workflow.floatingImpedanceLA,'部位':SITE_NAMES[s],'策略':tLabel(t),'记录类型':type,'编号':index,'VP次数':'','TPI%':'','PFA前阻抗Ω':'','PFA后阻抗Ω':'','RF前阻抗Ω':'','RF后阻抗Ω':'','目标AI':'','实际AI':'','RF时间s':'','功率W':'','平均CFg':'','RF阻抗下降Ω':'','点间距mm':'','稳定':'','备注':''});
   state.animals.forEach(a=>ATRIAL_SITES.forEach(s=>{
     const t=treatmentFor(a,s);
     a.ablation[s].vp.forEach((x,i)=>rows.push({...base(a,s,t,'Varipulse位置',i+1),'VP次数':x.count,'TPI%':x.tpi,'PFA前阻抗Ω':hasPFA(t)?x.impPrePFA:'','PFA后阻抗Ω':hasPFA(t)?x.impPostPFA:'','稳定':yn(x.stable),'备注':x.note||x.alarm}));
@@ -1902,7 +1929,7 @@ function exportAblationCSV(){
   }));
   download('消融质量_20260827.csv',csv(rows),'text/csv;charset=utf-8')
 }
-function exportSafetyCSV(){const rows=[];state.animals.forEach(a=>a.safety.forEach((x,i)=>rows.push({'动物编号':a.id,'序号':i+1,'事件':x.type,'时间':x.timepoint,'部位':x.site,'位置':x.position,'最大ST抬高mm':x.stMax,'持续时间':x.duration,'自行恢复':yn(x.selfResolve),'处理':x.treatment,'备注':x.note})));download('安全事件_v8.csv',csv(rows),'text/csv;charset=utf-8')}
+function exportSafetyCSV(){const rows=[];state.animals.forEach(a=>a.safety.forEach((x,i)=>rows.push({'动物编号':a.id,'心房分组':a.randomCode,'阶段':endpointLabel(a),'序号':i+1,'事件':x.type,'时间':x.timepoint,'部位':x.site,'位置':x.position,'最大ST抬高mm':x.stMax,'持续时间':x.duration,'自行恢复':yn(x.selfResolve),'处理':x.treatment,'备注':x.note})));download('安全事件_v8.csv',csv(rows),'text/csv;charset=utf-8')}
 
 function printCurrent(){ui.mode='crf';renderCurrent();setTimeout(()=>window.print(),80)}
 function printAll(){
@@ -1981,7 +2008,7 @@ window.addEventListener('beforeunload',saveLocal);
   ensureState();sessionUserId=safeSessionGet();if(sessionUserId&&!state.compliance.users.some(u=>u.id===sessionUserId)){sessionUserId='';safeSessionSet('')}
   if(currentUser()?.role==='Administrator'&&safeAdminAuthGet()!=='ADMIN_AUTH_V1'){sessionUserId='';safeSessionSet('');safeAdminAuthSet('')}
   renderAll();
-  if(schemaMigrationApplied){saveLocal();schemaMigrationApplied=false;setStatus('已升级为 LV 五策略方案并保留既有数据')}
+  if(schemaMigrationApplied){saveLocal();schemaMigrationApplied=false;setStatus('已升级为 Pig A–Pig F 固定分组方案并保留既有数据')}
   if(!isLoggedIn())setTimeout(showLoginDialog,80);
 })();
 </script>

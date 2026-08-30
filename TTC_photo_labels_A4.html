@@ -68,8 +68,8 @@ h1{font-size:20px;line-height:1.2;margin:0;letter-spacing:-.02em}.subtitle{font-
     </div>
     <div class="controls">
       <div class="control"><label for="animal">Animal ID</label><select id="animal"></select></div>
-      <div class="control"><label for="endpoint">Study endpoint</label><select id="endpoint"><option value="2 h">Acute 2 h</option><option value="28 d">Long-term 28 d</option></select></div>
-      <div class="control"><label for="side">Atrial allocation</label><select id="side"><option value="A">Arm A · VP</option><option value="B">Arm B · VP + RF</option></select></div>
+      <div class="control"><label for="endpoint">Study endpoint</label><select id="endpoint" disabled><option value="2 h">Acute 2 h</option><option value="28 d">Long-term 28 d</option></select></div>
+      <div class="control"><label for="side">Atrial group</label><select id="side" disabled><option value="A">4VP</option><option value="B">2VP + 450RF</option></select></div>
       <div class="control"><label for="procedureDate">Procedure / harvest date</label><input id="procedureDate" type="date"></div>
       <div class="control"><label for="ttcTime">TTC staining time</label><input id="ttcTime" type="time"></div>
       <div class="control"><label for="batch">TTC batch</label><input id="batch" placeholder="e.g. TTC-01"></div>
@@ -83,10 +83,10 @@ h1{font-size:20px;line-height:1.2;margin:0;letter-spacing:-.02em}.subtitle{font-
       <div class="control"><label>RF 450</label><input id="fp-rf" maxlength="3" placeholder="F__"></div>
       <div class="control"><label>RF + VP 2×</label><input id="fp-rfvp2" maxlength="3" placeholder="F__"></div>
     </div>
-    <div class="status-row"><span>Atrial allocation: Arm A MI / Roof = VP 4×; Arm B MI / Roof = VP 2× + SF 450 RF; RIPV = VP 2× + SF 450 RF in both arms.</span><span id="sourceStatus" class="status-ok">Using protocol defaults</span></div>
+    <div class="status-row"><span>Fixed allocation: Pig A-C MI / Roof = VP 4×; Pig D-F MI / Roof = VP 2× + SF 450 RF; RIPV = VP 2× + SF 450 RF in all pigs.</span><span id="sourceStatus" class="status-ok">Using protocol defaults</span></div>
   </section>
 
-  <div class="screen-note no-print"><b>Instructions:</b> Select an animal to populate its arm, endpoint, and F01-F05 assignment. If the CRF allocation was rerandomized, choose "Load current CRF allocation." Each label has a true-size 0-8 cm ruler. Print at 100% scale, do not use "Fit to page," and disable browser headers and footers.</div>
+  <div class="screen-note no-print"><b>Instructions:</b> Select Pig A-F to populate its fixed atrial group, endpoint, and F01-F05 assignment. To use the latest LV randomization, choose "Load current CRF allocation." Each label has a true-size 0-8 cm ruler. Print at 100% scale, do not use "Fit to page," and disable browser headers and footers.</div>
 
   <div class="preview-wrap">
     <section class="sheet" aria-label="A4 TTC photo labels">
@@ -106,13 +106,14 @@ const STRATEGY={
   rfvp2:{label:'SF 450 RF + VP 2× PFA',tone:'purple'}
 };
 const DEFAULTS={
-  P01:{side:'B',endpoint:'2 h',fp:{vp2rf:'F01',rfvp2:'F02',vp4:'F03',rf:'F04',vp2:'F05'}},
-  P02:{side:'A',endpoint:'2 h',fp:{vp2rf:'F01',rf:'F02',vp4:'F03',vp2:'F04',rfvp2:'F05'}},
-  P03:{side:'A',endpoint:'28 d',fp:{rfvp2:'F01',vp2rf:'F02',vp2:'F03',rf:'F04',vp4:'F05'}},
-  P04:{side:'B',endpoint:'28 d',fp:{vp2:'F01',vp2rf:'F02',rf:'F03',vp4:'F04',rfvp2:'F05'}},
-  P05:{side:'B',endpoint:'28 d',fp:{vp2:'F01',vp2rf:'F02',rf:'F03',vp4:'F04',rfvp2:'F05'}},
-  P06:{side:'A',endpoint:'28 d',fp:{rf:'F01',vp2:'F02',vp2rf:'F03',vp4:'F04',rfvp2:'F05'}}
+  'Pig A':{side:'A',endpoint:'2 h',fp:{vp2rf:'F01',rf:'F02',vp4:'F03',vp2:'F04',rfvp2:'F05'}},
+  'Pig B':{side:'A',endpoint:'28 d',fp:{rfvp2:'F01',vp2rf:'F02',vp2:'F03',rf:'F04',vp4:'F05'}},
+  'Pig C':{side:'A',endpoint:'28 d',fp:{rf:'F01',vp2:'F02',vp2rf:'F03',vp4:'F04',rfvp2:'F05'}},
+  'Pig D':{side:'B',endpoint:'2 h',fp:{vp2rf:'F01',rfvp2:'F02',vp4:'F03',rf:'F04',vp2:'F05'}},
+  'Pig E':{side:'B',endpoint:'28 d',fp:{vp2:'F01',vp2rf:'F02',rf:'F03',vp4:'F04',rfvp2:'F05'}},
+  'Pig F':{side:'B',endpoint:'28 d',fp:{vp2:'F01',vp2rf:'F02',rf:'F03',vp4:'F04',rfvp2:'F05'}}
 };
+const LEGACY_ID_BY_PIG={'Pig A':'P02','Pig B':'P03','Pig C':'P06','Pig D':'P01','Pig E':'P04','Pig F':'P05'};
 const CARD_PLAN=[
   {chamber:'LA',code:'MI',site:'Mitral Isthmus Line',strategy:'atrial'},
   {chamber:'LA',code:'ROOF',site:'Left Atrial Roof Line',strategy:'atrial'},
@@ -135,13 +136,16 @@ function strategyKey(value){
   return 'vp4';
 }
 function currentAnimal(){return $('animal').value}
-function roleFor(id){return ['P05','P06'].includes(id)?'Backup / Add-on':'Core'}
+function roleFor(id){return ['Pig C','Pig F'].includes(id)?'Backup / Add-on':'Core'}
+function groupLabel(side){return side==='A'?'4VP':'2VP + 450RF'}
 function dataFor(id){
   const fallback=DEFAULTS[id];if(!crfState)return fallback;
-  const a=crfState.animals?.find(x=>x.id===id);if(!a)return fallback;
+  const a=crfState.animals?.find(x=>x.id===id)||crfState.animals?.find(x=>x.id===LEGACY_ID_BY_PIG[id]);if(!a)return fallback;
   const fp={...fallback.fp};(a.ventFootprints||[]).forEach(f=>{fp[strategyKey(f.treatment)]=f.id||fp[strategyKey(f.treatment)]});
   const assessment=String(a.workflow?.assessmentTime||'');
-  return {side:a.workflow?.armSide||a.randomCode||fallback.side,endpoint:assessment.includes('28')?'28 d':assessment.includes('2')?'2 h':fallback.endpoint,fp};
+  const group=String(a.randomCode||'');
+  const side=a.workflow?.armSide||(group.includes('2VP')?'B':group.includes('4VP')?'A':fallback.side);
+  return {side,endpoint:assessment.includes('28')?'28 d':assessment.includes('2')?'2 h':fallback.endpoint,fp};
 }
 function applyAnimalDefaults(){
   const d=dataFor(currentAnimal());$('side').value=d.side;$('endpoint').value=d.endpoint;
@@ -152,7 +156,7 @@ function loadCRFState(){
   catch(error){crfState=null;$('sourceStatus').textContent='CRF data unavailable; using protocol defaults';applyAnimalDefaults()}
 }
 function resetForm(){
-  crfState=null;$('animal').value='P01';$('procedureDate').value='';$('ttcTime').value='';$('batch').value='';$('operator').value='';$('sourceStatus').textContent='Using protocol defaults';applyAnimalDefaults();
+  crfState=null;$('animal').value='Pig A';$('procedureDate').value='';$('ttcTime').value='';$('batch').value='';$('operator').value='';$('sourceStatus').textContent='Using protocol defaults';applyAnimalDefaults();
 }
 function cardHTML(card,index){
   const id=currentAnimal(),side=$('side').value,endpoint=$('endpoint').value,role=roleFor(id);
@@ -162,14 +166,14 @@ function cardHTML(card,index){
   return `<article class="label-card tone-${s.tone}">
     <div class="card-head"><div class="site"><small>${esc(card.chamber)} · ${esc(card.code)} · ${String(index+1).padStart(2,'0')} / 08</small>${esc(card.site)}</div><div class="animal">${esc(id)}</div></div>
     <div class="strategy"><div class="strategy-main">${fp?`<span class="fp-id">${esc(fp)}</span>`:''}${esc(s.label)}</div></div>
-    <div class="meta-strip"><span>${esc(endpoint)}</span><span>Arm ${esc(side)}</span><span>${esc(role)}</span>${batch?`<span class="batch">${esc(batch)}</span>`:''}</div>
+    <div class="meta-strip"><span>${esc(endpoint)}</span><span>${esc(groupLabel(side))}</span><span>${esc(role)}</span>${batch?`<span class="batch">${esc(batch)}</span>`:''}</div>
     <div class="specimen-area" aria-label="Specimen placement area"><div class="specimen-blank" aria-hidden="true"></div><div class="scale-ruler" aria-label="True-size ruler, 0 to 8 centimeters"><div class="ruler-labels"><span style="left:0">0</span><span style="left:12.5%">1</span><span style="left:25%">2</span><span style="left:37.5%">3</span><span style="left:50%">4</span><span style="left:62.5%">5</span><span style="left:75%">6</span><span style="left:87.5%">7</span><span style="left:100%">8 cm</span></div><div class="ruler-ticks"></div></div></div>
   </article>`;
 }
 function render(){
   const id=currentAnimal(),side=$('side').value,endpoint=$('endpoint').value,date=$('procedureDate').value,ttc=$('ttcTime').value,operator=$('operator').value.trim();
   $('labelGrid').innerHTML=CARD_PLAN.map(cardHTML).join('');
-  $('sheetMeta').innerHTML=`<strong>${esc(id)} · ${esc(endpoint)} · Arm ${esc(side)}</strong><br>${esc(roleFor(id))}${date?' · '+esc(date):''}${ttc?' · TTC '+esc(ttc):''}${operator?' · Recorder: '+esc(operator):''}`;
+  $('sheetMeta').innerHTML=`<strong>${esc(id)} · ${esc(endpoint)} · ${esc(groupLabel(side))}</strong><br>${esc(roleFor(id))}${date?' · '+esc(date):''}${ttc?' · TTC '+esc(ttc):''}${operator?' · Recorder: '+esc(operator):''}`;
 }
 function init(){
   $('animal').innerHTML=Object.keys(DEFAULTS).map(id=>`<option value="${id}">${id}</option>`).join('');
